@@ -15,7 +15,8 @@ import { CircleAlert, Search, Sparkles } from "lucide-react";
 const demoScenarios = [
   {
     industry: "Industrial supply",
-    query: "Best lifting equipment supplier Pretoria",
+    query:
+      "I'm sourcing for a new mining operation in Limpopo and need a BBBEE Level 1 verified lifting equipment supplier with crane inspection capability. Who are the most reliable suppliers in Pretoria or Gauteng I should consider?",
     location: "Pretoria, South Africa",
     findings: {
       cited: ["3 generic suppliers", "1 international chain"],
@@ -26,7 +27,8 @@ const demoScenarios = [
   },
   {
     industry: "Care services",
-    query: "Trusted home care services in Lincoln UK",
+    query:
+      "My mother (78) has early-stage dementia and lives in Lincoln, UK. We need a trusted home care provider that specialises in dementia care with strong CQC ratings. Who should we consider?",
     location: "Lincoln, United Kingdom",
     findings: {
       cited: ["2 national chains", "1 directory aggregator"],
@@ -37,7 +39,8 @@ const demoScenarios = [
   },
   {
     industry: "Legal",
-    query: "Commercial lawyer London for SaaS contracts",
+    query:
+      "I'm a SaaS founder in London raising a Series A from US investors. Which mid-market law firms have the strongest experience with venture-backed contracts and US-UK investor structures?",
     location: "London, United Kingdom",
     findings: {
       cited: ["3 magic circle firms"],
@@ -48,7 +51,8 @@ const demoScenarios = [
   },
   {
     industry: "Medical",
-    query: "Orthopaedic surgeon Sandton",
+    query:
+      "My father (68) needs a hip replacement and I'm in Johannesburg. Which private orthopaedic surgeons in Sandton have the best documented outcomes for elderly patients?",
     location: "Sandton, South Africa",
     findings: {
       cited: ["Hospital websites only"],
@@ -106,15 +110,19 @@ export function AiDemoSection() {
               key={scenario.query}
               className="group flex flex-col overflow-hidden rounded-3xl border border-rule bg-white shadow-soft transition-all hover:border-accent-300 hover:shadow-card"
             >
-              {/* Query bar — looks like an AI search input */}
-              <div className="border-b border-rule bg-ink-50/60 px-6 py-4">
+              {/* Query bar — looks like an AI prompt input */}
+              <div className="border-b border-rule bg-ink-50/60 px-6 py-5">
                 <div className="flex items-start gap-3">
                   <Search className="mt-0.5 h-4 w-4 flex-shrink-0 text-ink-400" />
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs uppercase tracking-wider text-ink-400">
-                      {scenario.industry} · {scenario.location}
+                    <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-ink-400">
+                      <span>{scenario.industry}</span>
+                      <span className="h-1 w-1 rounded-full bg-ink-300" />
+                      <span>{scenario.location}</span>
+                      <span className="h-1 w-1 rounded-full bg-ink-300" />
+                      <span className="text-accent-600">User prompt</span>
                     </div>
-                    <div className="mt-1 font-mono text-sm text-ink-900 break-words">
+                    <div className="mt-2 text-sm text-ink-900 leading-relaxed">
                       "{scenario.query}"
                     </div>
                   </div>
