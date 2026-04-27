@@ -6,9 +6,9 @@
 export const site = {
   name: "Kabelo More",
   brand: "Kabelomore",
-  tagline: "AI Visibility Consulting",
+  tagline: "GEO / AEO Specialist · AI Search Visibility",
   description:
-    "Most businesses are invisible to AI search. I help them get recommended by ChatGPT, Claude, Gemini, and Perplexity. Audits, implementation, and ongoing optimisation for businesses in South Africa, the UK, and the US.",
+    "GEO (Generative Engine Optimization) and AEO (Answer Engine Optimization) specialist helping businesses get found, cited, and recommended by ChatGPT, Claude, Gemini, and Perplexity. Schema markup, LLM citation strategy, and entity optimisation for industrial, legal, and medical firms in South Africa, the UK, and the US.",
   url: "https://kabelomore.com",
   ogImage: "/og-default.png",
 

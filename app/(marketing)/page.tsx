@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Section, Eyebrow } from "@/components/ui/section";
 import { Container } from "@/components/ui/container";
 import { JsonLd } from "@/components/ui/jsonld";
+import { AiDemoSection } from "@/components/ai-demo-section";
+import { AeoVsSeo } from "@/components/aeo-vs-seo";
 import { faqJsonLd } from "@/lib/seo";
 import { tiers } from "@/lib/site";
 import Link from "next/link";
@@ -32,6 +34,22 @@ const homepageFaqs = [
   {
     q: "Why are you based in South Africa if you serve UK and US clients?",
     a: "Currency arbitrage. We deliver work to international standards but operate from a lower cost base, so clients get London-quality service at significantly below London rates. The audit and implementation work happens entirely online — location is irrelevant to outcome.",
+  },
+  {
+    q: "What is the difference between GEO and AEO?",
+    a: "GEO (Generative Engine Optimization) and AEO (Answer Engine Optimization) are largely the same discipline using slightly different terminology. GEO emphasises optimising content so generative AI engines (ChatGPT, Claude, Gemini, Perplexity) cite and recommend your business. AEO emphasises optimising for answer-style results across both AI engines and traditional search features (featured snippets, People Also Ask). Practitioners often use them interchangeably. We do both.",
+  },
+  {
+    q: "What is structured data and why does it matter for AI search?",
+    a: "Structured data (also called schema.org markup or JSON-LD) is machine-readable code embedded on a webpage that explicitly tells AI crawlers what the page is about — business name, services, location, hours, ratings. Without it, AI engines have to guess. With it, they have verified data they can confidently cite when generating answers. It's the single highest-leverage technical change you can make for AI visibility.",
+  },
+  {
+    q: "Can a small South African business really rank in international AI search?",
+    a: "Yes. AI engines don't penalise businesses based on country origin — they reward businesses with strong structured data, citations, and authoritative content. We've seen SA businesses appear in ChatGPT responses for international queries when the underlying signals are right. South African industrial suppliers, professional services, and BBBEE Level 1 firms have a particularly strong opportunity because the local AEO market is undersaturated.",
+  },
+  {
+    q: "What's the difference between Starter, Growth, and Premium tiers?",
+    a: "Starter (R5,000 once-off) is a one-time audit and roadmap — you get the diagnosis and execute it yourself or hire someone else. Growth (R8,500/month) is ongoing optimisation: monthly tracking, content production, competitive intel, quarterly strategy. Premium (R15,000/month) includes everything in Growth plus full first-month implementation (schema, GBP rebuild, citations) and direct executive-level support — for businesses where AI visibility is the growth strategy.",
   },
 ];
 
@@ -140,6 +158,9 @@ export default function HomePage() {
         </Container>
       </section>
 
+      {/* ─── AI DEMO — see real queries, real engines ─────────────── */}
+      <AiDemoSection />
+
       {/* ─── WHAT'S BROKEN (Problem framing) ──────────────────────── */}
       <Section variant="default" padding="lg">
         <div className="mx-auto max-w-3xl text-center">
@@ -183,6 +204,9 @@ export default function HomePage() {
           ))}
         </div>
       </Section>
+
+      {/* ─── AEO vs TRADITIONAL SEO ───────────────────────────────── */}
+      <AeoVsSeo />
 
       {/* ─── 5-STEP PROCESS ───────────────────────────────────────── */}
       <Section variant="tinted" padding="lg">

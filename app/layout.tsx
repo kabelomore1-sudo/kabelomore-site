@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { StickyMobileCta } from "@/components/sticky-mobile-cta";
 import { JsonLd } from "@/components/ui/jsonld";
 import { organizationJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -20,17 +21,24 @@ export const metadata: Metadata = {
   creator: site.name,
   publisher: site.brand,
   keywords: [
-    "AI visibility",
-    "AEO",
-    "Answer Engine Optimisation",
+    "GEO specialist",
+    "Generative Engine Optimization",
+    "AEO consultant",
+    "Answer Engine Optimization",
+    "AI Search Visibility",
+    "LLM Visibility",
+    "Schema Markup",
+    "JSON-LD",
     "ChatGPT visibility",
     "Claude visibility",
+    "Gemini visibility",
     "Perplexity SEO",
     "AI search consultant",
-    "South Africa SEO",
+    "GEO consultant South Africa",
+    "AEO specialist UK",
     "Pretoria AI consultant",
     "BBBEE digital marketing",
-    "industrial SEO",
+    "industrial AEO",
   ],
   openGraph: {
     type: "website",
@@ -86,6 +94,7 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <StickyMobileCta />
       </body>
     </html>
   );
