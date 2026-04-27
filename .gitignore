@@ -31,6 +31,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# Raw uncompressed videos — only the compressed ones in public/videos go to git
+scripts/raw-videos/*
+!scripts/raw-videos/.gitkeep
+
 # Vercel
 .vercel
 
