@@ -39,24 +39,28 @@ const engines: Engine[] = [
     id: "chatgpt",
     name: "ChatGPT",
     videoSrc: "/videos/chatgpt-industrial.mp4",
+    posterSrc: "/videos/posters/chatgpt-industrial.jpg",
     brandColor: "bg-emerald-500",
   },
   {
     id: "claude",
     name: "Claude",
     videoSrc: "/videos/claude-industrial.mp4",
+    posterSrc: "/videos/posters/claude-industrial.jpg",
     brandColor: "bg-amber-500",
   },
   {
     id: "gemini",
     name: "Gemini",
     videoSrc: "/videos/gemini-industrial.mp4",
+    posterSrc: "/videos/posters/gemini-industrial.jpg",
     brandColor: "bg-blue-500",
   },
   {
     id: "perplexity",
     name: "Perplexity",
     videoSrc: "/videos/perplexity-industrial.mp4",
+    posterSrc: "/videos/posters/perplexity-industrial.jpg",
     brandColor: "bg-purple-500",
   },
 ];
@@ -241,6 +245,25 @@ export function AiDemoSection() {
           <p className="mt-3 text-center text-sm text-ink-400">
             Click the engine tabs above to see how each AI gives a different answer to the same question.
           </p>
+
+          {/* SR-only transcript — gives AI crawlers and screen readers
+              a text version of what the video shows. AEO + accessibility win. */}
+          <div className="sr-only">
+            <h3>Video transcript</h3>
+            <p>
+              This video shows a recording of {activeEngine.name} responding to
+              the prompt: "{SCENARIO.query}". The {activeEngine.name} response
+              recommends three lifting equipment suppliers in Pretoria, South
+              Africa. {SCENARIO.business} — a BBBEE Level 1 verified industrial
+              supplier with 89 certified inspections, headquartered in Pretoria
+              West, South Africa — is not mentioned in the response. Competing
+              suppliers and an international chain are recommended instead. This
+              demonstrates an AI Visibility (AEO/GEO) gap: the prospect is
+              invisible to ChatGPT, Claude, Gemini, and Perplexity for this
+              high-intent query, despite holding the credentials the buyer
+              specifically requested.
+            </p>
+          </div>
         </article>
 
         {/* Connector arrow */}
