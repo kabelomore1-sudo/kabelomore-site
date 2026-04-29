@@ -20,36 +20,36 @@ import {
 
 const homepageFaqs = [
   {
-    q: "What is AEO and how is it different from SEO?",
-    a: "AEO (Answer Engine Optimisation) is the discipline of getting your business recommended by AI engines like ChatGPT, Claude, Gemini, and Perplexity. SEO targets traditional search results — AEO targets the conversational answers AI engines give. The signals overlap, but AEO weighs structured data, third-party citations, and answer-shaped content more heavily than SEO does.",
+    q: "Is this just social media management?",
+    a: "No, and this is the most important question to answer up front. A social media manager schedules posts on Instagram and Facebook — that's mostly visible work. We do mostly invisible work: structured data (the code AI engines read), third-party citations (verified mentions on trusted sites), schema markup, answer-shaped content, and AI citation monitoring. Some of our work shows up on your social feeds. Most of it shows up where you can't see it — but where the AI's decision to recommend you is actually made. If you just need pretty posts on Instagram, hire a social media manager (R3-6K/month is fair for that). If you want AI engines to recommend your business when customers ask, that's our work — and it costs more because the leverage on outcomes is different.",
   },
   {
-    q: "How long does it take to see results from AI visibility work?",
-    a: "Most clients see initial citation rate movement within 30 days of implementation. Meaningful, durable improvement typically takes 60-90 days. Unlike paid ads, AEO results compound — the work you do today keeps paying off as AI engines re-train and update.",
+    q: "What does AEO actually mean for my business, in plain words?",
+    a: "AEO stands for Answer Engine Optimisation. In plain words: when your customer asks ChatGPT or Claude 'who's the best [your service] in [your city]', AEO is the work we do to make sure your business is in the answer. Different from SEO (which is about Google's blue links). Same goal — get found — different game.",
+  },
+  {
+    q: "Why pay 50% deposit and 50% on delivery?",
+    a: "Splitting payment is the industry standard for project work. It builds trust both ways. We don't get paid in full until you sign off, and you don't risk full payment to a stranger. If we don't deliver what's quoted, you don't pay the second half. Monthly retainers work differently — billed monthly in advance, cancel anytime after the 3-month minimum.",
+  },
+  {
+    q: "How long does it take to see results?",
+    a: "Most clients see citation movement within 30 days. Meaningful improvement takes 60-90 days. Unlike paid ads, AEO results compound — the work we do today keeps paying off as AI engines re-train and update. We rescan you every 30 days and show before/after data.",
   },
   {
     q: "Do you guarantee my business will be recommended by ChatGPT?",
-    a: "No — and avoid anyone who does. We guarantee a disciplined process based on best-known signals: structured data, GBP optimisation, third-party citations, and authoritative content. We measure citation rate before and after. If our process doesn't move the needle, we refine it together.",
+    a: "No — and avoid anyone who does. We guarantee a disciplined process: structured data, GBP optimisation, third-party citations, and authoritative content. We measure citation rate before and after. If our process doesn't move the needle, we refine it together. Specific outcome promises in AI search are dishonest.",
   },
   {
     q: "Why are you based in South Africa if you serve UK and US clients?",
-    a: "Currency arbitrage. We deliver work to international standards but operate from a lower cost base, so clients get London-quality service at significantly below London rates. The audit and implementation work happens entirely online — location is irrelevant to outcome.",
-  },
-  {
-    q: "What is the difference between GEO and AEO?",
-    a: "GEO (Generative Engine Optimization) and AEO (Answer Engine Optimization) are largely the same discipline using slightly different terminology. GEO emphasises optimising content so generative AI engines (ChatGPT, Claude, Gemini, Perplexity) cite and recommend your business. AEO emphasises optimising for answer-style results across both AI engines and traditional search features (featured snippets, People Also Ask). Practitioners often use them interchangeably. We do both.",
-  },
-  {
-    q: "What is structured data and why does it matter for AI search?",
-    a: "Structured data (also called schema.org markup or JSON-LD) is machine-readable code embedded on a webpage that explicitly tells AI crawlers what the page is about — business name, services, location, hours, ratings. Without it, AI engines have to guess. With it, they have verified data they can confidently cite when generating answers. It's the single highest-leverage technical change you can make for AI visibility.",
+    a: "Currency arbitrage. We deliver work to international standards but operate from a lower cost base, so clients get London-quality service at significantly below London rates. The work is entirely online — location doesn't affect outcomes.",
   },
   {
     q: "Can a small South African business really rank in international AI search?",
-    a: "Yes. AI engines don't penalise businesses based on country origin — they reward businesses with strong structured data, citations, and authoritative content. We've seen SA businesses appear in ChatGPT responses for international queries when the underlying signals are right. South African industrial suppliers, professional services, and BBBEE Level 1 firms have a particularly strong opportunity because the local AEO market is undersaturated.",
+    a: "Yes. AI engines don't penalise businesses based on country origin — they reward strong structured data, citations, and authoritative content. South African industrial suppliers, professional services, and BBBEE Level 1 firms have a particularly strong opportunity because the local AEO market is undersaturated.",
   },
   {
-    q: "What's the difference between Starter, Growth, and Premium tiers?",
-    a: "Starter (R5,000 once-off) is a one-time audit and roadmap — you get the diagnosis and execute it yourself or hire someone else. Growth (R8,500/month) is ongoing optimisation: monthly tracking, content production, competitive intel, quarterly strategy. Premium (R15,000/month) includes everything in Growth plus full first-month implementation (schema, GBP rebuild, citations) and direct executive-level support — for businesses where AI visibility is the growth strategy.",
+    q: "What's the difference between Foundation Pack, Starter, Growth, and Premium?",
+    a: "Foundation Pack (R12,500 once-off) is for businesses with no website yet — we build everything from zero. Starter Audit (R5,000 once-off) is for businesses with a website that just want a roadmap. Growth (R8,500/month) is ongoing optimisation: 2 articles, GBP posts, schema updates, citations, monthly reports. Premium (R15,000/month) is Growth + full first-month implementation + executive support for businesses where AI visibility is THE growth strategy.",
   },
 ];
 
@@ -254,16 +254,18 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl text-center">
           <Eyebrow className="justify-center">Services</Eyebrow>
           <h2 className="mt-4 text-display-lg font-semibold tracking-tight text-ink-900">
-            Start free. Upgrade when the fit is clear.
+            Where are you starting from?
           </h2>
           <p className="mt-5 text-lg text-ink-500">
-            Four ways to work together. Every tier includes a 30-minute strategy call.
-            Cancel anytime on the Partner tier after the 3-month minimum.
+            From "I have nothing yet" to "I want serious growth" — pick what fits.
+            Pay 50% to start on once-off work, 50% on delivery. Monthly retainers billed in advance, cancel after 3 months.
           </p>
         </div>
 
         <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {tiers.map((tier) => (
+          {tiers
+            .filter((t) => ["scan", "foundation", "growth", "premium"].includes(t.id))
+            .map((tier) => (
             <div
               key={tier.id}
               className={
@@ -284,7 +286,10 @@ export default function HomePage() {
                     : "text-xs font-semibold uppercase tracking-[0.14em] text-accent-600"
                 }
               >
-                Tier 0{tier.rank}
+                {tier.category === "scan" && "Try us"}
+                {tier.category === "foundation" && "No website yet"}
+                {tier.category === "audit" && "Just clarity"}
+                {tier.category === "retainer" && (tier.id === "premium" ? "Serious growth" : "Ongoing growth")}
               </div>
               <div className="mt-3 text-xl font-semibold">{tier.name}</div>
               <div className="mt-3">
@@ -292,14 +297,23 @@ export default function HomePage() {
                   {tier.price.sa}
                 </div>
                 <div className={tier.highlight ? "text-xs text-ink-300" : "text-xs text-ink-400"}>
-                  {tier.price.intl} · International
+                  {tier.price.intl}
                 </div>
               </div>
+              <div
+                className={
+                  tier.highlight
+                    ? "mt-3 inline-flex rounded-full bg-white/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent-300"
+                    : "mt-3 inline-flex rounded-full bg-accent-50 px-2 py-1 text-[10px] uppercase tracking-wider text-accent-700"
+                }
+              >
+                {tier.payment}
+              </div>
               <p className={tier.highlight ? "mt-4 text-sm text-ink-300 leading-relaxed" : "mt-4 text-sm text-ink-500 leading-relaxed"}>
-                {tier.description}
+                {tier.bestFor}
               </p>
               <ul className="mt-5 space-y-2">
-                {tier.bullets.slice(0, 4).map((b) => (
+                {tier.receives.slice(0, 4).map((b) => (
                   <li key={b} className="flex items-start gap-2 text-sm">
                     <CircleCheck
                       className={
