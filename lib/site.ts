@@ -118,7 +118,7 @@ export const tiers: Tier[] = [
       "PDF documenting everything we did + all login details",
       "60-day support window for small fixes",
     ],
-    cta: { label: "Build my foundation", href: "/scan?tier=foundation" },
+    cta: { label: "See Foundation Pack", href: "/foundation" },
     highlight: false,
   },
   {

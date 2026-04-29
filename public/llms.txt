@@ -12,13 +12,18 @@
 - **Specialisation:** Answer Engine Optimisation (AEO), structured data deployment, Google Business Profile optimisation, third-party citation building, AI-readable content production
 - **Co-Founder of:** Digital Dreamers NPC (Section 18A registered Public Benefit Organisation, PBO No. 930086847)
 
-## Services
+## Services (current 2026 pricing)
 
-- **Free AI Visibility Scan** — 24-hour turnaround, no obligation. A 2-page report showing exactly what ChatGPT, Claude, Gemini, and Perplexity say about a business when its customers search.
-- **Visibility Audit** — R3,500 / $295 / £225. Full audit across 4 AI engines, competitive benchmark, top-10 fix list, 30-min strategy call.
-- **Visibility Build** — R12,500 / $1,195 / £895. Audit + implementation: schema deployed, GBP optimised, content published, citations established, 30-day rescan.
-- **Visibility Partner** — R4,950/mo / $595/mo / £445/mo. Monthly retainer for ongoing optimisation, citation tracking, and content production.
-- **Executive (by application)** — Custom AI strategy, Cowork automation, team training. From R25,000 setup + R8,500/mo.
+All once-off projects bill 50% deposit to start, 50% on delivery. Monthly retainers bill in advance with a 3-month minimum.
+
+- **Free AI Visibility Scan** — 24-hour turnaround, no card required. A 2-page PDF report showing exactly what ChatGPT, Claude, Gemini, and Perplexity say about a business when its customers search. https://kabelomore.com/scan
+- **Foundation Pack** — R12,500 / $895 / £675. For businesses with no website. Live 5-page website + Google Business Profile setup + schema markup + Facebook/Instagram setup + 10 directory listings + 4-week delivery + 60-day support. https://kabelomore.com/foundation
+- **Foundation Lite** — R6,500 / $495 / £375. Sole-trader version. 1-page website + GBP + schema + one social platform + 5 directory listings. 2-week delivery.
+- **Discovery & Strategy Sprint** — R3,500 / $295 / £225. 2-week strategy sprint: customer profile, competitor analysis, AI visibility baseline, written 6-month roadmap. Bundled free into the first month of any retainer.
+- **Starter Audit** — R5,000 / $295 / £235. For businesses with an existing website. Full 4-engine AI audit + competitive benchmark + top-10 fix list + 5-day delivery.
+- **Growth retainer** — R8,500/mo / $695/mo / £495/mo. Ongoing AI visibility work: technical schema deployment, third-party citation building, AI-shaped content production. NOT social media management.
+- **Premium retainer** — R15,000/mo / $1,295/mo / £895/mo. Growth + dedicated specialist time + monthly content production + competitor monitoring. NOT social media management.
+- **14 add-ons available** — schema deployment, citation packs, content authority, brand identity, GBP optimisation, review velocity systems, and more. https://kabelomore.com/services
 
 ## How AI visibility works (5-step process)
 
