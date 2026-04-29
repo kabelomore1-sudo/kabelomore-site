@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/ui/jsonld";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About — Mogopa to Magaliesberg to London",
+  title: "About Kabelo More — AI Visibility Consultant, Pretoria",
   description:
-    "Kabelo More is an AI Visibility consultant in Pretoria. Custodian of ancestral land in Mogopa. Co-Founder of Digital Dreamers NPC. Building from South Africa for clients in SA, UK, and US.",
+    "Kabelo More is an AI Visibility / AEO consultant based in Pretoria, South Africa. 8 years of local SEO experience now applied to the AI search era. Serving clients in SA, UK, and US.",
   alternates: { canonical: `${site.url}/about` },
 };
 
@@ -30,7 +30,7 @@ export default function AboutPage() {
             jobTitle: "AI Visibility Consultant",
             worksFor: { "@id": `${site.url}/#organization` },
             description:
-              "AI Visibility Consultant based in Pretoria. Co-Founder of Digital Dreamers NPC. Custodian of ancestral land in Mogopa.",
+              "AI Visibility / AEO consultant based in Pretoria, South Africa. 8 years of local SEO experience now applied to the AI search era. Works with industrial, professional, and medical service businesses across SA, UK, and US.",
             address: {
               "@type": "PostalAddress",
               addressLocality: "Pretoria",
@@ -54,17 +54,17 @@ export default function AboutPage() {
       {/* Hero */}
       <Section variant="tinted" padding="lg">
         <div className="mx-auto max-w-3xl">
-          <Eyebrow>About</Eyebrow>
+          <Eyebrow>About Kabelo More</Eyebrow>
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
-            From Mogopa
+            8 years of local SEO.
             <br />
-            to Magaliesberg
-            <br />
-            <span className="text-ink-500">to London.</span>
+            <span className="text-ink-500">Now applied to the AI search era.</span>
           </h1>
           <p className="mt-7 text-lg text-ink-500 leading-relaxed">
-            Custodian of ancestral land. Builder of AI systems. Both require thinking
-            in decades. This is the bet I'm making.
+            I built local SEO businesses from Pretoria for nearly a decade. Then
+            ChatGPT, Claude, Gemini, and Perplexity changed how people search. I
+            now do AI Visibility — the same first-principles work, applied to a
+            new search layer that almost nobody in South Africa is doing yet.
           </p>
         </div>
       </Section>
@@ -72,95 +72,99 @@ export default function AboutPage() {
       {/* Story */}
       <Section variant="default" padding="lg" containerSize="narrow">
         <div className="prose-kabelo max-w-none">
-          <h2>The Mogopa thread</h2>
+          <h2>The path to AI Visibility</h2>
           <p>
-            My family has been custodians of land in Mogopa, in the Ventersdorp region
-            of South Africa, for generations. That land is more than ground — it's a
-            commitment that runs across decades. Soil takes seasons. Trees grow over
-            generations. Crops fail. Crops succeed. You plan for both.
+            For most of the last decade, &quot;search&quot; meant Google&apos;s blue
+            links. I spent eight years getting South African service businesses
+            found there — local citations, Google Business Profile builds, schema
+            deployment, content production. The fundamentals of being{" "}
+            <em>findable.</em>
           </p>
           <p>
-            I grew up understanding what it means to think in decades, not quarters.
-            That instinct shapes everything I build.
-          </p>
-
-          <h2>The path to AI</h2>
-          <p>
-            I'm a digital marketer with a decade in local SEO — the discipline of
-            getting businesses found by customers searching online. For most of that
-            time, "search" meant Google's blue links.
-          </p>
-          <p>
-            That's changing. Customers now ask AI engines first. ChatGPT, Claude,
-            Gemini, and Perplexity decide which businesses are worth recommending.
-            The signals that move AI engines aren't the same as classic SEO — and
-            almost no business in South Africa or the UK mid-market has done the work
+            That definition of search is changing fast. By Q3 2026, more service
+            queries happen in ChatGPT, Claude, Gemini, and Perplexity than on
+            Google&apos;s blue links. The signals that move AI engines aren&apos;t
+            the same as classic SEO — schema markup, entity consistency, third-party
+            citation breadth, answer-shaped content, all matter more. And almost
+            no business in South Africa or the UK mid-market has done the work
             yet.
           </p>
           <p>
-            I'm spending the next decade closing that gap. The discipline is called
-            AEO — Answer Engine Optimisation — and it's the next foundation layer for
-            local and professional businesses that depend on being found.
+            I&apos;m spending the next decade closing that gap. The discipline is
+            called AEO — Answer Engine Optimisation — and it&apos;s the next
+            foundation layer for any business that depends on being found.
           </p>
 
-          <h2>Digital Dreamers NPC</h2>
+          <h2>Who I work with</h2>
           <p>
-            Alongside the consulting practice, I co-founded{" "}
-            <strong>Digital Dreamers NPC</strong> — a SARS Section 18A registered
-            Public Benefit Organisation (PBO No. {site.ngo.pboNumber}) that trains
-            rural South African youth in three pillars: digital literacy and
-            employability, mapping and geospatial intelligence, and precision
-            agriculture.
+            Three buyer types I&apos;m best suited to:
           </p>
-          <p>
-            We adapt the Raspberry Pi Foundation's global literacy framework to South
-            African rural realities. The teenagers we train today will run the
-            agri-tech businesses of the next decade. The corporate CSI partners who
-            fund Digital Dreamers are the same firms that need AI visibility help.
-            Same conversation, two revenue streams, both legitimate, both
-            tax-efficient for donors.
-          </p>
-          <p>
-            Naval Ravikant talks about authenticity as escape from competition. This
-            is what he means. Nobody else is building exactly this combination —
-            commercial AI consulting plus rural digital literacy plus ancestral land
-            custodianship — because it's not a strategy. It's a life.
-          </p>
+          <ul>
+            <li>
+              <strong>Industrial &amp; B2B specialists</strong> in South Africa —
+              equipment suppliers, fabricators, contractors, BBBEE-certified
+              firms targeting enterprise and mining procurement. One AI
+              recommendation in this segment can be worth a R50,000 to R500,000
+              contract.
+            </li>
+            <li>
+              <strong>Professional firms</strong> — law firms, medical
+              specialists, accountants, consultancies. SA mid-market is a
+              wide-open AEO frontier; UK mid-market is moving faster.
+            </li>
+            <li>
+              <strong>UK and US service businesses</strong> wanting first-mover
+              advantage in AI search before the category gets crowded in 2027.
+            </li>
+          </ul>
 
           <h2>Where I work from</h2>
           <p>
-            I'm based in Pretoria, South Africa. I serve clients across South Africa,
-            the UK, and the US. The currency arbitrage is real and intentional — I
-            deliver work to international standards from a local cost base, so
-            clients get London-quality service at significantly below London rates.
-            Same skills, different cost structure, fair pricing for both sides.
+            I&apos;m based in Pretoria, South Africa. I serve clients across SA,
+            the UK, and the US. The currency arbitrage is real and intentional —
+            I deliver work to international standards from a local cost base, so
+            international clients get London-quality service at significantly
+            below London rates. Same skills, different cost structure, fair
+            pricing for both sides.
           </p>
           <p>
-            Most of my deep work happens in cafes around Brooklyn and Menlyn, on
-            hiking trails in Magaliesberg or Hennops, or at home with a flat white.
-            The lifestyle isn't a perk. It's the compounding loop: outdoor time
-            sharpens thinking, content emerges from real life, expertise builds
-            through public documentation.
+            Most of my deep work happens in cafes around Menlyn and Brooklyn,
+            on hiking trails in Magaliesberg, or at home with a flat white. The
+            lifestyle isn&apos;t a perk — it&apos;s the compounding loop. Outdoor
+            time sharpens thinking, content emerges from real life, expertise
+            builds through public documentation.
           </p>
 
-          <h2>What I'm building toward</h2>
+          <h2>What makes this hard to copy</h2>
           <p>
-            The five-year horizon: a Waterkloof home that anchors the family I'm
-            building. A working sunflower farm on the Mogopa land that integrates
-            Digital Dreamers' precision agriculture pillar. A reassembly factory that
-            converts unused industrial capacity into local jobs. The freelance
-            practice and the NPC are the engines that fund and validate all of it.
+            By 2027, every freelance marketer will claim &quot;AI visibility.&quot;
+            What won&apos;t be replicable is the specific stack:
           </p>
-          <p>
-            R4,000 a month is where I started. R50,000 a month is the next
-            milestone. Everything is built on income that compounds.
+          <ul>
+            <li>
+              <strong>Pretoria-based operator</strong> with deep SA local SEO
+              fluency (BBBEE scoring nuance, SARS implications, SA directory
+              ecosystem)
+            </li>
+            <li>
+              <strong>First-principles AEO understanding</strong> built during
+              the emergence window, not retrofitted from old SEO playbooks
+            </li>
+            <li>
+              <strong>Hybrid SA/UK/US practice</strong> with currency arbitrage
+              that lets me deliver below London rates without below-London
+              quality
+            </li>
+            <li>
+              <strong>Tools I built myself</strong> — including the AI visibility
+              tracker that runs on this site daily
+            </li>
+          </ul>
+
+          <p className="mt-10 text-base italic text-ink-500">
+            &quot;Escape competition through authenticity.&quot; — Naval Ravikant
           </p>
-          <p className="text-base italic text-ink-500">
-            "Escape competition through authenticity." — Naval Ravikant
-          </p>
-          <p>
-            That's the bet.
-          </p>
+          <p>That&apos;s the bet.</p>
         </div>
 
         <div className="mt-12 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
@@ -170,31 +174,6 @@ export default function AboutPage() {
           <Button href="/services" variant="secondary" size="md">
             See how we work together
           </Button>
-        </div>
-      </Section>
-
-      {/* Digital Dreamers callout */}
-      <Section variant="ink" padding="default">
-        <div className="mx-auto max-w-3xl">
-          <Eyebrow className="text-accent-400">Digital Dreamers NPC</Eyebrow>
-          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-white">
-            For high-income professionals: Section 18A donations are tax-deductible.
-          </h2>
-          <p className="mt-5 text-lg text-ink-300 leading-relaxed">
-            Digital Dreamers is a SARS-approved Public Benefit Organisation
-            (PBO No. {site.ngo.pboNumber}). Donations qualify for Section 18A tax
-            deduction up to 10% of taxable income. For a surgeon at the 45% bracket,
-            R50,000 donated = R22,500 back in tax + genuine community impact + BBBEE
-            scorecard points (SED + SD).
-          </p>
-          <div className="mt-8">
-            <a
-              href={`mailto:${site.contact.email}?subject=Digital%20Dreamers%20donation%20inquiry`}
-              className="inline-flex items-center gap-1 text-accent-400 hover:text-accent-300"
-            >
-              Request the impact dashboard <ArrowUpRight className="h-4 w-4" />
-            </a>
-          </div>
         </div>
       </Section>
     </>

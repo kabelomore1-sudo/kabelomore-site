@@ -55,7 +55,6 @@ const homepageFaqs = [
 
 const trustClients = [
   { name: "OMS Lifting Solutions", category: "Industrial · BBBEE Level 1" },
-  { name: "Digital Dreamers NPC", category: "Section 18A PBO · 930086847" },
 ];
 
 const verticals = [

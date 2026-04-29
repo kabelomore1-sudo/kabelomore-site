@@ -35,23 +35,28 @@ export function SiteFooter() {
             </div>
             <ul className="mt-4 space-y-2 text-sm">
               <li>
-                <Link href="/services" className="text-ink-700 hover:text-ink-900">
-                  AI Visibility Audit
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="text-ink-700 hover:text-ink-900">
-                  Visibility Build
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="text-ink-700 hover:text-ink-900">
-                  Visibility Partner
-                </Link>
-              </li>
-              <li>
                 <Link href="/scan" className="text-ink-700 hover:text-ink-900">
                   Free AI Scan
+                </Link>
+              </li>
+              <li>
+                <Link href="/foundation" className="text-ink-700 hover:text-ink-900">
+                  Foundation Pack
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="text-ink-700 hover:text-ink-900">
+                  All services
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="text-ink-700 hover:text-ink-900">
+                  Full price list
+                </Link>
+              </li>
+              <li>
+                <Link href="/how-we-work" className="text-ink-700 hover:text-ink-900">
+                  How we work
                 </Link>
               </li>
             </ul>
@@ -127,8 +132,7 @@ export function SiteFooter() {
             © {year} {site.name}. {site.contact.location}.
           </div>
           <div className="mt-2 md:mt-0">
-            Co-Founder, {site.ngo.name} · {site.ngo.section18A} · PBO No.{" "}
-            {site.ngo.pboNumber}
+            Serving South Africa · United Kingdom · United States
           </div>
         </div>
       </Container>

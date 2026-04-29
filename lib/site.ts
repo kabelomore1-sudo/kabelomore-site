@@ -24,13 +24,6 @@ export const site = {
     twitter: "",
     youtube: "",
   },
-
-  ngo: {
-    name: "Digital Dreamers NPC",
-    pboNumber: "930086847",
-    incomeTaxRef: "9553563207",
-    section18A: "Section 18A registered Public Benefit Organisation",
-  },
 } as const;
 
 export const navigation = {
