@@ -143,7 +143,7 @@ export const tiers: Tier[] = [
       "20-min walkthrough call",
       "PDF with all login details",
     ],
-    cta: { label: "Start Foundation Lite", href: "/scan?tier=foundation-lite" },
+    cta: { label: "Start Foundation Lite", href: "/brief/foundation-lite" },
     highlight: false,
   },
   {
@@ -166,7 +166,7 @@ export const tiers: Tier[] = [
       "Written strategy document: prioritised 6-month roadmap",
       "30-minute strategy review call",
     ],
-    cta: { label: "Book the Sprint", href: "/scan?tier=discovery" },
+    cta: { label: "Book the Sprint", href: "/brief/discovery" },
     highlight: false,
   },
   {
@@ -189,7 +189,7 @@ export const tiers: Tier[] = [
       "30-minute strategy call to walk through findings",
       "PDF report you can act on",
     ],
-    cta: { label: "Start with the audit", href: "/scan?tier=starter" },
+    cta: { label: "Start with the audit", href: "/brief/starter" },
     highlight: false,
   },
   {
@@ -231,7 +231,7 @@ export const tiers: Tier[] = [
       notSocialMedia:
         "This isn't social media management. The work is mostly technical and editorial — structured data, citations, and AI-shaped content. Some of it shows on your social feeds. Most of it shows up where you can't see it: in the signals AI engines use to decide who to recommend.",
     },
-    cta: { label: "Start Growth", href: "/scan?tier=growth" },
+    cta: { label: "Start Growth", href: "/brief/growth" },
     highlight: true,
   },
   {
@@ -274,7 +274,7 @@ export const tiers: Tier[] = [
       notSocialMedia:
         "This is technical AEO work plus brand presence at the level a serious business needs. The LinkedIn posting is part of it because LinkedIn now powers AI search results. But the core work is what AI engines read to decide who to recommend — schema, citations, answer-shaped content — not Instagram graphics.",
     },
-    cta: { label: "Apply for Premium", href: "/scan?tier=premium" },
+    cta: { label: "Apply for Premium", href: "/brief/premium" },
     highlight: false,
   },
 ];

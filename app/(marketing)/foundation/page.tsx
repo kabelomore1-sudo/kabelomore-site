@@ -194,7 +194,7 @@ export default function FoundationPage() {
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button href="/scan?tier=foundation" variant="primary" size="lg">
+            <Button href="/brief/foundation" variant="primary" size="lg">
               Build my foundation <ArrowRight className="h-4 w-4" />
             </Button>
             <Button href="/contact" variant="ghost" size="lg">
@@ -460,7 +460,7 @@ export default function FoundationPage() {
             ))}
           </ul>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button href="/scan?tier=foundation-lite" variant="primary" size="md">
+            <Button href="/brief/foundation-lite" variant="primary" size="md">
               Start Foundation Lite <ArrowRight className="h-4 w-4" />
             </Button>
             <Button href="/services" variant="ghost" size="md">
@@ -505,7 +505,7 @@ export default function FoundationPage() {
             Or book a free 20-min call if you want to talk first — no pitch, no pressure.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button href="/scan?tier=foundation" variant="ink" size="lg">
+            <Button href="/brief/foundation" variant="ink" size="lg">
               Build my foundation <ArrowRight className="h-4 w-4" />
             </Button>
             <Button
