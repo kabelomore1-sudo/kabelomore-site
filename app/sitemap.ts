@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/lib/site";
+import { getAllPosts } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const routes: MetadataRoute.Sitemap = [
+  const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${site.url}/`, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
     { url: `${site.url}/services`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${site.url}/pricing`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
@@ -15,9 +16,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site.url}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${site.url}/case-studies`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${site.url}/case-studies/oms-lifting-solutions`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${site.url}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
+    { url: `${site.url}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${site.url}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
   ];
 
-  return routes;
+  // Dynamically include every published blog post
+  const blogPosts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
+    url: `${site.url}/blog/${post.slug}`,
+    lastModified: new Date(post.frontmatter.updated ?? post.frontmatter.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...blogPosts];
 }

@@ -48,8 +48,12 @@ const homepageFaqs = [
     a: "Yes. AI engines don't penalise businesses based on country origin — they reward strong structured data, citations, and authoritative content. South African industrial suppliers, professional services, and BBBEE Level 1 firms have a particularly strong opportunity because the local AEO market is undersaturated.",
   },
   {
-    q: "What's the difference between Foundation Pack, Starter, Growth, and Premium?",
-    a: "Foundation Pack (R12,500 once-off) is for businesses with no website yet — we build everything from zero. Starter Audit (R5,000 once-off) is for businesses with a website that just want a roadmap. Growth (R8,500/month) is ongoing optimisation: 2 articles, GBP posts, schema updates, citations, monthly reports. Premium (R15,000/month) is Growth + full first-month implementation + executive support for businesses where AI visibility is THE growth strategy.",
+    q: "I already have a website on WordPress / Wix / Squarespace. Do I need to start over?",
+    a: "No. Most clients keep their existing site. We add the AI visibility layer on top — schema markup, GBP setup, citations, AI-shaped content. Whether you're on WordPress, Wix, Squarespace, Shopify, or a custom builder, AEO works on top of what you have. That's the Optimization Pack (R10,500, 3 weeks). We only recommend a rebuild when your existing site is so slow or broken that fixing it costs more than rebuilding — and we'll tell you honestly during the audit.",
+  },
+  {
+    q: "What's the difference between Foundation Pack, Optimization Pack, Starter, Growth, and Premium?",
+    a: "Foundation Pack (R12,500) is for businesses with NO website yet — we build everything from zero. Optimization Pack (R10,500) is for businesses with an EXISTING website that just need the AEO infrastructure layered on. Starter Audit (R5,000) is the diagnostic — find out where you stand with a written plan. Growth (R8,500/month) is ongoing optimisation: articles, GBP posts, schema updates, citations, reports. Premium (R15,000/month) is Growth plus dedicated specialist time and full first-month implementation for businesses where AI visibility is THE growth strategy.",
   },
 ];
 

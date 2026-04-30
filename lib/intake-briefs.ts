@@ -94,6 +94,115 @@ export const briefs: Record<string, BriefConfig> = {
     ],
   },
 
+  optimization: {
+    tierId: "optimization",
+    tierName: "Optimization Pack — R10,500",
+    title: "Tell us about your existing site",
+    subtitle:
+      "8 questions, 10 minutes. Tells us what platform you're on, what we'll be working with, and what you want to be found for. Once submitted, you'll get a 50% deposit invoice within 1 hour.",
+    estimatedMinutes: 10,
+    paymentNote:
+      "After you submit this brief, we send a R5,250 deposit invoice (card or EFT). Work begins the moment your deposit clears.",
+    whatHappensNext: [
+      "Within 1 hour: confirmation email + R5,250 deposit invoice",
+      "Within 24 hours: kickoff call scheduled + admin/contributor access requested",
+      "Within 3 weeks: schema deployed, GBP set up, citations live, content optimized",
+      "Day 21: handover call + final R5,250 invoice",
+    ],
+    tallyFormId: null,
+    questions: [
+      {
+        number: 1,
+        q: "Business name + 1-sentence description of what you do",
+        why: "Drives the schema, GBP, and citation work — needs to be consistent everywhere.",
+      },
+      {
+        number: 2,
+        q: "Your existing website URL + what platform it's built on (WordPress, Wix, Squarespace, Shopify, custom — we'll figure it out if you don't know)",
+        why: "Each platform has its own way to deploy schema and structured data. We pick the right approach based on what you have.",
+      },
+      {
+        number: 3,
+        q: "Will you be able to give us admin or editor login access?",
+        why: "We need to deploy schema and update content. If you can't grant access, we deploy via Google Tag Manager (works on any site) — but admin access is faster and cleaner.",
+      },
+      {
+        number: 4,
+        q: "Where you're based + the geographic area you serve",
+        why: "Drives Google Business Profile setup, schema 'areaServed' tagging, and which directories we list you on.",
+      },
+      {
+        number: 5,
+        q: "Your top 3 services + which is highest-margin",
+        why: "We allocate optimization effort toward the services that pay best. AI engines need granularity to recommend you for specific queries.",
+      },
+      {
+        number: 6,
+        q: "3 competitors (URLs preferred)",
+        why: "Tells us where the bar is in your specific market. We benchmark you against them on schema, GBP, citations, content shape.",
+      },
+      {
+        number: 7,
+        q: "What you've already tried for SEO/marketing — what worked and what failed",
+        why: "So we don't repeat what's failed and we build on what's worked.",
+      },
+      {
+        number: 8,
+        q: "What does success look like in 6 months? (specific metric preferred — e.g. 'cited by ChatGPT for [service]', or '5 inbound leads per week')",
+        why: "Drives the priority of every decision. Vague goals produce vague outcomes.",
+      },
+    ],
+  },
+
+  "optimization-lite": {
+    tierId: "optimization-lite",
+    tierName: "Optimization Lite — R5,500",
+    title: "Tell us about your existing site",
+    subtitle:
+      "6 questions, 7 minutes. Lighter version of the Optimization brief for sole traders.",
+    estimatedMinutes: 7,
+    paymentNote:
+      "After you submit, we send a R2,750 deposit invoice. Work starts when it clears. Delivery: 2 weeks.",
+    whatHappensNext: [
+      "Within 1 hour: confirmation + R2,750 deposit invoice",
+      "Within 24 hours: kickoff call scheduled",
+      "Within 2 weeks: schema, GBP, 5 citations, 1 page rewritten",
+    ],
+    tallyFormId: null,
+    questions: [
+      {
+        number: 1,
+        q: "Business name + 1-sentence description",
+        why: "Goes everywhere — schema, GBP, citations.",
+      },
+      {
+        number: 2,
+        q: "Existing website URL + platform (WordPress, Wix, Squarespace, etc.)",
+        why: "Determines how we deploy schema and structured data.",
+      },
+      {
+        number: 3,
+        q: "Can you grant admin or editor access?",
+        why: "Faster work if yes. If no, we use Google Tag Manager.",
+      },
+      {
+        number: 4,
+        q: "Where you're based + service area",
+        why: "Drives GBP and schema configuration.",
+      },
+      {
+        number: 5,
+        q: "Your single main service",
+        why: "Optimization Lite focuses on one service. Pick the one that pays the bills.",
+      },
+      {
+        number: 6,
+        q: "1 competitor you respect (URL or name)",
+        why: "Sets the benchmark for your specific service.",
+      },
+    ],
+  },
+
   "foundation-lite": {
     tierId: "foundation-lite",
     tierName: "Foundation Lite — R6,500",

@@ -97,9 +97,9 @@ export const tiers: Tier[] = [
     payment: "50% to start · 50% on delivery",
     delivery: "4 weeks",
     bestFor:
-      "Businesses with no website and no digital presence. We build everything from scratch — set up to be found by AI from day one.",
+      "Businesses with no website yet. We build everything from scratch — set up to be found by AI from day one. (Already have a website? See Optimization Pack instead.)",
     description:
-      "Don't have a website yet? We build everything you need to be found online. A clean website, your Google Business Profile, your Facebook and Instagram setup, and the technical bits that AI engines need to recommend you. Most agencies skip the technical part. We don't.",
+      "Don't have a website yet? We build everything you need to be found online. A clean website, your Google Business Profile, your Facebook and Instagram setup, and the technical bits that AI engines need to recommend you. Most agencies skip the technical part. We don't. After delivery you get a free 10-min walkthrough on how to update content yourself, or you can add the optional Self-Edit Admin Panel (R2,500) for a WordPress-like editing experience.",
     receives: [
       "Live 5-page website on your own domain (we register it if you don't have one)",
       "Google Business Profile claimed, verified, and fully set up",
@@ -107,7 +107,7 @@ export const tiers: Tier[] = [
       "Facebook and Instagram pages set up or refreshed, with 5 starter posts on each",
       "10 listings on trusted business directories",
       "Business email (you@yourbusiness.co.za)",
-      "30-minute walkthrough call to hand you the keys",
+      "30-minute walkthrough call + free 10-min self-edit walkthrough",
       "PDF documenting everything we did + all login details",
       "60-day support window for small fixes",
     ],
@@ -137,6 +137,56 @@ export const tiers: Tier[] = [
       "PDF with all login details",
     ],
     cta: { label: "Start Foundation Lite", href: "/brief/foundation-lite" },
+    highlight: false,
+  },
+  {
+    id: "optimization",
+    rank: 35,
+    name: "Optimization Pack",
+    category: "foundation",
+    price: { sa: "R10,500", intl: "$795 / £595" },
+    payment: "50% to start · 50% on delivery",
+    delivery: "3 weeks",
+    bestFor:
+      "Businesses with an existing website (any platform — WordPress, Wix, Squarespace, Shopify, or custom) that want AI visibility infrastructure added without rebuilding.",
+    description:
+      "You already have a website you're happy with. We don't touch it. We add the AI visibility layer on top — schema markup, GBP setup, citations, AI-shaped content. Same end goal as Foundation Pack (cited by AI engines), different starting point. Faster delivery because we're not building from scratch.",
+    receives: [
+      "Full audit of your existing site for AEO readiness",
+      "Schema markup deployed (via plugin if WordPress, GTM if Wix/Squarespace, custom code if needed)",
+      "Google Business Profile claimed, refreshed and verified",
+      "10 directory listings with NAP-consistent data",
+      "3 priority pages on your existing site rewritten in answer-shape (for AI engines)",
+      "5 starter LinkedIn or Facebook posts aligned with AEO strategy",
+      "Sitemap, robots.txt audit + llms.txt added",
+      "30-min handover call + PDF doc with everything we did",
+      "60-day support window",
+    ],
+    cta: { label: "Optimize my existing site", href: "/brief/optimization" },
+    highlight: false,
+  },
+  {
+    id: "optimization-lite",
+    rank: 36,
+    name: "Optimization Lite",
+    category: "foundation",
+    price: { sa: "R5,500", intl: "$395 / £295" },
+    payment: "50% to start · 50% on delivery",
+    delivery: "2 weeks",
+    bestFor:
+      "Sole traders or single-service businesses with a basic existing site (any platform) that want core AI visibility infrastructure added.",
+    description:
+      "Light version of Optimization Pack for sole traders. Schema markup, GBP, light citation work, and one priority page rewritten in answer-shape. Same Method, smaller scope, 2-week delivery.",
+    receives: [
+      "Audit of existing site for AEO readiness",
+      "Schema markup deployed on key pages",
+      "Google Business Profile claimed and set up",
+      "5 directory listings with NAP-consistent data",
+      "1 priority page rewritten in answer-shape",
+      "20-min handover call",
+      "PDF documentation of everything done",
+    ],
+    cta: { label: "Start Optimization Lite", href: "/brief/optimization-lite" },
     highlight: false,
   },
   {
@@ -289,6 +339,24 @@ export type AddOn = {
 };
 
 export const addOns: AddOn[] = [
+  {
+    id: "admin-panel",
+    name: "Self-Edit Admin Panel",
+    category: "setup",
+    price: { sa: "R2,500", intl: "$195 / £145" },
+    payment: "Paid in full upfront (under R5K)",
+    delivery: "2 days",
+    description:
+      "Optional admin panel for Foundation Pack clients who want to update content themselves without calling us. WordPress-like editing UI accessible at /admin on your site. You log in with your GitHub account, edit blog posts and key content fields, hit publish — changes go live in 60 seconds. Free 10-minute walkthrough is included with every Foundation Pack delivery; this add-on upgrades that to a full visual editor.",
+    receives: [
+      "/admin panel installed on your site (Decap CMS — free, open-source)",
+      "GitHub OAuth connection so login is secure",
+      "Editable schema for blog posts, FAQ items, basic content blocks",
+      "15-minute walkthrough call showing you how to use it",
+      "PDF reference doc for common edits",
+    ],
+    cta: { label: "Add admin panel", href: "/scan?tier=admin-panel" },
+  },
   {
     id: "gbp-setup",
     name: "GBP Setup & Verification",

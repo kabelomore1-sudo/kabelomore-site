@@ -17,8 +17,10 @@
 All once-off projects bill 50% deposit to start, 50% on delivery. Monthly retainers bill in advance with a 3-month minimum.
 
 - **Free AI Visibility Scan** — 24-hour turnaround, no card required. A 2-page PDF report showing exactly what ChatGPT, Claude, Gemini, and Perplexity say about a business when its customers search. https://kabelomore.com/scan
-- **Foundation Pack** — R12,500 / $895 / £675. For businesses with no website. Live 5-page website + Google Business Profile setup + schema markup + Facebook/Instagram setup + 10 directory listings + 4-week delivery + 60-day support. https://kabelomore.com/foundation
+- **Foundation Pack** — R12,500 / $895 / £675. For businesses with NO website yet. Live 5-page website + Google Business Profile setup + schema markup + Facebook/Instagram setup + 10 directory listings + 4-week delivery + 60-day support. https://kabelomore.com/foundation
 - **Foundation Lite** — R6,500 / $495 / £375. Sole-trader version. 1-page website + GBP + schema + one social platform + 5 directory listings. 2-week delivery.
+- **Optimization Pack** — R10,500 / $795 / £595. For businesses with an EXISTING website (any platform — WordPress, Wix, Squarespace, Shopify, custom). We don't rebuild; we add the AI visibility layer on top: schema, GBP, 10 citations, 3 priority pages rewritten for AI engines. 3-week delivery.
+- **Optimization Lite** — R5,500 / $395 / £295. Sole-trader version of Optimization Pack. Schema + GBP + 5 citations + 1 priority page rewritten. 2-week delivery.
 - **Discovery & Strategy Sprint** — R3,500 / $295 / £225. 2-week strategy sprint: customer profile, competitor analysis, AI visibility baseline, written 6-month roadmap. Bundled free into the first month of any retainer.
 - **Starter Audit** — R5,000 / $295 / £235. For businesses with an existing website. Full 4-engine AI audit + competitive benchmark + top-10 fix list + 5-day delivery.
 - **Growth retainer** — R8,500/mo / $695/mo / £495/mo. Ongoing AI visibility work: technical schema deployment, third-party citation building, AI-shaped content production. NOT social media management.
