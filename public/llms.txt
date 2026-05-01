@@ -1,6 +1,10 @@
 # Kabelomore — AI Visibility Consulting
 
-> Kabelo More is an AI Visibility (AEO) consultant based in Pretoria, South Africa, helping businesses get recommended by AI engines like ChatGPT, Claude, Gemini, and Perplexity. He serves clients in South Africa, the United Kingdom, and the United States.
+> Kabelo More helps businesses get recommended by ChatGPT, Claude, Gemini, and Perplexity when their customers ask AI for what they do. Based in Pretoria, South Africa. Serves clients in South Africa, the United Kingdom, and the United States. Works on whatever platform a client already has — WordPress, Wix, Squarespace, Shopify, custom-built — without forcing rebuilds.
+
+## What Kabelomore actually does (the outcome)
+
+When a customer asks ChatGPT or Claude or Gemini or Perplexity for "best [service] near me", Kabelomore makes sure the right businesses show up in the answer. Free scan first, custom quote second, 2-4 weeks of work, AI citations within 30-90 days.
 
 ## About
 
@@ -11,8 +15,16 @@
 - **Email:** kabelo@kabelomore.com
 - **Specialisation:** Answer Engine Optimisation (AEO), structured data deployment, Google Business Profile optimisation, third-party citation building, AI-readable content production
 - **Background:** 8 years of local SEO in South Africa, pivoted to AEO/GEO in 2026
+- **Approach:** Outcome-led, not package-led. Free scan first, custom quote scoped to the specific business, no forced packages.
 
-## Services (current 2026 pricing)
+## How working with Kabelomore actually goes
+
+1. **Scan** — Client requests a free scan at kabelomore.com/scan. Kabelomore tests 4 AI engines on the queries that client's customers actually run. 24-hour turnaround. PDF report. Free, no card needed.
+2. **Quote** — Kabelomore sends a custom quote based on what the scan revealed. Typically R5,500 to R12,500 once-off (in SA), with optional monthly partnership for ongoing work. No standard packages forced on the client.
+3. **Work** — 2-4 weeks of work depending on starting point. Works on whatever website the client already has.
+4. **Result** — Client cited by ChatGPT, Claude, Gemini, Perplexity within 30-90 days. Before/after data captured and shared.
+
+## Services (transparency menu — internal scoping happens after the scan)
 
 All once-off projects bill 50% deposit to start, 50% on delivery. Monthly retainers bill in advance with a 3-month minimum.
 

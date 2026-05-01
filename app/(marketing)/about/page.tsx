@@ -56,15 +56,18 @@ export default function AboutPage() {
         <div className="mx-auto max-w-3xl">
           <Eyebrow>About Kabelo More</Eyebrow>
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
-            8 years of local SEO.
+            I help businesses
             <br />
-            <span className="text-ink-500">Now applied to the AI search era.</span>
+            <span className="text-ink-500">
+              get cited by ChatGPT, Claude, Gemini, and Perplexity
+            </span>{" "}
+            when their customers ask AI for what they do.
           </h1>
           <p className="mt-7 text-lg text-ink-500 leading-relaxed">
-            I built local SEO businesses from Pretoria for nearly a decade. Then
-            ChatGPT, Claude, Gemini, and Perplexity changed how people search. I
-            now do AI Visibility — the same first-principles work, applied to a
-            new search layer that almost nobody in South Africa is doing yet.
+            8 years of local SEO out of Pretoria. Then the search layer changed.
+            I now apply the same first-principles work to AI engines — on
+            whatever website my clients have, for a flat fee, without forcing
+            anyone into packages they don&apos;t need.
           </p>
         </div>
       </Section>

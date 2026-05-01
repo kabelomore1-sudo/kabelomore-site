@@ -5,11 +5,9 @@ import { JsonLd } from "@/components/ui/jsonld";
 import { AiDemoSection } from "@/components/ai-demo-section";
 import { AeoVsSeo } from "@/components/aeo-vs-seo";
 import { faqJsonLd } from "@/lib/seo";
-import { tiers } from "@/lib/site";
 import Link from "next/link";
 import {
   ArrowRight,
-  CircleCheck,
   ScanSearch,
   Stethoscope,
   Building2,
@@ -49,11 +47,11 @@ const homepageFaqs = [
   },
   {
     q: "I already have a website on WordPress / Wix / Squarespace. Do I need to start over?",
-    a: "No. Most clients keep their existing site. We add the AI visibility layer on top — schema markup, GBP setup, citations, AI-shaped content. Whether you're on WordPress, Wix, Squarespace, Shopify, or a custom builder, AEO works on top of what you have. That's the Optimization Pack (R10,500, 3 weeks). We only recommend a rebuild when your existing site is so slow or broken that fixing it costs more than rebuilding — and we'll tell you honestly during the audit.",
+    a: "No. Most clients keep their existing site. We add the AI visibility layer on top — schema markup, GBP setup, citations, AI-shaped content. Whether you're on WordPress, Wix, Squarespace, Shopify, or a custom builder, AEO works on top of what you have. We only recommend a rebuild when your existing site is so slow or broken that fixing it costs more than rebuilding — and we'll tell you honestly during the audit.",
   },
   {
-    q: "What's the difference between Foundation Pack, Optimization Pack, Starter, Growth, and Premium?",
-    a: "Foundation Pack (R12,500) is for businesses with NO website yet — we build everything from zero. Optimization Pack (R10,500) is for businesses with an EXISTING website that just need the AEO infrastructure layered on. Starter Audit (R5,000) is the diagnostic — find out where you stand with a written plan. Growth (R8,500/month) is ongoing optimisation: articles, GBP posts, schema updates, citations, reports. Premium (R15,000/month) is Growth plus dedicated specialist time and full first-month implementation for businesses where AI visibility is THE growth strategy.",
+    q: "How much does it cost?",
+    a: "We don't have one fixed package. After your free scan we send a custom quote based on what we found — typically R5,500 to R12,500 once-off, plus an optional monthly partnership (R8,500-15,000/mo) for ongoing work. Once-off projects bill 50% deposit, 50% on delivery. Monthly retainers bill in advance, 3-month minimum. Full price list at /pricing if you want to see the menu before booking the scan.",
   },
 ];
 
@@ -94,38 +92,36 @@ export default function HomePage() {
         <Container className="relative">
           <div className="mx-auto max-w-4xl text-center">
             <Eyebrow className="justify-center">
-              AI Visibility · AEO · Pretoria → London
+              AI Visibility · AEO · Pretoria · Serving SA · UK · US
             </Eyebrow>
 
             <h1 className="mt-6 text-display-xl font-semibold tracking-tight text-ink-900">
-              Most businesses are{" "}
+              When your customer asks AI for{" "}
               <span className="relative inline-block whitespace-nowrap">
-                <span className="relative z-10">invisible</span>
+                <span className="relative z-10">your service</span>
                 <span className="absolute inset-x-0 bottom-1 h-3 -z-0 bg-accent-100" />
-              </span>{" "}
-              to AI search.
+              </span>
+              ,
               <br className="hidden md:block" />
-              <span className="text-ink-500">I fix that.</span>
+              <span className="text-ink-500">does your business come up?</span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-500 md:text-xl">
-              When customers ask ChatGPT, Claude, Gemini, or Perplexity to recommend a
-              business in your category — does your name come up? For most professional
-              firms in South Africa and the UK, the answer is no. That's a revenue
-              problem hiding in plain sight.
+              For most South African and UK firms, the answer is no. We fix that —
+              on whatever website you currently have, in 2-4 weeks, for a flat fee.
+              Free scan first, so you see exactly what AI says about you before
+              you spend a cent.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button href="/scan" variant="primary" size="lg">
-                Get a free AI scan <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button href="/services" variant="secondary" size="lg">
-                See pricing
+                See what AI says about you — free scan{" "}
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
 
             <p className="mt-5 text-sm text-ink-400">
-              24-hour turnaround · No obligation · Real businesses, real before-and-after data
+              24h turnaround · No card · No forced packages · Custom quote after scan
             </p>
           </div>
 
@@ -137,15 +133,15 @@ export default function HomePage() {
                   4
                 </div>
                 <div className="mt-1 text-sm text-ink-500">
-                  AI engines tested per audit
+                  AI engines tested — ChatGPT, Claude, Gemini, Perplexity
                 </div>
               </div>
               <div className="md:border-l md:border-rule md:pl-6">
                 <div className="text-3xl font-semibold tracking-tight text-ink-900">
-                  24h
+                  Any platform
                 </div>
                 <div className="mt-1 text-sm text-ink-500">
-                  Free scan turnaround
+                  WordPress, Wix, Squarespace, Shopify, custom — works on all
                 </div>
               </div>
               <div className="md:border-l md:border-rule md:pl-6">
@@ -153,7 +149,7 @@ export default function HomePage() {
                   R0
                 </div>
                 <div className="mt-1 text-sm text-ink-500">
-                  To find out if AI recommends you
+                  To find out where you stand. No obligation.
                 </div>
               </div>
             </div>
@@ -211,138 +207,86 @@ export default function HomePage() {
       {/* ─── AEO vs TRADITIONAL SEO ───────────────────────────────── */}
       <AeoVsSeo />
 
-      {/* ─── 5-STEP PROCESS ───────────────────────────────────────── */}
+      {/* ─── HOW WE WORK WITH YOU — single customer-facing flow ──── */}
       <Section variant="tinted" padding="lg">
         <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">How we work</Eyebrow>
+          <Eyebrow className="justify-center">How we work with you</Eyebrow>
           <h2 className="mt-4 text-display-lg font-semibold tracking-tight text-ink-900">
-            Five disciplined steps.
+            Four steps. One outcome.
             <br />
-            <span className="text-ink-500">Same process, every client.</span>
-          </h2>
-        </div>
-
-        <div className="mx-auto mt-16 grid max-w-5xl gap-px overflow-hidden rounded-2xl bg-rule shadow-card md:grid-cols-5">
-          {[
-            { n: "01", h: "Scan", p: "Test your business across ChatGPT, Claude, Gemini, and Perplexity. Capture verbatim responses." },
-            { n: "02", h: "Diagnose", p: "Audit website schema, GBP, third-party citations, review velocity. Map competitive gaps." },
-            { n: "03", h: "Build", p: "Deploy schema, optimise GBP, publish answer-shaped content, establish citations." },
-            { n: "04", h: "Measure", p: "Rescan at 30 days. Show before-and-after citation data. Prove the work." },
-            { n: "05", h: "Compound", p: "Keep optimising as AI models update. Own your category over time." },
-          ].map((step) => (
-            <div key={step.n} className="bg-white p-6">
-              <div className="text-sm font-mono text-accent-600">{step.n}</div>
-              <div className="mt-3 text-lg font-semibold text-ink-900">
-                {step.h}
-              </div>
-              <div className="mt-2 text-sm text-ink-500 leading-relaxed">
-                {step.p}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-10 text-center">
-          <Link
-            href="/process"
-            className="inline-flex items-center gap-1 text-sm font-medium text-accent-600 hover:text-accent-700"
-          >
-            Full process breakdown <ArrowUpRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </Section>
-
-      {/* ─── PRICING TIERS PREVIEW ────────────────────────────────── */}
-      <Section variant="default" padding="lg">
-        <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">Services</Eyebrow>
-          <h2 className="mt-4 text-display-lg font-semibold tracking-tight text-ink-900">
-            Where are you starting from?
+            <span className="text-ink-500">Your business, cited by AI.</span>
           </h2>
           <p className="mt-5 text-lg text-ink-500">
-            From "I have nothing yet" to "I want serious growth" — pick what fits.
-            Pay 50% to start on once-off work, 50% on delivery. Monthly retainers billed in advance, cancel after 3 months.
+            No menu of packages to choose from. No pressure to buy.
+            Free scan first, custom quote second, work third, results fourth.
           </p>
         </div>
 
-        <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {tiers
-            .filter((t) => ["scan", "foundation", "growth", "premium"].includes(t.id))
-            .map((tier) => (
-            <div
-              key={tier.id}
-              className={
-                tier.highlight
-                  ? "relative rounded-2xl bg-ink-900 p-7 text-white shadow-lift ring-1 ring-ink-900"
-                  : "rounded-2xl border border-rule bg-white p-7 shadow-soft transition-shadow hover:shadow-card"
-              }
+        <div className="mx-auto mt-16 grid max-w-5xl gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              n: "01",
+              h: "Scan",
+              accent: "bg-ink-900 text-white",
+              p: "Request a free scan. We test 4 AI engines on the queries your customers actually run. 24-hour turnaround. PDF report. Free.",
+            },
+            {
+              n: "02",
+              h: "Quote",
+              accent: "bg-accent-500 text-white",
+              p: "We send a custom quote based on what your scan revealed. Typically R5,500 to R12,500 once-off. No standard packages forced on you.",
+            },
+            {
+              n: "03",
+              h: "Work",
+              accent: "bg-gold-500 text-white",
+              p: "We make you findable by AI engines. 2-4 weeks depending on starting point. Works on whatever platform you're on — WordPress, Wix, Squarespace, custom.",
+            },
+            {
+              n: "04",
+              h: "Result",
+              accent: "bg-emerald-500 text-white",
+              p: "You're cited by ChatGPT, Claude, Gemini, Perplexity within 30-90 days. We measure before and after, and send you proof.",
+            },
+          ].map((step) => (
+            <article
+              key={step.n}
+              className="rounded-2xl border border-rule bg-white p-7 shadow-soft transition-shadow hover:shadow-card"
             >
-              {tier.highlight && (
-                <div className="absolute -top-3 left-7 rounded-full bg-accent-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-                  Most popular
-                </div>
-              )}
               <div
-                className={
-                  tier.highlight
-                    ? "text-xs font-semibold uppercase tracking-[0.14em] text-accent-400"
-                    : "text-xs font-semibold uppercase tracking-[0.14em] text-accent-600"
-                }
+                className={`flex h-10 w-10 items-center justify-center rounded-xl font-mono text-sm ${step.accent}`}
               >
-                {tier.category === "scan" && "Try us"}
-                {tier.category === "foundation" && "No website yet"}
-                {tier.category === "audit" && "Just clarity"}
-                {tier.category === "retainer" && (tier.id === "premium" ? "Serious growth" : "Ongoing growth")}
+                {step.n}
               </div>
-              <div className="mt-3 text-xl font-semibold">{tier.name}</div>
-              <div className="mt-3">
-                <div className={tier.highlight ? "text-2xl font-semibold" : "text-2xl font-semibold text-ink-900"}>
-                  {tier.price.sa}
-                </div>
-                <div className={tier.highlight ? "text-xs text-ink-300" : "text-xs text-ink-400"}>
-                  {tier.price.intl}
-                </div>
+              <div className="mt-5 text-2xl font-semibold tracking-tight text-ink-900">
+                {step.h}
               </div>
-              <div
-                className={
-                  tier.highlight
-                    ? "mt-3 inline-flex rounded-full bg-white/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent-300"
-                    : "mt-3 inline-flex rounded-full bg-accent-50 px-2 py-1 text-[10px] uppercase tracking-wider text-accent-700"
-                }
-              >
-                {tier.payment}
-              </div>
-              <p className={tier.highlight ? "mt-4 text-sm text-ink-300 leading-relaxed" : "mt-4 text-sm text-ink-500 leading-relaxed"}>
-                {tier.bestFor}
+              <p className="mt-3 text-sm text-ink-700 leading-relaxed">
+                {step.p}
               </p>
-              <ul className="mt-5 space-y-2">
-                {tier.receives.slice(0, 4).map((b) => (
-                  <li key={b} className="flex items-start gap-2 text-sm">
-                    <CircleCheck
-                      className={
-                        tier.highlight
-                          ? "mt-0.5 h-4 w-4 flex-shrink-0 text-accent-400"
-                          : "mt-0.5 h-4 w-4 flex-shrink-0 text-accent-500"
-                      }
-                    />
-                    <span className={tier.highlight ? "text-ink-100" : "text-ink-700"}>
-                      {b}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6">
-                <Button
-                  href={tier.cta.href}
-                  variant={tier.highlight ? "ink" : "secondary"}
-                  size="sm"
-                  className="w-full"
-                >
-                  {tier.cta.label}
-                </Button>
-              </div>
-            </div>
+            </article>
           ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <p className="text-sm text-ink-500">
+            Want to see the menu before booking the scan?
+          </p>
+          <div className="mt-3 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-1 text-sm font-medium text-accent-600 hover:text-accent-700"
+            >
+              Full price list <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+            <span className="hidden text-ink-300 sm:inline">·</span>
+            <Link
+              href="/how-we-work"
+              className="inline-flex items-center gap-1 text-sm font-medium text-accent-600 hover:text-accent-700"
+            >
+              Detailed delivery process <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </div>
       </Section>
 
@@ -442,20 +386,22 @@ export default function HomePage() {
             <ScanSearch className="h-6 w-6" />
           </div>
           <h2 className="mt-7 text-display-lg font-semibold tracking-tight text-ink-900">
-            Find out if AI recommends your business.
+            See what AI says about your business.
           </h2>
           <p className="mt-5 text-lg text-ink-500">
-            Submit your business name and website. You'll have a 2-page report in your
-            inbox within 24 hours. Free. No follow-up unless you want one.
+            Submit your business name and website. We test 4 AI engines on the queries
+            your customers actually run. 2-page report in your inbox within 24 hours.
+            No card. No obligation. No follow-up unless you ask for one.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button href="/scan" variant="primary" size="lg">
               Request your free scan <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button href="/services" variant="ghost" size="lg">
-              Or see services first
-            </Button>
           </div>
+          <p className="mt-5 text-sm text-ink-400">
+            After the scan we send a custom quote, scoped to what your business
+            actually needs. No forced packages.
+          </p>
         </div>
       </Section>
     </>
