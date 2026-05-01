@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { Loader2, Send, AlertTriangle, Sparkles } from "lucide-react";
@@ -8,29 +8,75 @@ import { cn } from "@/lib/cn";
 import { INDUSTRIES, COUNTRIES } from "@/lib/types/scan";
 import type { ScanResult } from "@/lib/types/scan";
 
+type FormValues = {
+  businessName?: string;
+  industry?: string;
+  city?: string;
+  country?: string;
+  servicesText?: string;
+  contactName?: string;
+  email?: string;
+  website?: string;
+  gbpUrl?: string;
+  phone?: string;
+  linkedinUrl?: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+};
+
 type FormState =
   | { status: "idle" }
   | { status: "scanning"; stage: number }
   | { status: "success"; scanId: string; result: ScanResult }
-  | { status: "error"; message: string; scanId?: string };
+  | { status: "error"; message: string; field?: string; values: FormValues };
 
 const inputClasses =
   "w-full rounded-xl border border-rule bg-white px-4 py-3 text-base text-ink-900 placeholder:text-ink-300 transition-colors focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20";
 
 const SCAN_STAGES = [
   { label: "Validating your business details", duration: 3000 },
+  { label: "Discovering your website and Google Business Profile", duration: 10000 },
   { label: "Searching for citations across the web", duration: 12000 },
-  { label: "Testing how ChatGPT sees your category", duration: 12000 },
-  { label: "Testing how Claude and Perplexity respond", duration: 12000 },
+  { label: "Testing how AI engines see your category", duration: 15000 },
   { label: "Computing your AI visibility score", duration: 5000 },
   { label: "Generating your personalized diagnosis", duration: 4000 },
 ];
 
+// Map technical field names to human-friendly labels for error messages
+const FIELD_LABELS: Record<string, string> = {
+  businessName: "Business name",
+  industry: "Industry",
+  city: "City",
+  country: "Country",
+  servicesText: "Services",
+  contactName: "Your name",
+  email: "Your email",
+  website: "Website",
+  gbpUrl: "Google Business Profile URL",
+};
+
+function friendlyError(message: string, field?: string): string {
+  const fieldLabel = field ? FIELD_LABELS[field] ?? field : null;
+  if (message.includes("at least 1 character")) {
+    return fieldLabel
+      ? `${fieldLabel} cannot be empty`
+      : "Please fill in all required fields";
+  }
+  if (message.includes("Invalid email")) return "Please enter a valid email address";
+  if (message.includes("Invalid url")) {
+    return fieldLabel
+      ? `${fieldLabel} must be a full URL (e.g. https://yourbusiness.co.za)`
+      : "Please enter a valid URL";
+  }
+  return fieldLabel ? `${fieldLabel}: ${message}` : message;
+}
+
 export function ScanForm({ defaultTier }: { defaultTier?: string }) {
   const router = useRouter();
   const [state, setState] = useState<FormState>({ status: "idle" });
+  const formRef = useRef<HTMLFormElement>(null);
 
-  // Animate scan stages while we wait for the response
+  // Animate scan stages while we wait
   useEffect(() => {
     if (state.status !== "scanning") return;
     let totalElapsed = 0;
@@ -49,7 +95,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
     };
   }, [state.status]);
 
-  // On success, navigate to the results page (after stashing in sessionStorage)
+  // On success, stash result in sessionStorage and navigate to results
   useEffect(() => {
     if (state.status !== "success") return;
     try {
@@ -57,24 +103,22 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
         `scan_${state.scanId}_result`,
         JSON.stringify(state.result),
       );
-    } catch {
-      // sessionStorage can be disabled (e.g. private browsing); not fatal
-    }
+    } catch {}
     router.push(`/scan/${state.scanId}/results`);
   }, [state, router]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setState({ status: "scanning", stage: 0 });
-
     const formData = new FormData(event.currentTarget);
-    const payload = Object.fromEntries(formData.entries());
+    const values: FormValues = Object.fromEntries(formData.entries());
+
+    setState({ status: "scanning", stage: 0 });
 
     try {
       const res = await fetch("/api/scan/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(values),
       });
 
       const data = await res.json();
@@ -85,7 +129,8 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
           message:
             data.message ??
             "Something went wrong. Please try again or email kabelo@kabelomore.com.",
-          scanId: data.scanId,
+          field: data.field,
+          values,
         });
         return;
       }
@@ -102,6 +147,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
           err instanceof Error
             ? err.message
             : "Could not submit. Please email kabelo@kabelomore.com directly.",
+        values,
       });
     }
   }
@@ -110,38 +156,38 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
     return <ScanningProgress stageIndex={state.stage} />;
   }
 
-  if (state.status === "error") {
-    return (
-      <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 md:p-10">
-        <div className="flex items-start gap-4">
-          <AlertTriangle className="mt-1 h-6 w-6 flex-shrink-0 text-amber-700" />
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold tracking-tight text-ink-900">
-              Scan didn&apos;t complete cleanly
-            </h2>
-            <p className="mt-3 text-sm text-ink-700 leading-relaxed">
-              {state.message}
-            </p>
-            <p className="mt-4 text-sm text-ink-700">
-              We&apos;ve still notified Kabelo with your details — he&apos;ll
-              follow up via email within 24 hours with your results manually.
-            </p>
-            <button
-              type="button"
-              onClick={() => setState({ status: "idle" })}
-              className="mt-5 text-sm font-medium text-accent-700 hover:text-accent-800 underline"
-            >
-              Try again
-            </button>
+  // Form is rendered for both "idle" and "error" states. Field defaults
+  // restore the user's previous input on error so they don't lose typing.
+  const defaults: FormValues = state.status === "error" ? state.values : {};
+
+  return (
+    <form ref={formRef} onSubmit={onSubmit} className="space-y-5" noValidate>
+      {/* Error banner — sticky at top of form when present */}
+      {state.status === "error" && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700" />
+            <div className="flex-1">
+              <div className="text-sm font-semibold text-ink-900">
+                {friendlyError(state.message, state.field)}
+              </div>
+              <div className="mt-1.5 text-xs text-ink-700">
+                Your input is preserved — fix the issue and submit again.
+                We&apos;ve also notified Kabelo with your details (he&apos;ll
+                follow up by email).
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    );
-  }
+      )}
 
-  // Idle / form view
-  return (
-    <form onSubmit={onSubmit} className="space-y-5" noValidate>
+      {/* ─── Section 1: About your business ─── */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
+          About your business
+        </h3>
+      </div>
+
       <div className="grid gap-5 md:grid-cols-2">
         <div>
           <label htmlFor="businessName" className="block text-sm font-medium text-ink-900">
@@ -152,6 +198,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
             id="businessName"
             name="businessName"
             required
+            defaultValue={defaults.businessName}
             placeholder="e.g. OMS Lifting Solutions"
             className={cn("mt-2", inputClasses)}
             autoComplete="organization"
@@ -165,7 +212,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
             id="industry"
             name="industry"
             required
-            defaultValue=""
+            defaultValue={defaults.industry ?? ""}
             className={cn("mt-2", inputClasses)}
           >
             <option value="" disabled>
@@ -190,6 +237,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
             id="city"
             name="city"
             required
+            defaultValue={defaults.city}
             placeholder="e.g. Pretoria"
             className={cn("mt-2", inputClasses)}
           />
@@ -202,7 +250,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
             id="country"
             name="country"
             required
-            defaultValue="ZA"
+            defaultValue={defaults.country ?? "ZA"}
             className={cn("mt-2", inputClasses)}
           >
             <option value="ZA">South Africa</option>
@@ -222,13 +270,135 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
           name="servicesText"
           rows={2}
           required
+          defaultValue={defaults.servicesText}
           placeholder="e.g. crane inspection, lifting equipment hire, BBBEE Level 1 industrial supplier"
           className={cn("mt-2", inputClasses, "resize-y")}
         />
         <p className="mt-1.5 text-xs text-ink-500">
-          Use the words your customers actually use. Don&apos;t worry about SEO —
-          this is what we test against AI engines.
+          Use the words your customers actually use. We test against AI engines using these.
         </p>
+      </div>
+
+      {/* ─── Section 2: Online presence (now visible by default) ─── */}
+      <div className="border-t border-rule pt-6">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
+          Your online presence
+        </h3>
+        <p className="mt-2 text-sm text-ink-700">
+          Help us run a more accurate scan. Leave any field blank if you don&apos;t have it —
+          we&apos;ll search for it automatically.
+        </p>
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-2">
+        <div>
+          <label htmlFor="website" className="block text-sm font-medium text-ink-900">
+            Website (if any)
+          </label>
+          <input
+            type="url"
+            id="website"
+            name="website"
+            defaultValue={defaults.website}
+            placeholder="https://"
+            className={cn("mt-2", inputClasses)}
+            autoComplete="url"
+          />
+          <p className="mt-1.5 text-xs text-ink-500">
+            Don&apos;t have one yet? Leave blank.
+          </p>
+        </div>
+        <div>
+          <label htmlFor="gbpUrl" className="block text-sm font-medium text-ink-900">
+            Google Business Profile URL
+          </label>
+          <input
+            type="url"
+            id="gbpUrl"
+            name="gbpUrl"
+            defaultValue={defaults.gbpUrl}
+            placeholder="https://maps.app.goo.gl/..."
+            className={cn("mt-2", inputClasses)}
+          />
+          <p className="mt-1.5 text-xs text-ink-500">
+            Search your business on Google → click &ldquo;Share&rdquo; → copy link.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="phone" className="block text-sm font-medium text-ink-900">
+          Business phone (optional but improves citation analysis)
+        </label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          defaultValue={defaults.phone}
+          placeholder="+27 ..."
+          className={cn("mt-2", inputClasses)}
+        />
+      </div>
+
+      {/* ─── Section 3: Social profiles (still hidden, less important) ─── */}
+      <details
+        className="group rounded-xl border border-rule bg-ink-50/40 p-4 open:bg-white open:shadow-soft"
+        open={Boolean(
+          defaults.linkedinUrl || defaults.facebookUrl || defaults.instagramUrl,
+        )}
+      >
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-ink-900">
+          <span>Add social profiles (optional)</span>
+          <span className="text-xs text-ink-500 transition-transform group-open:rotate-180">▾</span>
+        </summary>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div>
+            <label htmlFor="linkedinUrl" className="block text-xs font-medium text-ink-900">
+              LinkedIn page
+            </label>
+            <input
+              type="url"
+              id="linkedinUrl"
+              name="linkedinUrl"
+              defaultValue={defaults.linkedinUrl}
+              placeholder="https://linkedin.com/company/..."
+              className={cn("mt-1.5", inputClasses)}
+            />
+          </div>
+          <div>
+            <label htmlFor="facebookUrl" className="block text-xs font-medium text-ink-900">
+              Facebook page
+            </label>
+            <input
+              type="url"
+              id="facebookUrl"
+              name="facebookUrl"
+              defaultValue={defaults.facebookUrl}
+              placeholder="https://facebook.com/..."
+              className={cn("mt-1.5", inputClasses)}
+            />
+          </div>
+          <div>
+            <label htmlFor="instagramUrl" className="block text-xs font-medium text-ink-900">
+              Instagram
+            </label>
+            <input
+              type="url"
+              id="instagramUrl"
+              name="instagramUrl"
+              defaultValue={defaults.instagramUrl}
+              placeholder="https://instagram.com/..."
+              className={cn("mt-1.5", inputClasses)}
+            />
+          </div>
+        </div>
+      </details>
+
+      {/* ─── Section 4: How to reach you ─── */}
+      <div className="border-t border-rule pt-6">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
+          How to send you the scan
+        </h3>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
@@ -241,6 +411,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
             id="contactName"
             name="contactName"
             required
+            defaultValue={defaults.contactName}
             className={cn("mt-2", inputClasses)}
             autoComplete="name"
           />
@@ -254,100 +425,12 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
             id="email"
             name="email"
             required
+            defaultValue={defaults.email}
             className={cn("mt-2", inputClasses)}
             autoComplete="email"
           />
         </div>
       </div>
-
-      {/* Optional fields — collapsed under disclosure */}
-      <details className="group rounded-xl border border-rule bg-ink-50/40 p-4 open:bg-white open:shadow-soft">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-ink-900">
-          <span>Optional — add more for a more accurate scan</span>
-          <span className="text-xs text-ink-500 transition-transform group-open:rotate-180">▾</span>
-        </summary>
-        <div className="mt-4 space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label htmlFor="website" className="block text-xs font-medium text-ink-900">
-                Website (if any)
-              </label>
-              <input
-                type="url"
-                id="website"
-                name="website"
-                placeholder="https://"
-                className={cn("mt-1.5", inputClasses)}
-                autoComplete="url"
-              />
-            </div>
-            <div>
-              <label htmlFor="gbpUrl" className="block text-xs font-medium text-ink-900">
-                Google Business Profile URL
-              </label>
-              <input
-                type="url"
-                id="gbpUrl"
-                name="gbpUrl"
-                placeholder="https://maps.app.goo.gl/..."
-                className={cn("mt-1.5", inputClasses)}
-              />
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label htmlFor="phone" className="block text-xs font-medium text-ink-900">
-                Business phone
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                placeholder="+27 ..."
-                className={cn("mt-1.5", inputClasses)}
-              />
-            </div>
-            <div>
-              <label htmlFor="linkedinUrl" className="block text-xs font-medium text-ink-900">
-                LinkedIn page URL
-              </label>
-              <input
-                type="url"
-                id="linkedinUrl"
-                name="linkedinUrl"
-                placeholder="https://linkedin.com/company/..."
-                className={cn("mt-1.5", inputClasses)}
-              />
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label htmlFor="facebookUrl" className="block text-xs font-medium text-ink-900">
-                Facebook page URL
-              </label>
-              <input
-                type="url"
-                id="facebookUrl"
-                name="facebookUrl"
-                placeholder="https://facebook.com/..."
-                className={cn("mt-1.5", inputClasses)}
-              />
-            </div>
-            <div>
-              <label htmlFor="instagramUrl" className="block text-xs font-medium text-ink-900">
-                Instagram page URL
-              </label>
-              <input
-                type="url"
-                id="instagramUrl"
-                name="instagramUrl"
-                placeholder="https://instagram.com/..."
-                className={cn("mt-1.5", inputClasses)}
-              />
-            </div>
-          </div>
-        </div>
-      </details>
 
       {/* Honeypot */}
       <div className="hidden" aria-hidden="true">
@@ -359,7 +442,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
 
       <div className="flex flex-col items-start gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink-500">
-          Scan takes about 60 seconds. We email you the report. No card. No follow-up unless you want one.
+          Scan takes ~60 seconds. We email you the report. No card. No follow-up unless you want one.
         </p>
         <Button type="submit" variant="primary" size="lg">
           Start my free scan <Send className="h-4 w-4" />
@@ -383,13 +466,12 @@ function ScanningProgress({ stageIndex }: { stageIndex: number }) {
         </div>
         <div>
           <div className="text-sm font-semibold uppercase tracking-[0.14em] text-accent-600">
-            Scanning across 4 AI engines
+            Running your AI Visibility scan
           </div>
-          <div className="text-base text-ink-500">This takes ~60 seconds</div>
+          <div className="text-base text-ink-500">~60 seconds total</div>
         </div>
       </div>
 
-      {/* Progress bar */}
       <div className="mt-8">
         <div className="h-2 overflow-hidden rounded-full bg-ink-100">
           <div
@@ -403,7 +485,6 @@ function ScanningProgress({ stageIndex }: { stageIndex: number }) {
         </div>
       </div>
 
-      {/* Stage list */}
       <ul className="mt-8 space-y-3">
         {SCAN_STAGES.map((stage, idx) => {
           const done = idx < safeIndex;
@@ -441,34 +522,23 @@ function ScanningProgress({ stageIndex }: { stageIndex: number }) {
       </ul>
 
       <p className="mt-8 text-xs text-ink-400">
-        Don&apos;t close this tab. Your results will appear here automatically when the scan finishes.
+        Don&apos;t close this tab. Your results appear here automatically when the scan finishes.
       </p>
     </div>
   );
 }
 
-// ─── Industry label helper ───────────────────────────────────────
 function industryLabel(ind: (typeof INDUSTRIES)[number]): string {
   switch (ind) {
-    case "industrial-supplier":
-      return "Industrial supplier";
-    case "professional-services":
-      return "Professional services";
-    case "medical":
-      return "Medical practice";
-    case "legal":
-      return "Legal practice";
-    case "construction":
-      return "Construction";
-    case "retail":
-      return "Retail";
-    case "hospitality":
-      return "Hospitality";
-    case "manufacturing":
-      return "Manufacturing";
-    case "automotive":
-      return "Automotive";
-    case "other":
-      return "Other";
+    case "industrial-supplier": return "Industrial supplier";
+    case "professional-services": return "Professional services";
+    case "medical": return "Medical practice";
+    case "legal": return "Legal practice";
+    case "construction": return "Construction";
+    case "retail": return "Retail";
+    case "hospitality": return "Hospitality";
+    case "manufacturing": return "Manufacturing";
+    case "automotive": return "Automotive";
+    case "other": return "Other";
   }
 }

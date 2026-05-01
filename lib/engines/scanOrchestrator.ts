@@ -3,17 +3,20 @@
  * complete ScanResult.
  *
  * Sequence:
- *   1. Lightweight presence checks (HEAD request to website, search for GBP)
- *   2. Citation analyzer (1-2 web_search calls)
- *   3. Visibility simulator (2 web_search calls)
- *   4. Compute score, classification, recommendations, diagnosis
- *   5. Return full ScanResult
+ *   1. Discovery: find website + GBP if user didn't provide them (10-12s)
+ *   2. Presence checks: HEAD request + schema check on the resolved URL (3-5s)
+ *   3. Citation analysis: 2 parallel multi-strategy searches (10-15s)
+ *   4. Visibility simulator: 2 customer-style queries (20-25s)
+ *   5. Compute score, classification, recommendations, diagnosis
+ *   6. Return full ScanResult
  *
- * Total runtime target: 30-50 seconds. Vercel Hobby max is 60s, so we
- * budget conservatively. If any individual step fails, we proceed with
- * partial data — never fail the entire scan because one query timed out.
+ * Total runtime budget: 50-60s. Must fit Vercel Hobby maxDuration of 60s.
+ *
+ * Resilience: every stage has graceful error handling. One failed engine
+ * never fails the entire scan — partial data is better than no data.
  */
 
+import { discoverPresence } from "./presenceDiscovery";
 import { analyzeCitations } from "./citationAnalyzer";
 import { simulateAIQueries } from "./visibilitySimulator";
 import { computeScore } from "./scoring";
@@ -26,43 +29,112 @@ import type {
   ScanResult,
 } from "@/lib/types/scan";
 
+export type StageStatus = "ok" | "partial" | "failed" | "skipped";
+
+export type ScanStageReport = {
+  discovery: StageStatus;
+  presenceCheck: StageStatus;
+  citationAnalysis: StageStatus;
+  visibilitySimulation: StageStatus;
+};
+
 export async function runFullScan(
   profile: BusinessProfile,
-): Promise<ScanResult> {
+): Promise<ScanResult & { stageReport: ScanStageReport }> {
   const startTime = Date.now();
+  const stageReport: ScanStageReport = {
+    discovery: "skipped",
+    presenceCheck: "skipped",
+    citationAnalysis: "skipped",
+    visibilitySimulation: "skipped",
+  };
 
-  // ─── Step 1: Lightweight presence checks ─────────────────────
-  const presenceData = await detectPresence(profile);
+  // ─── Stage 1: Discovery (find website + GBP if not provided) ──
+  let resolvedWebsite = profile.website;
+  let resolvedGbpUrl = profile.gbpUrl;
+  let discoveryNotes = "";
 
-  // ─── Step 2: Citation analysis ──────────────────────────────
-  let citationData: Awaited<ReturnType<typeof analyzeCitations>>;
+  if (!resolvedWebsite || !resolvedGbpUrl) {
+    try {
+      const discovered = await discoverPresence(profile);
+      stageReport.discovery = discovered.discoveryRan ? "ok" : "failed";
+      discoveryNotes = discovered.notes;
+
+      if (!resolvedWebsite && discovered.websiteFound && discovered.websiteUrl) {
+        resolvedWebsite = discovered.websiteUrl;
+      }
+      if (!resolvedGbpUrl && discovered.gbpFound && discovered.gbpUrl) {
+        resolvedGbpUrl = discovered.gbpUrl;
+      } else if (!resolvedGbpUrl && discovered.gbpFound) {
+        // GBP exists but no direct URL — flag as found anyway
+        resolvedGbpUrl = "(found-via-search)";
+      }
+    } catch (err) {
+      console.error("[scanOrchestrator] discovery failed:", err);
+      stageReport.discovery = "failed";
+    }
+  } else {
+    stageReport.discovery = "skipped"; // user provided both URLs
+  }
+
+  // ─── Stage 2: Presence check ────────────────────────────────
+  let presenceData: Awaited<ReturnType<typeof checkPresence>>;
   try {
-    citationData = await analyzeCitations(profile);
+    presenceData = await checkPresence(resolvedWebsite, resolvedGbpUrl);
+    stageReport.presenceCheck = "ok";
   } catch (err) {
-    console.error("[scanOrchestrator] Citation analysis failed:", err);
-    citationData = {
-      count: 0,
-      level: "none",
-      napConsistent: false,
-      sources: [],
-      notes: "Citation analysis temporarily unavailable.",
+    console.error("[scanOrchestrator] presence check failed:", err);
+    stageReport.presenceCheck = "failed";
+    presenceData = {
+      websiteReachable: false,
+      websiteHasSchema: false,
+      gbpFound: Boolean(resolvedGbpUrl),
+      gbpCompleteness: undefined,
     };
   }
 
-  // ─── Step 3: Visibility simulation ──────────────────────────
-  let visibilityData: Awaited<ReturnType<typeof simulateAIQueries>>;
-  try {
-    visibilityData = await simulateAIQueries(profile);
-  } catch (err) {
-    console.error("[scanOrchestrator] Visibility simulation failed:", err);
-    visibilityData = { checks: [], competitors: [] };
-  }
+  // ─── Stage 3 + 4: Citation + Visibility (run in parallel for speed) ──
+  const profileForEngines: BusinessProfile = {
+    ...profile,
+    website: resolvedWebsite,
+    gbpUrl: resolvedGbpUrl,
+  };
 
-  // ─── Step 4: Synthesize ─────────────────────────────────────
+  const [citationResult, visibilityResult] = await Promise.all([
+    analyzeCitations(profileForEngines).catch((err) => {
+      console.error("[scanOrchestrator] citation analysis failed:", err);
+      return null;
+    }),
+    simulateAIQueries(profileForEngines).catch((err) => {
+      console.error("[scanOrchestrator] visibility simulation failed:", err);
+      return null;
+    }),
+  ]);
+
+  // Status based on whether engines actually ran (not just whether results were 0)
+  const citationData = citationResult ?? {
+    count: 0,
+    level: "none" as const,
+    napConsistent: false,
+    sources: [],
+    notes: "Citation analysis temporarily unavailable",
+    discoveryRan: false,
+  };
+  stageReport.citationAnalysis = citationResult
+    ? citationResult.discoveryRan
+      ? "ok"
+      : "partial"
+    : "failed";
+
+  const visibilityData = visibilityResult ?? { checks: [], competitors: [] };
+  stageReport.visibilitySimulation =
+    visibilityResult && visibilityResult.checks.length > 0 ? "ok" : "failed";
+
+  // ─── Stage 5: Synthesize ─────────────────────────────────────
   const detected: DetectedSignals = {
     websiteReachable: presenceData.websiteReachable,
     websiteHasSchema: presenceData.websiteHasSchema,
-    websiteHasFAQSchema: false, // deeper detection lives in audit-agent CLI
+    websiteHasFAQSchema: false,
     websiteHasLocalBusinessSchema: false,
     gbpFound: presenceData.gbpFound,
     gbpCompleteness: presenceData.gbpCompleteness,
@@ -86,7 +158,7 @@ export async function runFullScan(
     topIssue: issues[0],
   });
 
-  const result: ScanResult = {
+  const result: ScanResult & { stageReport: ScanStageReport } = {
     id: profile.scanId,
     businessName: profile.businessName,
     contactName: profile.contactName,
@@ -103,41 +175,49 @@ export async function runFullScan(
     diagnosisFull: full,
     scannedAt: new Date().toISOString(),
     durationMs: Date.now() - startTime,
+    stageReport,
   };
+
+  // Log stage report for Vercel debugging
+  console.log(`[scanOrchestrator] scan ${profile.scanId} complete:`, {
+    score,
+    classification,
+    duration: `${((Date.now() - startTime) / 1000).toFixed(1)}s`,
+    stages: stageReport,
+    discoveredWebsite: resolvedWebsite,
+    discoveredGbp: resolvedGbpUrl,
+    discoveryNotes,
+    citationCount: citationData.count,
+    citationSources: citationData.sources.slice(0, 5),
+  });
 
   return result;
 }
 
-// ─── Lightweight presence detection ──────────────────────────────
-async function detectPresence(profile: BusinessProfile): Promise<{
+// ─── Lightweight presence check using resolved URLs ──────────────
+async function checkPresence(
+  websiteUrl: string | undefined,
+  gbpUrl: string | undefined,
+): Promise<{
   websiteReachable: boolean;
   websiteHasSchema: boolean;
   gbpFound: boolean;
   gbpCompleteness?: number;
 }> {
-  // Website check: HEAD request with 5s timeout
   let websiteReachable = false;
   let websiteHasSchema = false;
-  if (profile.website) {
-    websiteReachable = await isUrlReachable(profile.website);
+  if (websiteUrl) {
+    websiteReachable = await isUrlReachable(websiteUrl);
     if (websiteReachable) {
-      websiteHasSchema = await checkForSchema(profile.website);
+      websiteHasSchema = await checkForSchema(websiteUrl);
     }
   }
-
-  // GBP check: if user provided URL, accept. If not, infer "unknown" (treat as not found
-  // for scoring purposes, but the scan won't penalise as harshly because it's an
-  // unknown vs verified-absent).
-  // For Phase 1, simple: if user provided GBP URL → assume found. If not → assume not.
-  // Phase 2 will add Google search for the business to detect GBP.
-  const gbpFound = Boolean(profile.gbpUrl);
 
   return {
     websiteReachable,
     websiteHasSchema,
-    gbpFound,
-    // gbpCompleteness intentionally undefined for Phase 1 — adding deeper
-    // GBP introspection is Phase 2 work
+    gbpFound: Boolean(gbpUrl),
+    // gbpCompleteness deferred to Phase 2 (requires Google Maps API or deeper scrape)
   };
 }
 
@@ -149,9 +229,10 @@ async function isUrlReachable(url: string): Promise<boolean> {
       method: "HEAD",
       signal: controller.signal,
       redirect: "follow",
+      headers: { "User-Agent": "KabelomoreScan/1.0" },
     });
     clearTimeout(timeout);
-    return res.ok || res.status < 500; // accept any non-server-error
+    return res.ok || res.status < 500;
   } catch {
     return false;
   }
@@ -169,7 +250,7 @@ async function checkForSchema(url: string): Promise<boolean> {
     clearTimeout(timeout);
     if (!res.ok) return false;
     const html = await res.text();
-    return html.includes('application/ld+json');
+    return html.includes("application/ld+json");
   } catch {
     return false;
   }

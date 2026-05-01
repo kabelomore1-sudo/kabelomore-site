@@ -181,7 +181,7 @@ async function notifyKabeloOnSubmission(profile: BusinessProfile): Promise<void>
 }
 
 async function notifyKabeloOnCompletion(
-  result: ScanResult,
+  result: ScanResult & { stageReport?: import("@/lib/engines/scanOrchestrator").ScanStageReport },
   profile: BusinessProfile,
 ): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -191,17 +191,40 @@ async function notifyKabeloOnCompletion(
   const inboxEmail = process.env.SCAN_INBOX_EMAIL ?? site.contact.email;
   const fromEmail = process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
 
+  // Stage report — what worked vs what didn't
+  const stages = result.stageReport;
+  const stageEmoji = (s: string | undefined) =>
+    s === "ok" ? "✅" : s === "partial" ? "⚠️" : s === "failed" ? "❌" : "—";
+
+  // Confidence flag — if any stage failed, mark scan as low-confidence
+  const hasFailures = stages
+    ? Object.values(stages).some((s) => s === "failed" || s === "partial")
+    : false;
+  const confidenceTag = hasFailures
+    ? `[LOW CONFIDENCE — manual verification recommended]`
+    : `[high confidence]`;
+
   await resend.emails.send({
     from: `Kabelomore Scans <${fromEmail}>`,
     to: [inboxEmail],
     replyTo: profile.email,
-    subject: `Scan complete — ${profile.businessName} — ${result.score}/100`,
+    subject: `Scan complete — ${profile.businessName} — ${result.score}/100 ${hasFailures ? "⚠️" : ""}`,
     text: [
-      `Scan complete for ${profile.businessName}`,
-      "─".repeat(50),
+      `Scan complete for ${profile.businessName} ${confidenceTag}`,
+      "─".repeat(60),
       ``,
       `Score:           ${result.score}/100`,
       `Classification:  ${result.classification}`,
+      ``,
+      `Stage report (what ran successfully):`,
+      stages
+        ? [
+            `  ${stageEmoji(stages.discovery)}  Discovery (find website + GBP):       ${stages.discovery}`,
+            `  ${stageEmoji(stages.presenceCheck)}  Presence check (HEAD + schema):       ${stages.presenceCheck}`,
+            `  ${stageEmoji(stages.citationAnalysis)}  Citation analysis (multi-search):     ${stages.citationAnalysis}`,
+            `  ${stageEmoji(stages.visibilitySimulation)}  Visibility simulation (AI queries):   ${stages.visibilitySimulation}`,
+          ].join("\n")
+        : `  (stage tracking unavailable)`,
       ``,
       `Layers:`,
       `  Presence:    ${result.layers.presence}/25`,
@@ -221,11 +244,16 @@ async function notifyKabeloOnCompletion(
       ``,
       `View full results page: ${site.url}/scan/${result.id}/results`,
       ``,
+      `─── Detected signals ───`,
+      `Website reachable: ${result.detected.websiteReachable ? "yes" : "no"}`,
+      `Website has schema: ${result.detected.websiteHasSchema ? "yes" : "no"}`,
+      `GBP found: ${result.detected.gbpFound ? "yes" : "no"}`,
       `Citation count: ${result.detected.citationCount}`,
       `Citation level: ${result.detected.citationLevel}`,
-      `Citation sources: ${result.detected.citationSources.slice(0, 5).join(", ") || "—"}`,
+      `Citation sources: ${result.detected.citationSources.slice(0, 8).join(", ") || "—"}`,
+      `NAP consistent: ${result.detected.napConsistent ? "yes" : "no"}`,
       ``,
-      `Visibility queries:`,
+      `─── Visibility queries ───`,
       ...result.visibilityChecks.map(
         (v) =>
           `  • "${v.query}" → ${v.businessAppears ? "✓ business cited" : "✗ business NOT cited"}`,
@@ -235,6 +263,10 @@ async function notifyKabeloOnCompletion(
       ...result.competitors.slice(0, 5).map((c) => `  • ${c.name}`),
       ``,
       `Scan duration: ${(result.durationMs / 1000).toFixed(1)}s`,
+      ``,
+      hasFailures
+        ? `⚠️  This scan had partial/failed stages — review the detected signals above and run audit-agent CLI manually for verification before sending the report to the prospect.`
+        : `✅  All scan stages ran successfully.`,
     ].join("\n"),
   });
 }
