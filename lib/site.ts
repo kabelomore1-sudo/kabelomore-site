@@ -16,6 +16,10 @@ export const site = {
     email: "kabelo@kabelomore.com",
     location: "Pretoria, South Africa",
     serving: "Serving clients in South Africa, UK, and US",
+    // International format (no leading +, no spaces) for wa.me links + Twilio
+    whatsappE164: "27760351084",
+    // Display format (what humans see)
+    whatsappDisplay: "+27 76 035 1084",
   },
 
   social: {
@@ -24,7 +28,24 @@ export const site = {
     twitter: "",
     youtube: "",
   },
+
+  // Booking flow — Phase 1 uses WhatsApp directly. Add Calendly URL later
+  // and the results page CTA will switch automatically.
+  booking: {
+    type: "whatsapp" as "whatsapp" | "calendly" | "email",
+    calendlyUrl: "", // e.g. "https://calendly.com/kabelomore/discovery"
+  },
 } as const;
+
+/**
+ * Build a wa.me link with optional pre-filled message text.
+ * Used by every WhatsApp CTA across the site.
+ */
+export function whatsappLink(prefilledText?: string): string {
+  const base = `https://wa.me/${site.contact.whatsappE164}`;
+  if (!prefilledText) return base;
+  return `${base}?text=${encodeURIComponent(prefilledText)}`;
+}
 
 export const navigation = {
   primary: [
