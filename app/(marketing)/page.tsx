@@ -4,6 +4,8 @@ import { Container } from "@/components/ui/container";
 import { JsonLd } from "@/components/ui/jsonld";
 import { AiDemoSection } from "@/components/ai-demo-section";
 import { AeoVsSeo } from "@/components/aeo-vs-seo";
+import { AiResponseMockup } from "@/components/ai-response-mockup";
+import { VisualPillars } from "@/components/visual-pillars";
 import { faqJsonLd } from "@/lib/seo";
 import Link from "next/link";
 import {
@@ -189,52 +191,14 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* ─── AI DEMO — see real queries, real engines ─────────────── */}
+      {/* ─── VISUAL: AI Response Mockup (the gut punch) ───────────── */}
+      <AiResponseMockup />
+
+      {/* ─── EXISTING: 4-engine video demo (industrial vertical) ──── */}
       <AiDemoSection />
 
-      {/* ─── WHAT'S BROKEN (Problem framing) ──────────────────────── */}
-      <Section variant="default" padding="lg">
-        <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">The shift</Eyebrow>
-          <h2 className="mt-4 text-display-lg font-semibold tracking-tight text-ink-900">
-            Search isn't a list of links any more.
-          </h2>
-          <p className="mt-5 text-lg text-ink-500">
-            A growing share of customers ask AI engines first — before they ever see a
-            search result page. The AI decides which 2-5 businesses to recommend.
-            If your business isn't in that list, you're not in the running.
-          </p>
-        </div>
-
-        <div className="mx-auto mt-16 grid max-w-5xl gap-6 md:grid-cols-3">
-          {[
-            {
-              h: "Schema",
-              p: "AI engines need structured signals (LocalBusiness, Service, FAQ schema) to trust your business. Most SA mid-market sites have none.",
-            },
-            {
-              h: "Citations",
-              p: "Third-party mentions in industry directories, professional bodies, and review platforms give AI engines verification anchors. Most businesses haven't built these.",
-            },
-            {
-              h: "Content",
-              p: "AI engines quote answer-shaped content — pages that mirror customer questions. Most websites read like brochures, not answers.",
-            },
-          ].map((item) => (
-            <div
-              key={item.h}
-              className="rounded-2xl border border-rule bg-white p-7 shadow-soft transition-shadow hover:shadow-card"
-            >
-              <div className="text-sm font-semibold uppercase tracking-[0.14em] text-accent-600">
-                {item.h}
-              </div>
-              <div className="mt-3 text-base text-ink-700 leading-relaxed">
-                {item.p}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Section>
+      {/* ─── VISUAL: Three pillars with code/visual examples ──────── */}
+      <VisualPillars />
 
       {/* ─── AEO vs TRADITIONAL SEO ───────────────────────────────── */}
       <AeoVsSeo />
