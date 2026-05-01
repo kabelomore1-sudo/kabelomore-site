@@ -91,8 +91,40 @@ export default function HomePage() {
 
         <Container className="relative">
           <div className="mx-auto max-w-4xl text-center">
-            <Eyebrow className="justify-center">
-              AI Visibility · AEO · Pretoria · Serving SA · UK · US
+            {/* Photo + name signature — personal brand anchor */}
+            <div className="mx-auto flex flex-col items-center gap-3">
+              <div
+                className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full shadow-lift ring-4 ring-white md:h-28 md:w-28"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgb(15 23 42) 0%, rgb(30 41 59) 45%, rgb(245 158 11) 130%)",
+                }}
+                aria-label="Kabelo More — photo placeholder"
+              >
+                <span className="text-2xl font-bold tracking-tight text-white md:text-3xl">
+                  KM
+                </span>
+                {/* When the real photo lands: replace the gradient + KM
+                    monogram above with:
+                    <Image
+                      src="/kabelo-headshot.jpg"
+                      alt="Kabelo More"
+                      fill
+                      sizes="(max-width: 768px) 96px, 112px"
+                      priority
+                      className="object-cover"
+                    /> */}
+              </div>
+              <div className="text-sm font-semibold tracking-tight text-ink-900">
+                Kabelo More
+              </div>
+              <div className="-mt-2 text-xs text-ink-500">
+                AI Visibility Consultant · Pretoria, South Africa
+              </div>
+            </div>
+
+            <Eyebrow className="mt-10 justify-center">
+              Serving SA · UK · US · Built in Pretoria
             </Eyebrow>
 
             <h1 className="mt-6 text-display-xl font-semibold tracking-tight text-ink-900">

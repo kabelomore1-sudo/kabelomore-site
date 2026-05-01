@@ -44,6 +44,24 @@ const ScanStartSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  // ─── Pre-flight: detect missing required env vars and fail loudly ──
+  // Better to refuse the scan than silently return zeros.
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error(
+      "[scan/start] ANTHROPIC_API_KEY is not set in the environment. " +
+        "Scan cannot run. Set this in Vercel → Settings → Environment Variables.",
+    );
+    return NextResponse.json(
+      {
+        ok: false,
+        message:
+          "The scan service isn't fully configured yet. Kabelo has been notified — he'll deliver your scan manually within 24 hours via email. Sorry for the inconvenience.",
+        configError: "ANTHROPIC_API_KEY missing",
+      },
+      { status: 503 },
+    );
+  }
+
   let body: unknown;
   try {
     body = await req.json();

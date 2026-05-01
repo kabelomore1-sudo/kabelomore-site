@@ -5,8 +5,12 @@
 
 export const site = {
   name: "Kabelo More",
-  brand: "Kabelomore",
-  tagline: "GEO / AEO Specialist · AI Search Visibility",
+  brand: "Kabelo More",
+  // The URL stays kabelomore.com (one word) but the visible brand is the
+  // founder's name with a space. Like Neil Patel: header says "Neil Patel",
+  // domain is neilpatel.com.
+  brandDomain: "kabelomore.com",
+  tagline: "AI Visibility Consultant · Pretoria → London → New York",
   description:
     "GEO (Generative Engine Optimization) and AEO (Answer Engine Optimization) specialist helping businesses get found, cited, and recommended by ChatGPT, Claude, Gemini, and Perplexity. Schema markup, LLM citation strategy, and entity optimisation for industrial, legal, and medical firms in South Africa, the UK, and the US.",
   url: "https://kabelomore.com",
