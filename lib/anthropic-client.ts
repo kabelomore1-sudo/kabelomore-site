@@ -27,9 +27,11 @@ export const anthropic: Anthropic = new Proxy({} as Anthropic, {
   },
 });
 
-// Use Sonnet 4.7 for scan engine work — faster than Opus, plenty smart for
-// structured extraction. Opus reserved for the deep audit-agent CLI.
-export const SCAN_MODEL = "claude-sonnet-4-7";
+// Use claude-opus-4-7 for scan engine work — same model audit-agent uses
+// successfully. Slightly pricier than a Sonnet variant but verified working
+// across our infra. Cost per scan is ~$0.40-0.80 which fits unit economics.
+// (Tried "claude-sonnet-4-7" — that model name returns 404 on this account.)
+export const SCAN_MODEL = "claude-opus-4-7";
 
 export const WEB_SEARCH_TOOL = {
   type: "web_search_20260209" as const,

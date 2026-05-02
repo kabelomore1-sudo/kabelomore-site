@@ -91,7 +91,7 @@ export async function GET() {
       const Anthropic = (await import("@anthropic-ai/sdk")).default;
       const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
       const res = await client.messages.create({
-        model: "claude-sonnet-4-7",
+        model: "claude-opus-4-7",
         max_tokens: 20,
         messages: [{ role: "user", content: "Reply with the word OK only." }],
       });
