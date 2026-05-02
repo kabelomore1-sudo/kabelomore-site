@@ -22,8 +22,13 @@
     @apply bg-accent-100 text-ink-900;
   }
 
+  /* Headings inherit color from their parent. Body defaults to text-ink-900,
+     so on light pages headings render dark by default. Inside dark cards
+     (bg-ink-gradient with text-white parent) they correctly inherit white.
+     Previously this rule hard-set color: ink-900 which broke contrast on
+     every dark CTA card across the site (e.g. /foundation final CTA). */
   h1, h2, h3, h4, h5, h6 {
-    @apply text-ink-900 font-semibold tracking-tight;
+    @apply font-semibold tracking-tight;
   }
 
   a {
