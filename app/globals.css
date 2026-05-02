@@ -49,3 +49,78 @@
     background-size: 48px 48px;
   }
 }
+
+/* =========================================================
+   Print styles — used when buyers ctrl+P sector checklists
+   to save as PDF for offline review or sharing.
+   Hides nav/footer/CTAs; tunes typography for paper.
+   ========================================================= */
+@media print {
+  /* Hide UI chrome */
+  header,
+  footer,
+  nav,
+  [class*="StickyMobileCta"],
+  .scroll-to-top,
+  button,
+  details summary,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Reset to single-column for paper */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  /* Content sections expand for print */
+  section {
+    page-break-inside: auto;
+    margin-bottom: 1.5em !important;
+  }
+
+  /* Avoid awkward breaks inside checklist items */
+  .print\:break-inside-avoid,
+  li {
+    page-break-inside: avoid;
+  }
+
+  /* Always show 'why' text on print */
+  .print\:block {
+    display: block !important;
+  }
+
+  /* Section titles always start on new page if they'd be orphaned */
+  .checklist-section h2 {
+    page-break-before: auto;
+    page-break-after: avoid;
+  }
+
+  /* Strip background colours that waste ink */
+  [class*="bg-emerald"],
+  [class*="bg-amber"],
+  [class*="bg-accent"],
+  [class*="bg-ink-50"] {
+    background: white !important;
+    border: 1px solid #999 !important;
+  }
+
+  a {
+    color: black !important;
+    text-decoration: none !important;
+  }
+
+  /* URL after links — useful for printed reference */
+  .checklist-print a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
+  }
+}

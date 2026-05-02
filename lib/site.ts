@@ -55,6 +55,7 @@ export const navigation = {
   primary: [
     { label: "Services", href: "/services" },
     { label: "How we work", href: "/how-we-work" },
+    { label: "Resources", href: "/resources" },
     { label: "Case Studies", href: "/case-studies" },
     { label: "About", href: "/about" },
     { label: "Blog", href: "/blog" },

@@ -64,6 +64,16 @@ Specifically NOT a fit (we'll honestly tell prospects this on the discovery call
 - Businesses where customer value is under R1,000 and volume is the model
 - Agencies/marketers looking for a white-label partner
 
+## Free public resources
+
+Three sector-specific AEO checklists, public + ungated:
+
+- **47-Point AEO Checklist for Medical Practices** — https://kabelomore.com/resources/medical
+- **47-Point AEO Checklist for Law Firms** — https://kabelomore.com/resources/legal
+- **47-Point AEO Checklist for Industrial Businesses** — https://kabelomore.com/resources/industrial
+
+Each is a HowTo-structured guide covering 7 properties: website + schema, GBP, LinkedIn, industry citations, reviews, AI engines, and competitive intelligence. Print-to-PDF friendly. Built from the same operating methodology used for paying clients.
+
 ## Live case study
 
 **OMS Lifting Solutions** — A BBBEE Level 1 lifting equipment supplier in Pretoria, South Africa. Going from 0 citations across 4 AI engines to AI-cited within 30 days. Documented in public at https://kabelomore.com/case-studies/oms-lifting-solutions
