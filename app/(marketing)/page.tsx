@@ -89,7 +89,7 @@ export default function HomePage() {
       <JsonLd data={faqJsonLd(homepageFaqs)} />
 
       {/* ─── HERO ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-hero-gradient pb-20 pt-16 md:pb-32 md:pt-24">
+      <section className="relative overflow-hidden bg-hero-gradient pb-14 pt-10 md:pb-20 md:pt-14">
         <div className="absolute inset-0 grid-pattern opacity-40 [mask-image:radial-gradient(ellipse_at_top,white,transparent_70%)]" />
 
         <Container className="relative">
@@ -128,10 +128,14 @@ export default function HomePage() {
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button href="/scan" variant="primary" size="lg">
-                See what AI says about you — free scan{" "}
+              <a
+                href="/scan"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-ink-900 px-7 text-base font-semibold text-white shadow-lift transition-all duration-200 hover:bg-ink-800 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2"
+                style={{ height: "3rem" }}
+              >
+                See what AI says about you — free scan
                 <ArrowRight className="h-4 w-4" />
-              </Button>
+              </a>
             </div>
 
             <p className="mt-5 text-sm text-ink-400">
@@ -154,8 +158,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Trust strip */}
-          <div className="mx-auto mt-20 max-w-4xl rounded-2xl border border-rule bg-white/60 p-6 shadow-soft backdrop-blur md:p-8">
+          {/* Trust strip — solid bg + shadow-card per polish sprint */}
+          <div className="mx-auto mt-10 max-w-4xl rounded-2xl border border-rule bg-white p-6 shadow-card md:p-8">
             <div className="grid gap-6 text-center md:grid-cols-3 md:text-left">
               <div>
                 <div className="text-3xl font-semibold tracking-tight text-ink-900">

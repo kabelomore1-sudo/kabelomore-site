@@ -5,6 +5,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StickyMobileCta } from "@/components/sticky-mobile-cta";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { JsonLd } from "@/components/ui/jsonld";
 import { organizationJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -92,9 +93,12 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col">
         <JsonLd data={organizationJsonLd()} />
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        {/* pb-24 buffer prevents the sticky scan bar from covering the
+            last content of any page (e.g., final-CTA buttons). */}
+        <main className="flex-1 pb-24">{children}</main>
         <SiteFooter />
         <StickyMobileCta />
+        <ScrollToTop />
       </body>
     </html>
   );

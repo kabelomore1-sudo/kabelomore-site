@@ -100,16 +100,18 @@ export function AiResponseMockup() {
             </div>
           </PhoneFrame>
 
-          {/* Annotation pointing to the missing slot */}
+          {/* The emotional centrepiece — accent-bordered callout panel */}
           <div className="relative mt-8">
-            <div className="mx-auto max-w-md rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/60 p-5 text-center">
-              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">
-                ↑ Your business should be in this list
+            <div className="mx-auto max-w-md rounded-xl border-l-4 border-accent-500 bg-accent-50 px-5 py-4">
+              <div className="flex items-start gap-2">
+                <span className="text-base font-semibold text-ink-900">
+                  ↑ Your business should be in this list.
+                </span>
               </div>
               <p className="mt-2 text-sm text-ink-700 leading-relaxed">
-                Right now, every Pretoria customer who asks AI for what you sell
-                gets your competitors&apos; names instead of yours. Every day.
-                Every query.
+                Every day this gap stays open, your competitors win the
+                recommendation. Not because they&apos;re better — because they
+                did the AEO work and you haven&apos;t.
               </p>
             </div>
           </div>

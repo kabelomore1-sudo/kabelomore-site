@@ -94,12 +94,28 @@ export default function ServicesPage() {
             Pick what fits where you are.
           </h1>
           <p className="mt-5 text-lg text-ink-500">
-            From "I have nothing yet" to "I want serious growth" — there's a starting point for everyone.
-            Pay 50% to start on once-off work. 50% on delivery. No surprises.
+            From &quot;I have nothing yet&quot; to &quot;I want serious growth&quot; — there&apos;s a
+            starting point for everyone. Pay 50% to start on once-off work. 50%
+            on delivery. No surprises.
           </p>
+
+          {/* Funnel guidance — kills decision paralysis */}
+          <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-accent-200 bg-accent-50 px-6 py-4 text-center">
+            <p className="text-sm text-ink-700">
+              <span className="font-semibold text-ink-900">Not sure which fits?</span>{" "}
+              Start with the free scan — we&apos;ll tell you exactly what&apos;s missing
+              and which package makes sense.{" "}
+              <a
+                href="/scan"
+                className="font-semibold text-accent-600 underline underline-offset-2 hover:text-accent-700"
+              >
+                Get free scan →
+              </a>
+            </p>
+          </div>
         </div>
 
-        {/* Trust strip */}
+        {/* Trust strip — teal checkmark + stronger weight per polish sprint */}
         <div className="mx-auto mt-10 grid max-w-3xl gap-3 sm:grid-cols-3">
           {[
             "50% deposit, 50% on delivery",
@@ -108,9 +124,9 @@ export default function ServicesPage() {
           ].map((item) => (
             <div
               key={item}
-              className="rounded-2xl border border-rule bg-white p-4 text-center text-sm font-medium text-ink-700 shadow-soft"
+              className="rounded-2xl border border-rule bg-white p-4 text-center text-sm font-semibold text-ink-900 shadow-soft"
             >
-              ✓ {item}
+              <span className="mr-1.5 text-accent-500">✓</span> {item}
             </div>
           ))}
         </div>
@@ -125,7 +141,7 @@ export default function ServicesPage() {
           </h2>
         </div>
 
-        <div className="mt-12 grid gap-8 md:gap-10">
+        <div className="mt-8 grid gap-6 md:gap-8">
           {tiers.map((tier) => {
             const cat = categoryLabels[tier.category];
             return (
@@ -134,8 +150,8 @@ export default function ServicesPage() {
                 id={tier.id}
                 className={
                   tier.highlight
-                    ? "relative overflow-hidden rounded-3xl bg-ink-900 p-8 text-white shadow-lift md:p-12"
-                    : "rounded-3xl border border-rule bg-white p-8 shadow-soft md:p-12"
+                    ? "relative overflow-hidden rounded-3xl bg-ink-900 p-6 text-white shadow-lift md:p-10"
+                    : "rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10"
                 }
               >
                 {tier.highlight && (
@@ -173,8 +189,8 @@ export default function ServicesPage() {
                     <p
                       className={
                         tier.highlight
-                          ? "mt-4 text-sm text-ink-300 leading-relaxed"
-                          : "mt-4 text-sm text-ink-500 leading-relaxed"
+                          ? "mt-4 text-base text-ink-300 leading-relaxed"
+                          : "mt-4 text-base text-ink-500 leading-relaxed"
                       }
                     >
                       {tier.description}
@@ -257,7 +273,7 @@ export default function ServicesPage() {
                     >
                       What you receive
                     </div>
-                    <ul className="mt-5 space-y-3">
+                    <ul className="mt-5 space-y-2">
                       {tier.receives.map((b) => (
                         <li key={b} className="flex items-start gap-3 text-sm">
                           <CircleCheck
@@ -362,9 +378,15 @@ export default function ServicesPage() {
 
       {/* Add-Ons */}
       <Section variant="tinted" padding="lg">
+        {/* Visual rule + eyebrow per polish sprint — signals a clear
+            section transition from full-width tier cards to 2-col add-ons */}
+        <hr className="mb-12 border-rule" />
+
         <div className="mx-auto max-w-3xl">
-          <Eyebrow>Add-ons</Eyebrow>
-          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+          <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
+            <span>•</span> Add-ons & standalone services
+          </p>
+          <h2 className="mt-2 text-display-md font-semibold tracking-tight text-ink-900">
             Specialty services. Buy alone or attach to any tier.
           </h2>
           <p className="mt-4 text-base text-ink-500 leading-relaxed">
@@ -427,7 +449,7 @@ export default function ServicesPage() {
                       <div className="mt-5">
                         <Button
                           href={addon.cta.href}
-                          variant="secondary"
+                          variant="ink"
                           size="sm"
                         >
                           {addon.cta.label}

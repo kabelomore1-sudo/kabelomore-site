@@ -23,9 +23,12 @@ export function Section({
         variant === "default" && "bg-white text-ink-900",
         variant === "tinted" && "bg-section-gradient text-ink-900",
         variant === "ink" && "bg-ink-gradient text-white",
-        padding === "sm" && "py-12 md:py-16",
-        padding === "default" && "py-16 md:py-24",
-        padding === "lg" && "py-24 md:py-32",
+        // Tightened spacing per UI/UX polish sprint — was sm:py-12/16,
+        // default:py-16/24, lg:py-24/32. Reduced ~30% to remove dead air
+        // before content while preserving section breathing room.
+        padding === "sm" && "py-8 md:py-12",
+        padding === "default" && "py-10 md:py-16",
+        padding === "lg" && "py-14 md:py-20",
         className,
       )}
       {...props}

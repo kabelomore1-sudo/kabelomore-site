@@ -181,6 +181,15 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
         </div>
       )}
 
+      {/* Step 1 of 2 — progress indicator */}
+      <div className="mb-2 flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
+          <div className="h-1.5 w-8 rounded-full bg-ink-900" />
+          <div className="h-1.5 w-8 rounded-full bg-ink-200" />
+        </div>
+        <span className="text-xs text-ink-400">Step 1 of 2 — Basic details</span>
+      </div>
+
       {/* ─── Section 1: About your business ─── */}
       <div>
         <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
@@ -277,6 +286,15 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
         <p className="mt-1.5 text-xs text-ink-500">
           Use the words your customers actually use. We test against AI engines using these.
         </p>
+      </div>
+
+      {/* Step 2 of 2 — progress indicator */}
+      <div className="mb-2 mt-6 flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
+          <div className="h-1.5 w-8 rounded-full bg-ink-900" />
+          <div className="h-1.5 w-8 rounded-full bg-ink-900" />
+        </div>
+        <span className="text-xs text-ink-400">Step 2 of 2 — Online presence</span>
       </div>
 
       {/* ─── Section 2: Online presence (now visible by default) ─── */}

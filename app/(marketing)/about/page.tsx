@@ -162,6 +162,22 @@ export default function AboutPage() {
             </li>
           </ul>
 
+          {/* Mid-page CTA — warm visitors here are ready to act */}
+          <div className="my-10 rounded-2xl border border-accent-200 bg-accent-50 px-8 py-6 text-center not-prose">
+            <p className="mb-1 font-semibold text-ink-900">
+              Ready to find out where you stand?
+            </p>
+            <p className="mb-4 text-sm text-ink-600">
+              Free scan. 24 hours. No card required.
+            </p>
+            <a
+              href="/scan"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink-900 px-6 text-[0.95rem] font-medium text-white shadow-soft transition-all duration-200 hover:bg-ink-800 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2"
+            >
+              Get my free AI scan →
+            </a>
+          </div>
+
           <h2>Where I work from</h2>
           <p>
             I&apos;m based in Pretoria, South Africa. I serve clients across SA,

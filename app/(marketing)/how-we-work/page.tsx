@@ -15,7 +15,7 @@ import {
 export const metadata: Metadata = {
   title: "How we work — From buying to delivery, step by step",
   description:
-    "Four clear steps from clicking buy to delivery. Pay 50% to start, 50% on delivery. Brief takes 10 minutes. Updates every 3 days. One round of revisions included.",
+    "Four clear steps from first contact to delivery. Pay 50% to start, 50% on delivery. Brief takes 10 minutes. Updates every 3 days. One round of revisions included.",
   alternates: { canonical: `${site.url}/how-we-work` },
 };
 
@@ -140,7 +140,7 @@ export default function HowWeWorkPage() {
         <div className="mx-auto max-w-3xl text-center">
           <Eyebrow className="justify-center">How we work together</Eyebrow>
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
-            From clicking buy
+            From first contact
             <br />
             <span className="text-ink-500">to delivery, step by step.</span>
           </h1>

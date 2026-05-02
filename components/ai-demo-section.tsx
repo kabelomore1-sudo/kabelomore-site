@@ -167,29 +167,34 @@ export function AiDemoSection() {
           <StepHeader number="01" title="Watch" subtitle="What AI tells your customers right now" />
 
           <div className="mt-6 overflow-hidden rounded-3xl border border-rule bg-white shadow-card">
-            {/* Engine tabs */}
-            <div className="flex items-center gap-1 border-b border-rule bg-ink-50/50 px-4 py-2">
-              {engines.map((engine) => (
-                <button
-                  key={engine.id}
-                  onClick={() => setActiveEngineId(engine.id)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all",
-                    activeEngineId === engine.id
-                      ? "bg-ink-900 text-white shadow-soft"
-                      : "text-ink-500 hover:bg-ink-100 hover:text-ink-900",
-                  )}
-                  aria-pressed={activeEngineId === engine.id}
-                >
-                  <span
+            {/* Engine tabs — with instruction label per polish sprint */}
+            <div className="border-b border-rule bg-ink-50/50 px-4 pb-3 pt-3">
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.12em] text-ink-400">
+                Click to see each AI engine&apos;s answer
+              </p>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {engines.map((engine) => (
+                  <button
+                    key={engine.id}
+                    onClick={() => setActiveEngineId(engine.id)}
                     className={cn(
-                      "h-1.5 w-1.5 rounded-full",
-                      activeEngineId === engine.id ? engine.brandColor : "bg-ink-300",
+                      "flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-medium transition-all",
+                      activeEngineId === engine.id
+                        ? "bg-ink-900 text-white shadow-soft"
+                        : "border border-rule bg-white text-ink-700 shadow-soft hover:bg-ink-50 hover:text-ink-900",
                     )}
-                  />
-                  {engine.name}
-                </button>
-              ))}
+                    aria-pressed={activeEngineId === engine.id}
+                  >
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full",
+                        activeEngineId === engine.id ? engine.brandColor : "bg-ink-300",
+                      )}
+                    />
+                    {engine.name}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* User prompt bar */}
