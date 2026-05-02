@@ -5,19 +5,31 @@ import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 /**
- * Mobile-only sticky CTA. Appears after scrolling past the hero
- * (350px), hides on /scan and /contact pages where the form/CTA
- * is already the primary action. Conversion lift on mobile is
- * typically 15-25% with a sticky CTA on service pages.
+ * Sticky bottom CTA — always-on persistent "Free AI Scan" pill that
+ * follows the user as they scroll. Highest-leverage real estate on
+ * the site.
+ *
+ * Behavior:
+ *   - Hides on /scan and /contact (form is the primary action there)
+ *   - Hides on /scan/[id]/results, /brief/[tier], /proposals/[slug]
+ *   - Otherwise: visible after 350px of scroll, full-width pill on
+ *     mobile, centered max-420px pill with drop shadow on desktop
  */
+const HIDE_PATTERNS = [
+  /^\/scan$/,
+  /^\/scan\//,
+  /^\/contact$/,
+  /^\/brief\//,
+  /^\/proposals\//,
+];
+
 export function StickyMobileCta() {
   const [visible, setVisible] = useState(false);
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    // Hide on /scan and /contact — form is the primary action there
     const path = window.location.pathname;
-    if (path === "/scan" || path === "/contact") {
+    if (HIDE_PATTERNS.some((re) => re.test(path))) {
       setHidden(true);
       return;
     }
@@ -35,28 +47,27 @@ export function StickyMobileCta() {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-30 md:hidden transition-transform duration-300 ${
+      className={`fixed inset-x-0 bottom-0 z-30 transition-transform duration-300 ${
         visible ? "translate-y-0" : "translate-y-full"
       }`}
       aria-hidden={!visible}
     >
-      <div className="border-t border-rule bg-white/95 px-5 py-3 shadow-lift backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="truncate text-xs font-medium uppercase tracking-wider text-accent-600">
-              Free · 24-hour turnaround
-            </div>
-            <div className="truncate text-sm font-semibold text-ink-900">
-              See what AI says about your business
-            </div>
-          </div>
+      {/* Mobile: full-width bar with prominent button.
+          Desktop: centered pill with subtle gradient backdrop. */}
+      <div className="px-4 pb-4 pt-2 md:flex md:justify-center md:px-0 md:pb-6">
+        <div
+          className="md:max-w-[420px] md:rounded-2xl md:border md:border-rule md:bg-white/95 md:shadow-lift md:backdrop-blur-md md:px-2 md:py-2"
+        >
           <Link
             href="/scan"
-            className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-ink-900 px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-ink-800"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-ink-900 px-6 py-4 text-base font-semibold text-white shadow-lift transition-colors hover:bg-ink-800 md:py-3"
           >
-            Free scan
+            Get a free AI scan
             <ArrowRight className="h-4 w-4" />
           </Link>
+          <div className="mt-1.5 text-center text-[11px] font-medium text-ink-500">
+            Free · 24-hour turnaround · No card
+          </div>
         </div>
       </div>
     </div>

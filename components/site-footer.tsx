@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { Container } from "./ui/container";
-import { site } from "@/lib/site";
+import { site, whatsappLink } from "@/lib/site";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
+  const waLink = whatsappLink(
+    `Hi Kabelo — I'm visiting kabelomore.com and have a quick question.`,
+  );
 
   return (
     <footer className="border-t border-rule bg-ink-50">
@@ -24,6 +27,17 @@ export function SiteFooter() {
                 className="text-accent-600 hover:text-accent-700"
               >
                 {site.contact.email}
+              </a>
+            </p>
+            <p className="mt-2 text-sm text-ink-500">
+              <span className="text-ink-900">WhatsApp</span>{" "}
+              <a
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent-600 hover:text-accent-700"
+              >
+                {site.contact.whatsappDisplay}
               </a>
             </p>
           </div>

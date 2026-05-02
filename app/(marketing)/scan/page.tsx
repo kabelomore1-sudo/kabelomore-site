@@ -81,6 +81,18 @@ export default async function ScanPage({
             {site.contact.email}
           </a>
         </p>
+        <p className="mt-2 text-center text-sm text-ink-400">
+          Or{" "}
+          <a
+            href={`https://wa.me/${site.contact.whatsappE164}?text=${encodeURIComponent("Hi Kabelo — I want a free AI Visibility scan for my business.")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent-600 hover:text-accent-700"
+          >
+            WhatsApp Kabelo directly
+          </a>{" "}
+          ({site.contact.whatsappDisplay})
+        </p>
       </Section>
 
       {/* What you get */}

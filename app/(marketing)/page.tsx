@@ -6,6 +6,7 @@ import { AiDemoSection } from "@/components/ai-demo-section";
 import { AeoVsSeo } from "@/components/aeo-vs-seo";
 import { AiResponseMockup } from "@/components/ai-response-mockup";
 import { VisualPillars } from "@/components/visual-pillars";
+import { FounderAvatar } from "@/components/founder-avatar";
 import { faqJsonLd } from "@/lib/seo";
 import Link from "next/link";
 import {
@@ -95,28 +96,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-4xl text-center">
             {/* Photo + name signature — personal brand anchor */}
             <div className="mx-auto flex flex-col items-center gap-3">
-              <div
-                className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full shadow-lift ring-4 ring-white md:h-28 md:w-28"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgb(15 23 42) 0%, rgb(30 41 59) 45%, rgb(245 158 11) 130%)",
-                }}
-                aria-label="Kabelo More — photo placeholder"
-              >
-                <span className="text-2xl font-bold tracking-tight text-white md:text-3xl">
-                  KM
-                </span>
-                {/* When the real photo lands: replace the gradient + KM
-                    monogram above with:
-                    <Image
-                      src="/kabelo-headshot.jpg"
-                      alt="Kabelo More"
-                      fill
-                      sizes="(max-width: 768px) 96px, 112px"
-                      priority
-                      className="object-cover"
-                    /> */}
-              </div>
+              <FounderAvatar size={112} className="ring-4" />
               <div className="text-sm font-semibold tracking-tight text-ink-900">
                 Kabelo More
               </div>
@@ -157,6 +137,21 @@ export default function HomePage() {
             <p className="mt-5 text-sm text-ink-400">
               24h turnaround · No card · No forced packages · Custom quote after scan
             </p>
+
+            {/* Pricing pre-qualifier — reduces post-scan sticker shock */}
+            <p className="mt-2 text-sm text-ink-500">
+              Most engagements:{" "}
+              <span className="font-semibold text-ink-700">
+                R5,500–R12,500 once-off
+              </span>{" "}
+              ·{" "}
+              <Link
+                href="/services"
+                className="text-accent-600 hover:text-accent-700"
+              >
+                See full pricing
+              </Link>
+            </p>
           </div>
 
           {/* Trust strip */}
@@ -180,10 +175,10 @@ export default function HomePage() {
               </div>
               <div className="md:border-l md:border-rule md:pl-6">
                 <div className="text-3xl font-semibold tracking-tight text-ink-900">
-                  R0
+                  Free
                 </div>
                 <div className="mt-1 text-sm text-ink-500">
-                  To find out where you stand. No obligation.
+                  To find out where you stand. No card, no obligation.
                 </div>
               </div>
             </div>
@@ -359,14 +354,13 @@ export default function HomePage() {
               <div className="rounded-2xl bg-ink-50 p-6">
                 <div className="flex items-start gap-3">
                   <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent-600" />
-                  <div className="text-sm text-ink-700 leading-relaxed">
-                    Your business could be next. Free scan, 24h turnaround.{" "}
-                    <Link
-                      href="/scan"
-                      className="font-medium text-accent-600 hover:text-accent-700"
-                    >
-                      Request one →
-                    </Link>
+                  <div className="flex-1 text-sm text-ink-700 leading-relaxed">
+                    Your business could be next. Free scan, 24h turnaround.
+                    <div className="mt-3">
+                      <Button href="/scan" variant="primary" size="sm">
+                        Get a free AI scan <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

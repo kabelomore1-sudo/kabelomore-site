@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/ui/jsonld";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
+import { FounderAvatarLandscape } from "@/components/founder-avatar";
 import { ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -51,24 +52,64 @@ export default function AboutPage() {
         ]}
       />
 
-      {/* Hero */}
+      {/* Hero — photo + headline */}
       <Section variant="tinted" padding="lg">
-        <div className="mx-auto max-w-3xl">
-          <Eyebrow>About Kabelo More</Eyebrow>
-          <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
-            I help businesses
-            <br />
-            <span className="text-ink-500">
-              get cited by ChatGPT, Claude, Gemini, and Perplexity
-            </span>{" "}
-            when their customers ask AI for what they do.
-          </h1>
-          <p className="mt-7 text-lg text-ink-500 leading-relaxed">
-            8 years of local SEO out of Pretoria. Then the search layer changed.
-            I now apply the same first-principles work to AI engines — on
-            whatever website my clients have, for a flat fee, without forcing
-            anyone into packages they don&apos;t need.
-          </p>
+        <div className="mx-auto max-w-5xl">
+          <div className="grid gap-10 md:grid-cols-5 md:items-center md:gap-14">
+            {/* Photo column */}
+            <div className="md:col-span-2">
+              <FounderAvatarLandscape className="w-full max-w-sm" />
+            </div>
+
+            {/* Copy column */}
+            <div className="md:col-span-3">
+              <Eyebrow>About Kabelo More</Eyebrow>
+              <h1 className="mt-4 text-display-lg font-semibold tracking-tight text-ink-900 md:text-display-xl">
+                I help businesses
+                <br />
+                <span className="text-ink-500">
+                  get cited by ChatGPT, Claude, Gemini, and Perplexity
+                </span>{" "}
+                when their customers ask AI for what they do.
+              </h1>
+              <p className="mt-7 text-lg text-ink-500 leading-relaxed">
+                8 years of local SEO out of Pretoria. Then the search layer
+                changed. I now apply the same first-principles work to AI
+                engines — on whatever website my clients have, for a flat fee,
+                without forcing anyone into packages they don&apos;t need.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* Credibility strip — quick credential scan */}
+      <Section variant="default" padding="default">
+        <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-rule bg-white p-6 text-center shadow-soft">
+            <div className="text-3xl font-semibold tracking-tight text-ink-900">
+              8 years
+            </div>
+            <div className="mt-1.5 text-sm text-ink-500">
+              Local SEO experience
+            </div>
+          </div>
+          <div className="rounded-2xl border border-rule bg-white p-6 text-center shadow-soft">
+            <div className="text-3xl font-semibold tracking-tight text-ink-900">
+              4 AI engines
+            </div>
+            <div className="mt-1.5 text-sm text-ink-500">
+              Tested on every scan
+            </div>
+          </div>
+          <div className="rounded-2xl border border-rule bg-white p-6 text-center shadow-soft">
+            <div className="text-3xl font-semibold tracking-tight text-ink-900">
+              SA · UK · US
+            </div>
+            <div className="mt-1.5 text-sm text-ink-500">
+              Pretoria-built, internationally served
+            </div>
+          </div>
         </div>
       </Section>
 
@@ -161,6 +202,31 @@ export default function AboutPage() {
             <li>
               <strong>Tools I built myself</strong> — including the AI visibility
               tracker that runs on this site daily
+            </li>
+          </ul>
+
+          <h2>What I actually do in a week</h2>
+          <p>
+            More transparency than testimonials at this stage:
+          </p>
+          <ul>
+            <li>
+              Run 2–4 AI scans for prospective clients (24h turnaround each)
+            </li>
+            <li>
+              Schema deployment and Google Business Profile builds for active
+              engagements
+            </li>
+            <li>
+              Writing answer-shaped content — service pages structured as
+              buyer questions
+            </li>
+            <li>
+              Citation outreach across SA, UK, and global industry directories
+            </li>
+            <li>
+              Documenting everything publicly on LinkedIn so clients can
+              verify the methodology
             </li>
           </ul>
 
