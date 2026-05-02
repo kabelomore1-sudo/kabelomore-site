@@ -67,38 +67,39 @@ export type DiscoveryQuestion = {
 
 const stepLabels: Record<number, { title: string; description: string }> = {
   1: {
-    title: "Who you are",
-    description: "Just enough to identify you and tailor the questions to your sector.",
+    title: "About your business",
+    description:
+      "Just the basics — name, website, what kind of business you run.",
   },
   2: {
     title: "What you sell",
     description:
-      "We need to know your services to know what AI engines should recommend you for.",
+      "Tell us what you do. The clearer this is, the sharper your Google + AI ranking strategy will be.",
   },
   3: {
-    title: "Who you serve",
+    title: "Who your customers are",
     description:
-      "Your ideal customer + service area drives every visibility decision.",
+      "Your ideal customer + the area you serve. Drives every decision about where you should show up online.",
   },
   4: {
-    title: "Who you compete with",
+    title: "Your competitors",
     description:
-      "We benchmark against real competitors — the ones AI engines surface, not the ones at industry events.",
+      "Who you compete with online. We'll see exactly where you're losing ground — and how to close the gap.",
   },
   5: {
     title: "What you want to rank for",
     description:
-      "The exact queries you wish your customers searched and found you for.",
+      "The exact words your customers would Google to find you. This is where SEO + AI strategy starts.",
   },
   6: {
-    title: "Where you stand today",
+    title: "Where you are now",
     description:
-      "Quick honest snapshot of your current digital presence. We'll verify ourselves; we just want your read.",
+      "Quick honest read of your current online presence. We verify everything ourselves — just want your perspective first.",
   },
   7: {
-    title: "Send the report",
+    title: "Get your free report",
     description:
-      "We'll email you a personalised AEO Discovery summary within 24 hours.",
+      "We'll email you your personalised SEO + AI scan within 24 hours.",
   },
 };
 
@@ -107,14 +108,16 @@ export function getStepLabel(step: number) {
 }
 
 export const discoveryQuestions: DiscoveryQuestion[] = [
-  // STEP 1 — Identification
+  // STEP 1 — About your business
   {
     id: "businessName",
     step: 1,
     sector: "all",
     required: true,
     question:
-      "What is the registered name of your business or firm as you want it to appear on Google, AI engines, and industry directories?",
+      "What's your business name? (Exactly as you want it to appear when people Google you.)",
+    context:
+      "Whatever name you use on Google Maps, your website, your invoices. We'll use this to match you across SEO + AI search results.",
     type: "text",
     placeholder: "e.g. Sandton Cardiology Practice",
     maxLength: 200,
@@ -125,9 +128,9 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: false,
     question:
-      "What is your business website URL — or do you not have a website yet?",
+      "What's your website? (Or leave blank if you don't have one yet.)",
     context:
-      "If you don't have one yet, leave blank — building or improving the website is part of what we'd address as Property 1 of The Real Estate Method.",
+      "If you don't have a website yet, that's fine — building one is part of what we'd recommend in your plan.",
     type: "url",
     placeholder: "https://yourfirm.co.za",
   },
@@ -136,29 +139,43 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     step: 1,
     sector: "all",
     required: true,
-    question:
-      "Which sector best describes your business — medical, legal, industrial, or other?",
+    question: "What kind of business do you run?",
     context:
-      "We'll tailor the rest of the questions to your sector. Medical, legal, and industrial are our locked ICP — other sectors get a more general path.",
+      "We'll tailor the next questions to your sector. We're best for medical, legal, and industrial firms — those are who we work with most.",
     type: "select",
     options: [
-      { value: "medical", label: "Medical practice (practitioner, dentist, specialist, GP group, aesthetics, psychology)" },
-      { value: "legal", label: "Legal firm (attorney, advocate, advisor, labour-law, mid-market commercial firm)" },
-      { value: "industrial", label: "Industrial business (B2B equipment, fabricator, contractor, BBBEE supplier, mining services)" },
-      { value: "other", label: "Other sector / I'm not sure where I fit" },
+      {
+        value: "medical",
+        label:
+          "Medical practice — doctor, dentist, specialist, GP group, aesthetics, psychology",
+      },
+      {
+        value: "legal",
+        label:
+          "Law firm — attorney, advocate, advisor, labour law, mid-market commercial",
+      },
+      {
+        value: "industrial",
+        label:
+          "Industrial / B2B — equipment, fabricator, contractor, BBBEE supplier, mining services",
+      },
+      {
+        value: "other",
+        label: "Something else — or I'm not sure where I fit",
+      },
     ],
   },
 
-  // STEP 2 — Services
+  // STEP 2 — What you sell
   {
     id: "services",
     step: 2,
     sector: "all",
     required: true,
     question:
-      "What are the top 3 services your business offers that you most want customers to find you for on Google and AI engines?",
+      "What are the top 3 things you sell or do? (The services you most want to be Googled for.)",
     context:
-      "List the 3 you sell most, or 3 you want to sell more of. Each will be tested as an individual AEO query against ChatGPT, Claude, Gemini, and Perplexity.",
+      "List the 3 services you sell most — or 3 you want to sell more of. Each one becomes a query we test against ChatGPT, Claude, Gemini, and Perplexity.",
     type: "multi-text",
     multiLabels: ["Service 1", "Service 2", "Service 3"],
   },
@@ -167,10 +184,9 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     step: 2,
     sector: "all",
     required: true,
-    question:
-      "Which one of those services would you most like to grow or sell more of in the next 6 to 12 months?",
+    question: "Of those 3, which one do you most want to sell MORE of?",
     context:
-      "We'll prioritise AEO work around this service — including schema, content, and citations specifically targeted to it.",
+      "We'll focus the SEO + AI work on this service first. The other two get covered too — but this one gets priority.",
     type: "text",
     placeholder: "Type the service name",
   },
@@ -180,16 +196,36 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: true,
     question:
-      "What is the average value of a single customer, contract, patient, matter, or supply order for your business?",
+      "What's a typical customer worth to you? (One job, one patient, one contract — pick the closest range.)",
     context:
-      "Used for ROI math — and to recommend the right tier. The higher the customer value, the more leverage AEO has for your business.",
+      "Used for ROI math — and to recommend the right plan for your budget. Higher customer value = more leverage from SEO + AI work.",
     type: "range-select",
     options: [
-      { value: "under-5k", label: "Under R5,000 per customer / patient / matter" },
-      { value: "5-25k", label: "R5,000 – R25,000 per customer (typical for routine medical, retail-services, small legal matters)" },
-      { value: "25-100k", label: "R25,000 – R100,000 per customer (specialist medical procedures, mid-size matters, smaller industrial supply)" },
-      { value: "100-500k", label: "R100,000 – R500,000 per customer (enterprise medical groups, complex legal, mid-size industrial contracts)" },
-      { value: "500k-plus", label: "Over R500,000 per customer (large industrial supply, enterprise legal mandates, major procurement)" },
+      {
+        value: "under-5k",
+        label:
+          "Under R5,000 per customer (think: routine consult, basic service, small order)",
+      },
+      {
+        value: "5-25k",
+        label:
+          "R5,000 – R25,000 per customer (specialist visit, small legal matter, retail-service)",
+      },
+      {
+        value: "25-100k",
+        label:
+          "R25,000 – R100,000 per customer (medical procedure, mid-size legal matter, small industrial order)",
+      },
+      {
+        value: "100-500k",
+        label:
+          "R100,000 – R500,000 per customer (enterprise medical, complex legal, mid-size industrial contract)",
+      },
+      {
+        value: "500k-plus",
+        label:
+          "Over R500,000 per customer (major contract, enterprise mandate, large supply order)",
+      },
     ],
   },
 
@@ -200,11 +236,12 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: true,
     question:
-      "Who is your ideal customer or client — and what specific industry, role, location, or buying intent makes them a perfect fit for your business?",
+      "Describe your dream customer in one sentence. (The kind you want MORE of — not the ones who waste your time.)",
     context:
-      "Specific is better. 'Mid-market law firms in Johannesburg with 15-50 attorneys handling SaaS contracts' is 100× more useful than 'businesses that need legal help.' AI engines surface specific matches; they filter out generic ones.",
+      "Be specific. 'Mid-market law firms in Joburg with 15-50 attorneys handling tech contracts' beats 'businesses that need legal help.' The more specific you are, the more specific your Google + AI ranking strategy can be.",
     type: "textarea",
-    placeholder: "e.g. Industrial procurement managers at SA mining houses sourcing BBBEE Level 1-2 lifting equipment suppliers for R500k+ contracts",
+    placeholder:
+      "e.g. Procurement managers at SA mining houses looking for BBBEE Level 1 lifting equipment suppliers for R500k+ contracts",
     maxLength: 500,
   },
   {
@@ -213,11 +250,12 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: true,
     question:
-      "Which cities, regions, or countries does your business actually serve customers in?",
+      "Where are your customers based? (Cities, suburbs, or regions you actually serve.)",
     context:
-      "Drives Google Business Profile area-served, schema 'areaServed' tagging, and which directories we list you on. Be specific — 'Gauteng' is good; 'Pretoria + Johannesburg + Witbank' is better.",
+      "Be specific. 'Gauteng' is good. 'Pretoria + Johannesburg + Witbank' is better. This drives where your business shows up on Google Maps + AI search.",
     type: "text",
-    placeholder: "e.g. Pretoria + Johannesburg + Witbank, plus mining sites in Mpumalanga",
+    placeholder:
+      "e.g. Pretoria + Johannesburg + Witbank, plus mining sites in Mpumalanga",
     maxLength: 200,
   },
 
@@ -228,11 +266,12 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "medical",
     required: false,
     question:
-      "Which medical aid plans does your practice currently accept — Discovery, Bonitas, Momentum, GEMS, or others?",
+      "Which medical aids do you accept? (Discovery, Bonitas, Momentum, GEMS — patients Google this exact thing.)",
     context:
-      "Critical for buyer-intent AI queries like 'cardiologist who accepts Discovery in Sandton' — these are the exact queries patients run when choosing a specialist.",
+      "Patients search 'cardiologist who accepts Discovery in Sandton' or 'Bonitas dentist near me'. If your medical aid list isn't visible online, you're invisible to those searches.",
     type: "textarea",
-    placeholder: "e.g. Discovery Health, Bonitas, Momentum Health, GEMS, Polmed, Profmed",
+    placeholder:
+      "e.g. Discovery Health, Bonitas, Momentum Health, GEMS, Polmed, Profmed",
     maxLength: 500,
   },
   {
@@ -241,9 +280,9 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "medical",
     required: false,
     question:
-      "What is your HPCSA registration number, if you'd like it visible as a verified credential on your AEO scan?",
+      "What's your HPCSA number? (Optional — but we'll show it as a verified credential.)",
     context:
-      "Optional. HPCSA verification is one of the highest-trust signals AI engines use to validate medical practitioners — and is absent from most SA practice websites.",
+      "Patients trust HPCSA-verified practitioners. AI engines weight it heavily. Most SA practice websites don't show this — easy edge for you.",
     type: "text",
     placeholder: "e.g. MP0123456",
     maxLength: 50,
@@ -254,15 +293,24 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "legal",
     required: false,
     question:
-      "Is your firm currently listed on the Law Society of South Africa (LSSA) directory — and is that listing up to date?",
+      "Are you listed on the Law Society of SA (LSSA) directory? Is it up to date?",
     context:
-      "LSSA is the highest-trust legal citation in South Africa. AI engines cross-reference LSSA before recommending attorneys to prospective clients.",
+      "LSSA is the most trusted legal directory in SA. Clients check it. AI engines cite from it. If you're not on it (or your listing is stale), prospects can't verify you exist.",
     type: "select",
     options: [
-      { value: "listed-current", label: "Yes — listed and current with all our practitioners" },
-      { value: "listed-stale", label: "Yes — but the listing is probably out of date or incomplete" },
-      { value: "not-listed", label: "No, the firm is not currently listed on LSSA" },
-      { value: "unsure", label: "I'm not sure — would need to check" },
+      {
+        value: "listed-current",
+        label: "Yes — listed and current with all our attorneys",
+      },
+      {
+        value: "listed-stale",
+        label: "Yes — but it's probably out of date",
+      },
+      {
+        value: "not-listed",
+        label: "No, we're not on LSSA",
+      },
+      { value: "unsure", label: "I'd have to check" },
     ],
   },
   {
@@ -271,11 +319,12 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "legal",
     required: false,
     question:
-      "What specific practice areas does your firm cover, and which ones do you most want to be known for in AI engine results?",
+      "What types of cases do you handle? (Up to 5 — the more specific, the better.)",
     context:
-      "List up to 5. The most specific practice areas rank best — 'commercial litigation' is good; 'commercial litigation in tech and SaaS contracts' is much better.",
+      "Specific practice areas rank way better than generic ones. 'Commercial litigation' is fine. 'Commercial litigation for tech / SaaS startups' is gold — that's exactly what someone Googles.",
     type: "textarea",
-    placeholder: "e.g. Commercial litigation in tech / SaaS, M&A advisory for mid-market deals, Labour law (CCMA), Intellectual property and trademark, Corporate restructuring",
+    placeholder:
+      "e.g. Commercial litigation in tech / SaaS, M&A for mid-market deals, Labour law (CCMA), Intellectual property + trademark, Corporate restructuring",
     maxLength: 500,
   },
   {
@@ -284,18 +333,27 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "industrial",
     required: false,
     question:
-      "What is your business's current BBBEE Level, and is it independently verified by an accredited verification agency?",
+      "What's your BBBEE Level? (And is it verified by an accredited agency?)",
     context:
-      "BBBEE Level is THE filter for SA enterprise and state-owned-enterprise (SOE) procurement queries. AI engines surface verified BBBEE status directly when procurement officers search.",
+      "BBBEE Level is THE filter for SA enterprise + government procurement. Procurement officers Google 'BBBEE Level 1 supplier for [service] in [region]' — verified Level 1/2 firms get found first.",
     type: "select",
     options: [
-      { value: "level-1", label: "Level 1 (highest — 100%+ procurement recognition)" },
+      {
+        value: "level-1",
+        label: "Level 1 (highest — 100%+ procurement recognition)",
+      },
       { value: "level-2", label: "Level 2 (125% recognition)" },
       { value: "level-3", label: "Level 3" },
       { value: "level-4", label: "Level 4" },
       { value: "level-5-plus", label: "Level 5 or below" },
-      { value: "exempt", label: "Exempt micro-enterprise (EME) — under R10m turnover" },
-      { value: "not-applicable", label: "Not BBBEE-relevant for our market (e.g. international export only)" },
+      {
+        value: "exempt",
+        label: "Exempt micro-enterprise (EME) — under R10m turnover",
+      },
+      {
+        value: "not-applicable",
+        label: "Not BBBEE-relevant for our market (e.g. international export only)",
+      },
     ],
   },
   {
@@ -304,11 +362,12 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "industrial",
     required: false,
     question:
-      "Which industry certifications, registrations, or supplier database listings does your business currently hold?",
+      "What certifications and supplier registrations do you hold? (CSD, CIDB, ISO, sector-specific — list whatever applies.)",
     context:
-      "CSD (Central Supplier Database for SOE work), CIDB (Construction Industry Development Board), ISO, sector-specific bodies (NTC for telecoms, MEMSA for engineering, SAFAS for foundries). List what applies.",
+      "CSD = Central Supplier Database, essential for government work. CIDB = Construction grading. ISO = quality standard. Plus sector-specific (NTC, MEMSA, SAFAS, etc.). The more you list, the more procurement queries you can rank for.",
     type: "textarea",
-    placeholder: "e.g. CSD MAAA1234567, CIDB Grade 5GB, ISO 9001:2015 certified, NTC member, BBBEE Level 1 verified by AQRate",
+    placeholder:
+      "e.g. CSD MAAA1234567, CIDB Grade 5GB, ISO 9001:2015, NTC member, BBBEE Level 1 verified by AQRate",
     maxLength: 500,
   },
 
@@ -319,11 +378,15 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: true,
     question:
-      "Who are the top 3 competitors your business loses customers to, or that you compete with most directly in your market?",
+      "Who are your top 3 competitors? (The ones you lose deals to — or want to beat.)",
     context:
-      "Website URLs preferred — names work if you don't know the URL. We benchmark you against them on schema, citations, AI visibility, and every property of The Real Estate Method.",
+      "Website URLs are best. Names work if you don't have the URL handy. We'll Google them, see what they're doing on Google + AI, and show you exactly where you're behind.",
     type: "multi-text",
-    multiLabels: ["Competitor 1 (URL preferred)", "Competitor 2 (URL preferred)", "Competitor 3 (URL preferred)"],
+    multiLabels: [
+      "Competitor 1 (URL preferred)",
+      "Competitor 2 (URL preferred)",
+      "Competitor 3 (URL preferred)",
+    ],
   },
   {
     id: "competitorAdvantage",
@@ -331,26 +394,28 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: false,
     question:
-      "What is the one thing your top competitors do better than your business right now, in terms of digital presence or customer acquisition?",
+      "Be honest — what's the ONE thing they do better than you? (Online or offline. We're not judging.)",
     context:
-      "Brutal honesty here is more useful than diplomacy. The clearer you name the gap, the faster we close it.",
+      "The more specific you are, the faster we close the gap. 'They post on LinkedIn 3× a week — I don't' is way more useful than 'they're better at marketing.'",
     type: "textarea",
-    placeholder: "e.g. They post on LinkedIn 3× per week with case-win stories. Our founder doesn't post at all. They show up in ChatGPT for our service queries; we don't.",
+    placeholder:
+      "e.g. They show up #1 when I Google our main service. They post on LinkedIn weekly. They have 50+ Google reviews — we have 8.",
     maxLength: 500,
   },
 
-  // STEP 5 — Visibility goals
+  // STEP 5 — What you want to rank for
   {
     id: "wishedQueries",
     step: 5,
     sector: "all",
     required: true,
     question:
-      "What are the exact search queries you wish your customers used to find your business — on Google, ChatGPT, Claude, Gemini, or Perplexity? List 3 to 5.",
+      "If a customer Googled to find your business, what exact words would they type? List 3-5 searches.",
     context:
-      "These become the queries we test on all 4 AI engines as part of your scan. Examples: 'Best cardiologist in Sandton accepting Discovery Health,' 'BBBEE Level 1 lifting equipment supplier for mining contracts in Gauteng,' 'Top commercial attorney for SaaS startups in Cape Town.'",
+      "Think about the EXACT queries — what your customers type into Google or ask ChatGPT. These become the queries we test for you across Google + all 4 AI engines (ChatGPT, Claude, Gemini, Perplexity).",
     type: "textarea",
-    placeholder: "One query per line",
+    placeholder:
+      "One per line. Examples:\n• best dentist in Sandton accepting Discovery\n• BBBEE Level 1 lifting equipment supplier mining\n• commercial attorney for SaaS startups Cape Town\n• cardiologist near me Pretoria",
     maxLength: 1000,
   },
   {
@@ -359,11 +424,12 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: true,
     question:
-      "What does success look like for your business 6 months from now — measured in new customers, revenue growth, AI engine citations, or another metric you can measure?",
+      "If we work together, what does success look like 6 months from now?",
     context:
-      "Specific is better. '10 new patient bookings per week from AI search' beats 'more visibility.' Vague goals produce vague strategy.",
+      "Be specific. '5 new patients a week' beats 'more visibility'. '2 mining contracts at R500k each' beats 'more leads'. Vague goals = vague results.",
     type: "textarea",
-    placeholder: "e.g. 5 new mid-market law firm clients found via AI engines, average matter value R200k each. Or: 2 new BBBEE-aligned mining contracts at R500k+ each, sourced through procurement-officer AI searches.",
+    placeholder:
+      "e.g. 5 new mid-market law firm clients per quarter from Google + AI search. Or: 2 new BBBEE-aligned mining contracts a quarter at R500k+ each.",
     maxLength: 500,
   },
 
@@ -374,21 +440,39 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: true,
     question:
-      "Where do your customers actually find your business today — through Google search, social media, AI engines, referrals, or somewhere else?",
+      "How do customers find you today? (Tick everything that's true.)",
     context:
-      "Tick all that apply. Honest answer beats aspirational answer. We use this to identify which channels are leaking demand.",
+      "Honest answer beats aspirational. If 90% are word-of-mouth and 0% from Google, that's gold — we know exactly what to fix.",
     type: "multi-select",
     options: [
-      { value: "google-organic", label: "Google search (organic results, not paid ads)" },
-      { value: "google-paid", label: "Google ads (paid search)" },
-      { value: "gbp", label: "Google Business Profile / Google Maps" },
-      { value: "linkedin", label: "LinkedIn (founder or company page)" },
-      { value: "industry-directory", label: "Industry-specific directory listings (HPCSA, LSSA, CSD, BBBEE Verification, etc.)" },
-      { value: "word-of-mouth", label: "Word of mouth and referrals from existing customers" },
-      { value: "ai-engine", label: "AI engines like ChatGPT, Claude, Gemini, or Perplexity" },
-      { value: "social-other", label: "Other social media (Instagram, Facebook, Twitter/X)" },
-      { value: "trade-publications", label: "Trade publications, press mentions, industry media" },
-      { value: "i-dont-know", label: "Honestly, I don't know — we don't track this" },
+      { value: "google-organic", label: "Google search (organic — not paid ads)" },
+      { value: "google-paid", label: "Google Ads (paid search)" },
+      { value: "gbp", label: "Google Maps / Google Business Profile" },
+      { value: "linkedin", label: "LinkedIn" },
+      {
+        value: "industry-directory",
+        label: "Industry directories (HPCSA, LSSA, CSD, BBBEE listings, etc.)",
+      },
+      {
+        value: "word-of-mouth",
+        label: "Word of mouth + referrals from existing customers",
+      },
+      {
+        value: "ai-engine",
+        label: "AI engines (ChatGPT, Claude, Gemini, Perplexity)",
+      },
+      {
+        value: "social-other",
+        label: "Other social media (Instagram, Facebook, Twitter/X)",
+      },
+      {
+        value: "trade-publications",
+        label: "Trade publications + industry press",
+      },
+      {
+        value: "i-dont-know",
+        label: "Honestly, I don't track where they come from",
+      },
     ],
   },
   {
@@ -397,20 +481,48 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: true,
     question:
-      "What is the current state of your digital presence — Google Business Profile, schema markup, LinkedIn cadence, reviews, and industry citations?",
+      "What do you have set up online already? (Tick what's true — be honest.)",
     context:
-      "Tick everything that's true today. We'll verify ourselves in the audit; we just want your honest read of where things stand.",
+      "We verify everything ourselves anyway — we just want your read first. The more honest you are about gaps, the more accurate the recommendation.",
     type: "multi-select",
     options: [
-      { value: "gbp-claimed", label: "Google Business Profile is claimed, verified, and actively maintained" },
-      { value: "schema-deployed", label: "Schema markup is deployed on our website (LocalBusiness, Service, FAQ, etc.)" },
-      { value: "linkedin-active", label: "We post on LinkedIn at least once a week (founder or company page)" },
-      { value: "reviews-managed", label: "We actively respond to Google + HelloPeter + sector-specific reviews" },
-      { value: "hellopeter-claimed", label: "We've claimed our HelloPeter profile and respond to reviews there" },
-      { value: "industry-citations", label: "We're listed on industry-specific directories (HPCSA / LSSA / CSD / BBBEE / sector-specific)" },
-      { value: "newsletter-running", label: "We send a regular email newsletter to customers or prospects" },
-      { value: "youtube-active", label: "We have an active YouTube channel with educational or branded content" },
-      { value: "none-of-above", label: "None of the above (or I honestly don't know the state of any of these)" },
+      {
+        value: "gbp-claimed",
+        label: "Our Google Business Profile is claimed and active",
+      },
+      {
+        value: "schema-deployed",
+        label:
+          "Our website has the right code so Google + AI can read it properly",
+      },
+      {
+        value: "linkedin-active",
+        label: "We post on LinkedIn at least once a week",
+      },
+      {
+        value: "reviews-managed",
+        label: "We respond to Google + HelloPeter reviews regularly",
+      },
+      {
+        value: "hellopeter-claimed",
+        label: "We've claimed our HelloPeter profile",
+      },
+      {
+        value: "industry-citations",
+        label: "We're listed on industry directories (HPCSA / LSSA / CSD / BBBEE / etc.)",
+      },
+      {
+        value: "newsletter-running",
+        label: "We send a regular email newsletter",
+      },
+      {
+        value: "youtube-active",
+        label: "We have an active YouTube channel",
+      },
+      {
+        value: "none-of-above",
+        label: "None of the above (or I honestly don't know what's set up)",
+      },
     ],
   },
   {
@@ -419,11 +531,12 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: false,
     question:
-      "What digital marketing or SEO strategies has your business tried before — and which ones worked, which ones failed?",
+      "What have you tried before to get more customers online? What worked, what didn't?",
     context:
-      "Past SEO agencies, freelancers, tools, courses, paid ads. Telling us what failed prevents us from repeating it. The more specific, the more useful.",
+      "Past SEO agencies, freelancers, paid ads, social media — be honest. Saves us repeating mistakes you've already paid for.",
     type: "textarea",
-    placeholder: "e.g. Hired an SEO agency in 2024 — they delivered generic blog posts and cheap directory submissions, no leads. Tried LinkedIn ads — too expensive at our deal size. Built a Google Ads account in-house — kept burning money on broad-match keywords.",
+    placeholder:
+      "e.g. Hired an SEO agency in 2024 — they did blog posts and cheap directory listings, no real leads. Tried LinkedIn ads — too expensive for our deal size. Built Google Ads in-house — burned budget on the wrong keywords.",
     maxLength: 1000,
   },
 
@@ -433,8 +546,7 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     step: 7,
     sector: "all",
     required: true,
-    question:
-      "What is your name — so we can address your AEO Discovery summary correctly?",
+    question: "Your name?",
     type: "text",
     placeholder: "e.g. Dr Mokoena",
     maxLength: 200,
@@ -445,9 +557,9 @@ export const discoveryQuestions: DiscoveryQuestion[] = [
     sector: "all",
     required: true,
     question:
-      "What is the best email address to send your personalised AEO Discovery summary to within 24 hours?",
+      "Email to send your free SEO + AI scan to? (Within 24 hours. No spam.)",
     context:
-      "We'll email you a personalised summary within 24 hours. No spam. No sales sequence without explicit opt-in. Easy one-click unsubscribe.",
+      "We'll email you a personalised report — covering Google rankings, AI engine visibility, and the highest-leverage thing to fix first. One-click unsubscribe if you'd rather not hear from us again.",
     type: "email",
     placeholder: "you@yourfirm.com",
   },

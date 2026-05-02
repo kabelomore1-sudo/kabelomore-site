@@ -14,43 +14,48 @@ import { discoveryQuestions } from "@/lib/discovery-questions";
 import { Clock, Lock, Mail, Award } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "The Real Estate Discovery — Free 10-min AEO Intake (Medical, Legal, Industrial)",
+  title: "Free SEO + AI Visibility Scan — 10-min Intake for Medical, Legal & Industrial Firms",
   description:
-    "What questions does an AEO consultant ask before starting work? These 15. Free interactive intake form for medical practices, law firms, and industrial businesses. Personalised AEO Discovery summary within 24 hours. No card required.",
+    "Want more customers from Google + AI? Tell us about your business in 10 minutes — get a personalised SEO + AI Visibility report within 24 hours. Free, no card. Built for medical practices, law firms, and industrial businesses.",
   alternates: { canonical: `${site.url}/discover` },
 };
 
-// FAQs about the Discovery process — meta-questions that buyers (and
-// AI engines) Google when researching AEO consultancies. These wrap as
-// FAQPage schema so AI engines can cite the answers directly.
+// FAQs about the discovery process — phrased in the language buyers
+// actually search. Some use SEO/Google terms (what most people Google
+// today), some use AEO/AI terms (the emerging category). Maximum
+// long-tail coverage. Wrapped in FAQPage JSON-LD for AI citation.
 const discoveryMetaFaqs = [
   {
-    q: "What questions does an AEO consultant ask before starting work for a business?",
-    a: "A thorough AEO consultant asks 15 questions across 7 areas: business identification, services and primary offering, ideal customer and service area, top 3 competitors and their advantages, the exact queries the business wishes customers searched, the current state of digital presence (Google Business Profile, schema, LinkedIn, reviews, industry citations), and contact details for delivering the personalised report. The full list of questions is public on this page and forms the foundation of The Real Estate Method.",
+    q: "What questions should I expect when working with an SEO + AI search consultant?",
+    a: "A thorough SEO + AI Visibility consultant asks about 15 questions across 7 areas: your business and website, the services you sell, your ideal customer and service area, your top 3 competitors, the exact words customers would Google to find you, what you have set up online today (Google Business Profile, reviews, LinkedIn, industry directories), and where to send your personalised report. The full list is public on this page so you can read them before committing 10 minutes.",
   },
   {
-    q: "How long does an AEO Discovery intake take to complete?",
-    a: "Approximately 10 minutes. The Real Estate Discovery is a multi-step interactive form with sector-specific branching for medical, legal, and industrial firms. It auto-saves to your browser as you go, so you can pause and return later without losing progress.",
+    q: "How long does the free SEO + AI Visibility intake take?",
+    a: "About 10 minutes. The form is multi-step with sector-specific questions for medical, legal, and industrial businesses. It auto-saves to your browser as you go — so you can pause and come back without losing your answers.",
   },
   {
-    q: "Why does an AEO Discovery include questions about your competitors?",
-    a: "AI engines (ChatGPT, Claude, Gemini, Perplexity) benchmark businesses comparatively. When a buyer asks 'best cardiologist in Sandton,' the AI considers all candidates and recommends the strongest match across schema, citations, reviews, and content depth. Knowing your top 3 competitors lets us measure where your gaps are versus theirs — and which gaps are highest-leverage to close.",
+    q: "Why do you ask about my competitors in the intake form?",
+    a: "Google and AI engines (ChatGPT, Claude, Gemini, Perplexity) compare businesses against each other. When a customer searches 'best cardiologist in Sandton,' the answer goes to whoever has the strongest combination of website, Google Business Profile, reviews, and industry citations. Knowing your top 3 competitors lets us show you exactly where you're behind — and the fastest way to catch up.",
   },
   {
-    q: "What is the difference between an AEO Discovery and a free AI Visibility Scan?",
-    a: "The free AI Visibility Scan at /scan takes 30 seconds and tests how AI engines respond to your business name + city today. It is a snapshot. The Real Estate Discovery takes 10 minutes and captures services, customers, competitors, goals, and current state — producing a personalised 24-hour summary report with sector-specific recommendations. Discovery is the deeper path; the scan is the lighter alternative.",
+    q: "What's the difference between this intake and the free AI scan at /scan?",
+    a: "The free AI scan at /scan takes 30 seconds and tests how AI engines respond to your business name + city today. It's a quick snapshot. This intake takes 10 minutes and captures everything we need — services, customers, competitors, goals, current setup — to send you a personalised SEO + AI Visibility report within 24 hours, with a clear recommendation on what to fix first.",
   },
   {
-    q: "What information do I need to prepare before starting The Real Estate Discovery?",
-    a: "Have these ready: your business name and website URL, your top 3 services, your top 3 competitor URLs (or names), 3-5 search queries you wish customers used to find you, your average customer or contract value range, and your service area cities. Sector-specific firms also need: medical aid plans accepted (medical), Law Society of SA listing status (legal), or BBBEE Level + certifications (industrial).",
+    q: "What do I need to prepare before starting the intake form?",
+    a: "Have these handy: your business name + website URL, your top 3 services, your top 3 competitor URLs (or names), 3-5 search queries customers would type to find you, the rough value of one typical customer/contract, and your service area cities. Sector-specific: medical practices add medical aid plans accepted, law firms add LSSA listing status, industrial firms add BBBEE Level + certifications.",
   },
   {
-    q: "Are the answers I provide in The Real Estate Discovery kept private?",
-    a: "Yes. Your answers are private and used only to prepare your personalised AEO Discovery summary. The questions themselves are public — these are 'the questions every AEO consultant should ask' — but your specific answers are confidential. We never share, never sell, never add you to a sales sequence without explicit opt-in. Easy one-click unsubscribe on any future communication.",
+    q: "Will my answers be kept private?",
+    a: "Yes. Your specific answers are private and used only to prepare your personalised report. The questions themselves are public on the page — that's transparency about the methodology — but your answers stay confidential. We never share, never sell, never enrol you in a sales sequence without explicit opt-in. One-click unsubscribe on any future email.",
   },
   {
-    q: "Will I be sold a retainer after completing the AEO Discovery?",
-    a: "No automatic pitch. We send the personalised summary within 24 hours with our honest assessment, including a recommended tier (or an honest 'we're not the right fit for you yet' if that's true). If you want to discuss the report on a free 20-minute call, you ask for it — we don't push.",
+    q: "Will you try to sell me a monthly retainer after the report?",
+    a: "No automatic pitch. We send the report within 24 hours with our honest read on where you are, what to fix first, and which of our packages (if any) would suit you. If we're not the right fit for your business right now, we'll honestly say so. If you want to talk about it on a free 20-min call, you ask for it — we don't push.",
+  },
+  {
+    q: "How is The Real Estate Method different from regular SEO?",
+    a: "Regular SEO focuses on Google rankings only. The Real Estate Method covers all 7 properties customers actually use to find businesses today: your website + Google rankings, Google Business Profile, LinkedIn, industry directories, reviews, industry press, AND the new layer of AI engines (ChatGPT, Claude, Gemini, Perplexity). Most SEO agencies still only do 1-2 of these. We do all 7 — because that's where modern customers actually look.",
   },
 ];
 
@@ -58,22 +63,22 @@ const valueProps = [
   {
     icon: Clock,
     title: "10 minutes",
-    body: "Multi-step. Auto-saves. Close the tab and come back — your progress is saved.",
+    body: "Multi-step. Auto-saves as you go. Close the tab and come back — your answers are kept.",
   },
   {
     icon: Mail,
-    title: "Personalised summary",
-    body: "Within 24 hours: your AEO score, your gaps, your highest-leverage fix, and a no-pressure tier recommendation.",
+    title: "Free SEO + AI report",
+    body: "Within 24 hours: where you rank on Google + AI engines, what's leaking, and the highest-leverage thing to fix first.",
   },
   {
     icon: Award,
     title: "Same questions we ask paying clients",
-    body: "This isn't a marketing form. It's the actual intake we use for every retainer. The depth pays off.",
+    body: "Not a marketing form — the actual intake we use for every project. The depth is the difference.",
   },
   {
     icon: Lock,
     title: "Public + private",
-    body: "Your answers are private. The structure is public — these are 'the questions every AEO consultant should ask.' You can verify the methodology before committing.",
+    body: "Your answers stay private. The questions are public — read them before you commit. Transparency before trust.",
   },
 ];
 
@@ -88,9 +93,9 @@ export default function DiscoverPage() {
           ]),
           articleJsonLd({
             url: `${site.url}/discover`,
-            headline: "The Real Estate Discovery — Free AEO Intake",
+            headline: "Free SEO + AI Visibility Intake — 10-min Discovery for Medical, Legal & Industrial Firms",
             description:
-              "What questions does an AEO consultant ask? These 15. 10-minute interactive intake form. Free. Personalised AEO summary within 24 hours.",
+              "What questions does an SEO + AI consultant ask before working with you? These 15. 10-minute interactive intake. Free. Personalised report within 24 hours.",
             datePublished: "2026-05-02",
           }),
           // FAQPage schema — direct AI engine citation target for queries
@@ -104,18 +109,19 @@ export default function DiscoverPage() {
       <Section variant="tinted" padding="lg">
         <div className="mx-auto max-w-3xl text-center">
           <Eyebrow className="justify-center">
-            The Real Estate Method · Free intake
+            Free intake · The Real Estate Method
           </Eyebrow>
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
-            The Real Estate Discovery.
+            Want more customers from
             <br />
-            <span className="text-ink-500">10 minutes. Personalised AEO summary.</span>
+            <span className="text-ink-500">Google AND AI?</span>
           </h1>
           <p className="mt-5 text-lg text-ink-500">
-            Tell us about your firm — your services, your customers, your
-            competitors, where you want to rank — and we&apos;ll send you a
-            personalised AEO Discovery summary within 24 hours. Free, no card,
-            no follow-up sales call unless you ask for one.
+            Tell us about your business in 10 minutes — your services, your
+            customers, your competitors, what you want to rank for — and
+            we&apos;ll email you a personalised SEO + AI Visibility report
+            within 24 hours. Free, no card, no sales pressure. Built for
+            medical, legal, and industrial firms.
           </p>
 
           {/* Value props grid */}
@@ -148,14 +154,16 @@ export default function DiscoverPage() {
         <div className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10">
           <Eyebrow>Preview the questions</Eyebrow>
           <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
-            What does an AEO consultant ask before starting work?
+            What does a good SEO + AI consultant ask before starting?
           </h2>
           <p className="mt-4 text-base text-ink-600 leading-relaxed">
-            These 15 questions. They cover 7 areas: identification,
-            services, customers, competition, visibility goals, current
-            state, and contact. Sector-specific questions branch in for
-            medical, legal, or industrial firms. Read them now —
-            transparency before commitment.
+            These 15 questions. They cover the 7 areas that actually
+            move the needle: your business, your services, your
+            customers, your competitors, what you want to rank for, what
+            you have set up online, and where to send the report.
+            Sector-specific questions branch in for medical, legal, or
+            industrial firms. Read them before committing your 10
+            minutes — that&apos;s transparency.
           </p>
 
           <details className="group mt-6">
@@ -222,12 +230,12 @@ export default function DiscoverPage() {
             </div>
 
             <p className="mt-6 text-xs italic text-ink-500">
-              These questions are public on purpose — Naval&apos;s frame:
-              specific knowledge attached to a name compounds. By
-              publishing the methodology questions openly, we let
-              prospects verify the depth before committing, and we plant
-              a flag in the AI-engine knowledge graph for &quot;questions
-              every AEO consultant should ask.&quot;
+              These questions are public on purpose. Most agencies hide
+              their intake forms behind a sales call. We don&apos;t. The
+              quality of the questions IS the proof of the methodology —
+              if they don&apos;t look like the right questions to ask
+              about your business, we&apos;re not the right fit and
+              you&apos;ve saved yourself a discovery call.
             </p>
           </details>
         </div>
@@ -241,18 +249,17 @@ export default function DiscoverPage() {
         <DiscoveryForm />
       </Section>
 
-      {/* FAQ — meta-questions about the Discovery itself. These are the
-          long-tail queries AI engines receive when buyers research AEO
-          consultancies. FAQPage schema is wrapped in JsonLd above so AI
-          engines can cite the answers directly. */}
+      {/* FAQ — meta-questions about the discovery itself. Phrased in
+          the language buyers actually Google. FAQPage schema is wrapped
+          in JsonLd above so AI engines can cite the answers directly. */}
       <Section variant="default" padding="lg" containerSize="narrow">
         <Eyebrow>Frequently asked</Eyebrow>
         <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
-          Questions about the AEO Discovery itself.
+          Questions about working with us.
         </h2>
         <p className="mt-4 text-base text-ink-500 leading-relaxed">
-          Common questions buyers Google when researching AEO consultancies and
-          intake processes.
+          Common questions business owners ask before booking an SEO + AI
+          Visibility audit.
         </p>
 
         <div className="mt-10 space-y-3">
@@ -278,49 +285,53 @@ export default function DiscoverPage() {
       {/* Trust footer */}
       <Section variant="tinted" padding="default" containerSize="narrow">
         <div className="prose-kabelo max-w-none">
-          <h2>Why we ask 15 questions instead of 4</h2>
+          <h2>Why we ask 15 questions and not 4</h2>
           <p>
-            The free AI Scan at{" "}
-            <Link href="/scan">kabelomore.com/scan</Link> takes 30 seconds and
-            tests how AI engines respond to your business name + city today.
-            That&apos;s useful but limited.
+            The 30-second free scan at{" "}
+            <Link href="/scan">kabelomore.com/scan</Link> checks how AI engines
+            respond to your business today. Useful — but limited. It&apos;s
+            a snapshot.
           </p>
           <p>
-            The Real Estate Discovery goes deeper. By the time you finish, we
-            know your services, your competitors, the queries you wish your
-            customers searched, your goals, and your current digital state. The
-            personalised summary we send back covers all 7 properties of{" "}
-            <Link href="/about">The Real Estate Method</Link>, with specific
-            recommendations for your firm — not generic advice.
+            This deeper intake gets us to a real plan. By the time you finish,
+            we know your services, your competitors, the exact queries you
+            want to rank for, your goals, and what&apos;s already set up. The
+            report we send back covers Google rankings + Google Business
+            Profile + reviews + LinkedIn + industry directories + AI engines
+            (ChatGPT, Claude, Gemini, Perplexity) — with specific
+            recommendations for YOUR business.
           </p>
           <p>
-            Filling this is a 10-minute investment. Reading the response is a
-            5-minute investment. The combined 15 minutes typically saves
-            months of guessing about what to fix first.
+            10 minutes here. 5 minutes reading the response. That 15-minute
+            investment typically saves months of guessing about what to fix
+            first — and which agency to spend money with.
           </p>
 
           <h2>What happens after you submit</h2>
           <ol>
             <li>
-              <strong>Within 1 hour:</strong> confirmation email with a copy of
-              your answers (so you have a record).
+              <strong>Within 1 hour:</strong> we email you a copy of your
+              answers (so you have a record of what you said).
             </li>
             <li>
-              <strong>Within 24 hours:</strong> personalised AEO Discovery
-              summary covering your score, gaps, top fix, and tier
-              recommendation.
+              <strong>Within 24 hours:</strong> personalised SEO + AI
+              Visibility report covering where you rank now, your gaps versus
+              competitors, the highest-leverage fix, and an honest
+              recommendation on what to do next.
             </li>
             <li>
-              <strong>Optional:</strong> if you want to discuss the report on a
-              free 20-min call, just reply with a time. No pitch, no pressure.
-              If we&apos;re not the right fit, we&apos;ll honestly say so.
+              <strong>Optional:</strong> want to talk through it on a free 20-
+              min call? Reply with a time that works. No pitch, no pressure.
+              If we&apos;re not the right fit for your business, we&apos;ll
+              honestly say so.
             </li>
           </ol>
 
           <p className="text-xs italic text-ink-500">
-            We&apos;ll never share your answers, never sell your email, never
-            add you to a sales sequence without explicit opt-in. Your data is
-            for us to deliver the summary you asked for. Full stop.
+            Your answers stay private. We never share your data, never sell
+            your email, never add you to a sales sequence without explicit
+            opt-in. The information is for us to send you the report you asked
+            for. Full stop.
           </p>
         </div>
       </Section>
