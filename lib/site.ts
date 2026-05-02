@@ -88,6 +88,17 @@ export type Tier = {
     items: { task: string; effort: string }[];
     notSocialMedia: string;
   };
+  // NEW: value-anchoring fields (retainers especially benefit from these)
+  // comparableTo  — anchors the price to something the buyer already understands
+  //                 (DStv, junior SMM, Semrush, agency retainer, etc.)
+  // roiMath       — explicit break-even calculation so buyer doesn't have to invent it
+  // cancelTerms   — visible cancellation terms; kills SA subscription anxiety
+  comparableTo?: string;
+  roiMath?: {
+    breakEven: string; // "1 new customer per quarter" or similar
+    targetReturn: string; // "30 customers / R150,000 / 2.3× ROI" etc.
+  };
+  cancelTerms?: string;
   cta: { label: string; href: string };
   highlight: boolean;
 };
@@ -261,64 +272,119 @@ export const tiers: Tier[] = [
     highlight: false,
   },
   {
-    id: "growth",
-    rank: 6,
-    name: "Growth",
+    id: "local-growth-lite",
+    rank: 55,
+    name: "Local Growth Lite",
     category: "retainer",
-    price: { sa: "R8,500 / mo", intl: "$695 / £495 / mo" },
+    price: { sa: "R2,950 / mo", intl: "$210 / £180 / mo" },
     payment: "Monthly billing in advance · 3-month minimum · cancel anytime after",
     delivery: "Ongoing",
     bestFor:
-      "Businesses with an existing website that want AI visibility as an ongoing growth channel. Active monthly work, not passive monitoring.",
+      "Local SA businesses that want their AI visibility to keep growing on autopilot — without committing to a full agency retainer. The bridge between once-off work and full-service ongoing.",
     description:
-      "Active monthly work to compound your AI visibility over time. We write the content, build the citations, update the schema, watch the competitors — every month. Discovery & Strategy Sprint included free in your first month.",
+      "The lighter, lower-friction monthly option for local businesses. Google Posts run automatically, daily AI tracking watches your business across 4 engines, and we touch up your GBP twice a month. No content production, no citation building — that's what Local Growth (the next tier up) is for.",
     receives: [
-      "Discovery & Strategy Sprint in Month 1 (R3,500 value)",
-      "2 answer-shaped articles published on your site each month",
-      "4 Google Business Profile posts each month",
-      "Schema markup updates as new pages launch",
-      "5 new third-party citations established each quarter",
-      "Monthly AI citation report across all 4 engines",
-      "Monthly competitive intelligence report",
-      "Quarterly strategy review (60-min call)",
-      "48-hour priority support",
-      "10% off any add-on services",
+      "Google Posts automation — 4 posts/week, AI-drafted, you approve or auto-publish",
+      "Daily AI Visibility tracking across all 4 engines (your business + 3 competitors)",
+      "2 manual GBP optimisations per month (photos, posts, Q&A, hours)",
+      "Quarterly AI scan with full report",
+      "Email support — 48-hour response",
+      "10% off any once-off add-on services",
     ],
     monthlyWork: {
       intro:
-        "Roughly 30-50 hours of specialist work each month. Not posting on Instagram. Here's what's actually happening:",
+        "Mostly automated. The point: AI Visibility maintenance without you thinking about it. Here's the breakdown:",
+      items: [
+        { task: "Generating + scheduling 4 Google Posts/week (AI-drafted)", effort: "Auto" },
+        { task: "Daily AI scan across 4 engines (audit-agent runs nightly)", effort: "Auto" },
+        { task: "2 manual GBP touch-ups (photos, posts, Q&A)", effort: "1-2 hrs" },
+        { task: "Monthly review + recommendation email", effort: "1 hr" },
+      ],
+      notSocialMedia:
+        "This is set-and-forget AI visibility maintenance. Not social media management. The Google Posts and AI tracking happen automatically. Once a month we send you what changed and what to do about it.",
+    },
+    comparableTo:
+      "A junior social media person in SA: R3-6k/mo for posts. A US Local SEO tool subscription: $100-300/mo. We bundle Google Post automation, AI tracking, and manual GBP work — at less than either alternative.",
+    roiMath: {
+      breakEven:
+        "Pays for itself with one new customer per year. If your average customer is worth R5,000+, break-even is 0.7 customers from this work.",
+      targetReturn:
+        "Annual cost: R35,400. Realistic target: 4-12 new customers via AI visibility = R20,000-R60,000+ revenue. Net gain at the low end matches cost; at the high end is 2-3× ROI in year 1.",
+    },
+    cancelTerms:
+      "3-month minimum. After that, cancel via email with 30 days notice. No phone calls, no retention pitch, no fine print.",
+    cta: { label: "Start Local Growth Lite", href: "/brief/local-growth-lite" },
+    highlight: false,
+  },
+  {
+    id: "growth",
+    rank: 6,
+    name: "Local Growth",
+    category: "retainer",
+    price: { sa: "R5,500 / mo", intl: "$395 / £335 / mo" },
+    payment: "Monthly billing in advance · 3-month minimum · cancel anytime after",
+    delivery: "Ongoing",
+    bestFor:
+      "Local SA businesses that want AI visibility to compound. Active content production + citation building on top of automated GBP work. Where most clients land.",
+    description:
+      "Everything in Lite, plus we actually produce content and build citations every month — the work that compounds your AI authority over time. Discovery & Strategy Sprint included free in your first month.",
+    receives: [
+      "Everything in Local Growth Lite (Google Posts automation + daily AI tracking + GBP touch-ups)",
+      "2 answer-shaped articles published on your site each month",
+      "5 new third-party citations established each quarter",
+      "Schema markup updates as new pages launch",
+      "Monthly AI citation report across all 4 engines (vs quarterly in Lite)",
+      "Monthly competitive intelligence report",
+      "Monthly 30-min strategy call",
+      "Discovery & Strategy Sprint in Month 1 (R3,500 value, free)",
+      "48-hour priority support",
+      "10% off any once-off add-on services",
+    ],
+    monthlyWork: {
+      intro:
+        "Roughly 20-35 hours of specialist work each month, on top of the automated Lite features. Not social media management. Here's the breakdown:",
       items: [
         { task: "Researching, writing and publishing 2 detailed articles", effort: "16-24 hrs" },
-        { task: "Writing and scheduling 4 Google Business Profile posts", effort: "3-4 hrs" },
-        { task: "Updating structured data (schema markup)", effort: "2-4 hrs" },
-        { task: "Building third-party citations (1-2 per month)", effort: "3-5 hrs" },
-        { task: "Monitoring AI citation rate across 4 engines + report", effort: "4-6 hrs" },
-        { task: "Tracking what your competitors are doing", effort: "3-4 hrs" },
-        { task: "Strategy refinement, communication, project management", effort: "2-4 hrs" },
+        { task: "Building 1-2 third-party citations per month", effort: "3-5 hrs" },
+        { task: "Schema markup updates as new content publishes", effort: "1-2 hrs" },
+        { task: "Monthly AI scan + competitor monitoring + report", effort: "3-5 hrs" },
+        { task: "Monthly 30-min strategy call + ad-hoc support", effort: "2-3 hrs" },
+        { task: "All Lite-tier automation (Google Posts, daily tracking, GBP touch-ups)", effort: "Mostly auto" },
       ],
       notSocialMedia:
         "This isn't social media management. The work is mostly technical and editorial — structured data, citations, and AI-shaped content. Some of it shows on your social feeds. Most of it shows up where you can't see it: in the signals AI engines use to decide who to recommend.",
     },
-    cta: { label: "Start Growth", href: "/brief/growth" },
+    comparableTo:
+      "A SA full-service SMM agency: R6-9k/mo doing posts + reporting only. A US SEO retainer: $1,000-2,500/mo. We charge less than either AND actually move AI engines (which they don't).",
+    roiMath: {
+      breakEven:
+        "Pays for itself with one new customer per quarter. If average customer = R5,000+, you need ~14 new customers/year to break even. Most clients see 30-60.",
+      targetReturn:
+        "Annual cost: R66,000. Realistic target: 30 new customers × R5,000 = R150,000+ revenue. Net gain: R84,000+. Floor, not ceiling.",
+    },
+    cancelTerms:
+      "3-month minimum. After that, cancel via email with 30 days notice. No phone calls, no retention pitch, no fine print.",
+    cta: { label: "Start Local Growth", href: "/brief/growth" },
     highlight: true,
   },
   {
     id: "premium",
     rank: 7,
-    name: "Premium",
+    name: "AI Authority",
     category: "retainer",
-    price: { sa: "R15,000 / mo", intl: "$1,295 / £895 / mo" },
+    price: { sa: "R10,500 / mo", intl: "$750 / £640 / mo" },
     payment: "Monthly billing in advance · 3-month minimum · cancel anytime after",
     delivery: "Ongoing · first month is implementation",
     bestFor:
-      "Businesses where AI visibility is THE growth strategy. Includes everything we'd implement in the first month plus deeper ongoing work.",
+      "Businesses where AI visibility IS the growth strategy. Aggressive content velocity, citation building, LinkedIn brand presence, and direct access. For businesses ready to dominate their category in AI search.",
     description:
-      "Everything in Growth, plus we do all the technical setup in the first 30 days — schema, GBP rebuild, citations, the lot. Then deeper monthly work after that. Direct access to me, executive call every month, 24-hour support. For businesses ready to invest in being the answer.",
+      "Everything in Local Growth, plus a heavy first-month implementation (schema + GBP rebuild + 5 citations + initial content), then 4 articles/month, LinkedIn management, reputation monitoring, and a monthly 60-min executive call. Direct access to me. 24-hour support SLA.",
     receives: [
-      "Discovery & Strategy Sprint in Month 1 (R3,500 value)",
+      "Everything in Local Growth (Lite automation + content + citations + reporting)",
+      "Discovery & Strategy Sprint in Month 1 (R3,500 value, free)",
       "First-month implementation: full schema + GBP rebuild + 5 citations + initial content",
       "30-day rescan with documented before/after",
-      "4 articles published each month (vs 2 in Growth)",
+      "4 answer-shaped articles published each month (vs 2 in Local Growth)",
       "8 Google Business Profile posts each month",
       "LinkedIn company page management — 3 posts/week aligned with AEO strategy",
       "Reputation monitoring + review response templates",
@@ -342,7 +408,67 @@ export const tiers: Tier[] = [
       notSocialMedia:
         "This is technical AEO work plus brand presence at the level a serious business needs. The LinkedIn posting is part of it because LinkedIn now powers AI search results. But the core work is what AI engines read to decide who to recommend — schema, citations, answer-shaped content — not Instagram graphics.",
     },
-    cta: { label: "Apply for Premium", href: "/brief/premium" },
+    comparableTo:
+      "A boutique SA digital agency: R15-25k/mo doing surface SEO + posts. A US-based AEO/SEO retainer: $2,500-5,000/mo. A senior in-house marketer's salary: R50k+/mo plus tools. We do the AEO heavy lift — at less than half of any alternative.",
+    roiMath: {
+      breakEven:
+        "Pays for itself with one new customer per quarter at R5,000+. Most AI Authority clients see 60-150 new customers/year via AI search.",
+      targetReturn:
+        "Annual cost: R126,000. Realistic target: 60 new customers × R5,000 = R300,000+ revenue. Net gain: R174,000+. For B2B with R20k+ deals, 6 new customers = R120k = break even; 30 = R600k = 4.7× ROI.",
+    },
+    cancelTerms:
+      "3-month minimum (covers the implementation-heavy first month + payback). After that, cancel via email with 30 days notice. No phone calls, no retention pitch, no fine print.",
+    cta: { label: "Apply for AI Authority", href: "/brief/premium" },
+    highlight: false,
+  },
+  {
+    id: "strategy-partner",
+    rank: 8,
+    name: "Strategy Partner",
+    category: "retainer",
+    price: { sa: "R20,000 / mo", intl: "$1,395 / £1,150 / mo" },
+    payment: "Monthly billing in advance · 6-month minimum · cancel anytime after",
+    delivery: "Ongoing · embedded role",
+    bestFor:
+      "Businesses where I'm essentially your fractional Head of AI Visibility. Quarterly strategy off-sites, custom dashboards, multi-region rollouts, and direct executive access. For mid-market firms scaling AI presence across SA, UK, or US markets simultaneously.",
+    description:
+      "Everything in AI Authority, plus I act as a strategic partner — not a vendor. Weekly executive sync. Quarterly off-site strategy day. Custom AI visibility dashboards built specifically for your business. Multi-market rollout support. Senior-level access for leadership decisions.",
+    receives: [
+      "Everything in AI Authority (4 articles, LinkedIn, reputation, monthly executive call)",
+      "Weekly 30-min executive sync (vs monthly in AI Authority)",
+      "Quarterly strategy off-site day (4 hrs deep work, in-person if Pretoria/JHB or virtual)",
+      "Custom AI visibility dashboard built for your business",
+      "Multi-market support (SA + UK, or SA + US, or all three)",
+      "Direct mobile/WhatsApp access to me during business hours",
+      "Annual brand audit + competitive intelligence deep-dive",
+      "First-look access to new tools and methods I'm building",
+      "Priority custom integrations as your business grows",
+    ],
+    monthlyWork: {
+      intro:
+        "100-160 hours of specialist + strategic work each month. The work mix tilts heavier toward strategy and partner-level engagement:",
+      items: [
+        { task: "Everything in AI Authority (content, citations, GBP, LinkedIn)", effort: "60-100 hrs" },
+        { task: "Weekly executive sync + ad-hoc strategic input", effort: "8-10 hrs" },
+        { task: "Custom dashboard build + maintenance", effort: "6-10 hrs" },
+        { task: "Multi-market research + localised content adaptation", effort: "8-15 hrs" },
+        { task: "Quarterly off-site prep + delivery (averaged monthly)", effort: "4-6 hrs" },
+        { task: "Annual brand + competitive deep-dive (averaged monthly)", effort: "2-4 hrs" },
+      ],
+      notSocialMedia:
+        "This is fractional executive work. I'm not your social media manager — I'm your AI visibility strategist with hands-on delivery. The model is: I think about your AI presence the way a Head of Growth would, but at a fraction of the cost and with the technical execution built in.",
+    },
+    comparableTo:
+      "A fractional CMO or Head of Growth: R40-80k/mo in SA, $8-15k/mo in US. A senior in-house marketer + agency stack: R60k+/mo combined. We do this for less than half — and execution is built in, not outsourced.",
+    roiMath: {
+      breakEven:
+        "Pays for itself with one mid-size B2B customer per year (R250k+ deal value). Or 4 new customers per month at R5k. Most Strategy Partner clients are B2B with deal values where 1-2 wins/year covers it.",
+      targetReturn:
+        "Annual cost: R240,000. Realistic target for B2B: 2-5 enterprise wins × R250k+ = R500k-R1.25M revenue. For volume retail/services: 80-150 new customers × R5k = R400k-R750k. Net gain: R200k-R1M+ in year 1.",
+    },
+    cancelTerms:
+      "6-month minimum (the dashboard build + multi-market setup takes that long to compound). After that, cancel via email with 60 days notice. No phone calls, no retention pitch, no fine print.",
+    cta: { label: "Apply for Strategy Partner", href: "/brief/strategy-partner" },
     highlight: false,
   },
 ];

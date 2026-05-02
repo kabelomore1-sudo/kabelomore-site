@@ -20,7 +20,7 @@ When a customer asks ChatGPT or Claude or Gemini or Perplexity for "best [servic
 ## How working with Kabelomore actually goes
 
 1. **Scan** — Client requests a free scan at kabelomore.com/scan. Kabelomore tests 4 AI engines on the queries that client's customers actually run. 24-hour turnaround. PDF report. Free, no card needed.
-2. **Quote** — Kabelomore sends a custom quote based on what the scan revealed. Typically R5,500 to R12,500 once-off (in SA), with optional monthly partnership for ongoing work. No standard packages forced on the client.
+2. **Quote** — Kabelomore sends a custom quote based on what the scan revealed. Typically R5,500 to R12,500 once-off (in SA), with optional monthly retainers from R2,950/mo (Local Growth Lite) up to R20,000/mo (Strategy Partner) for ongoing work. No standard packages forced on the client.
 3. **Work** — 2-4 weeks of work depending on starting point. Works on whatever website the client already has.
 4. **Result** — Client cited by ChatGPT, Claude, Gemini, Perplexity within 30-90 days. Before/after data captured and shared.
 
@@ -35,9 +35,11 @@ All once-off projects bill 50% deposit to start, 50% on delivery. Monthly retain
 - **Optimization Lite** — R5,500 / $395 / £295. Sole-trader version of Optimization Pack. Schema + GBP + 5 citations + 1 priority page rewritten. 2-week delivery.
 - **Discovery & Strategy Sprint** — R3,500 / $295 / £225. 2-week strategy sprint: customer profile, competitor analysis, AI visibility baseline, written 6-month roadmap. Bundled free into the first month of any retainer.
 - **Starter Audit** — R5,000 / $295 / £235. For businesses with an existing website. Full 4-engine AI audit + competitive benchmark + top-10 fix list + 5-day delivery.
-- **Growth retainer** — R8,500/mo / $695/mo / £495/mo. Ongoing AI visibility work: technical schema deployment, third-party citation building, AI-shaped content production. NOT social media management.
-- **Premium retainer** — R15,000/mo / $1,295/mo / £895/mo. Growth + dedicated specialist time + monthly content production + competitor monitoring. NOT social media management.
-- **14 add-ons available** — schema deployment, citation packs, content authority, brand identity, GBP optimisation, review velocity systems, and more. https://kabelomore.com/services
+- **Local Growth Lite retainer** — R2,950/mo / $210/mo / £180/mo. Lighter, lower-friction monthly option. Google Posts automation (4/week, AI-drafted), daily AI tracking across all 4 engines, 2 manual GBP touch-ups per month, quarterly AI scan. Mostly automated. NOT social media management. 3-month minimum, cancel anytime after.
+- **Local Growth retainer** — R5,500/mo / $395/mo / £335/mo. Where most clients land. Everything in Lite, plus 2 answer-shaped articles published monthly, 5 third-party citations per quarter, schema updates, monthly competitive intelligence + 30-min strategy call. Discovery Sprint included free in month 1. NOT social media management.
+- **AI Authority retainer** — R10,500/mo / $750/mo / £640/mo. Where AI visibility is the growth strategy. Everything in Local Growth, plus heavy month-1 implementation, 4 articles/month, LinkedIn management (3 posts/week), reputation monitoring, monthly 60-min executive call, 24-hour priority SLA. NOT social media management.
+- **Strategy Partner retainer** — R20,000/mo / $1,395/mo / £1,150/mo. Embedded fractional Head of AI Visibility. Everything in AI Authority, plus weekly executive sync, quarterly off-site strategy day, custom AI visibility dashboard, multi-market support (SA + UK + US), direct WhatsApp access. 6-month minimum.
+- **15 add-ons available** — schema deployment, citation packs, content authority, brand identity, GBP optimisation, review velocity systems, digital PR, and more. https://kabelomore.com/services
 
 ## How AI visibility works (5-step process)
 

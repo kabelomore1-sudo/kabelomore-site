@@ -361,15 +361,15 @@ export const briefs: Record<string, BriefConfig> = {
 
   growth: {
     tierId: "growth",
-    tierName: "Growth retainer — R8,500/mo",
-    title: "Set up your Growth engagement",
+    tierName: "Local Growth retainer — R5,500/mo",
+    title: "Set up your Local Growth engagement",
     subtitle:
       "8 questions, 10 minutes. The retainer is ongoing technical + editorial work, NOT social media management. This brief frames the first 90 days.",
     estimatedMinutes: 10,
     paymentNote:
-      "After you submit, we send month 1 invoice (R8,500). 3-month minimum, then month-to-month. Cancel any time after month 3 with 30 days notice.",
+      "After you submit, we send month 1 invoice (R5,500). 3-month minimum, then cancel anytime with 30 days notice.",
     whatHappensNext: [
-      "Within 1 hour: confirmation + R8,500 month-1 invoice",
+      "Within 1 hour: confirmation + R5,500 month-1 invoice",
       "Within 48 hours: kickoff call + 90-day plan delivered",
       "Every 3 days: status update via email",
       "Monthly: 30-min review call + month progress report",
@@ -421,15 +421,15 @@ export const briefs: Record<string, BriefConfig> = {
 
   premium: {
     tierId: "premium",
-    tierName: "Premium retainer — R15,000/mo",
-    title: "Set up your Premium engagement",
+    tierName: "AI Authority retainer — R10,500/mo",
+    title: "Set up your AI Authority engagement",
     subtitle:
-      "8 questions, 12 minutes. Premium includes everything in Growth plus dedicated specialist time, monthly content production, and competitor monitoring. This brief frames the first 90 days.",
+      "8 questions, 12 minutes. AI Authority includes everything in Local Growth plus heavier content velocity, LinkedIn brand presence, reputation monitoring, and direct executive access. This brief frames the first 90 days.",
     estimatedMinutes: 12,
     paymentNote:
-      "After you submit, we send month 1 invoice (R15,000). 3-month minimum, then month-to-month. Cancel any time after month 3 with 30 days notice.",
+      "After you submit, we send month 1 invoice (R10,500). 3-month minimum, then cancel anytime with 30 days notice.",
     whatHappensNext: [
-      "Within 1 hour: confirmation + R15,000 month-1 invoice",
+      "Within 1 hour: confirmation + R10,500 month-1 invoice",
       "Within 48 hours: kickoff call + 90-day plan delivered",
       "Weekly: status update + dedicated specialist hours",
       "Monthly: 60-min strategy review + executive report",
@@ -475,6 +475,126 @@ export const briefs: Record<string, BriefConfig> = {
         number: 8,
         q: "What does 12-month success look like? (Be specific — revenue, lead volume, named accounts, AI citation count, anything measurable)",
         why: "Premium is priced against outcomes. If we can't measure it, we can't compound it.",
+      },
+    ],
+  },
+
+  "local-growth-lite": {
+    tierId: "local-growth-lite",
+    tierName: "Local Growth Lite — R2,950/mo",
+    title: "Set up your Local Growth Lite engagement",
+    subtitle:
+      "6 questions, 6 minutes. Mostly automated AI visibility maintenance. This brief tells us what to publish on your behalf and what to track.",
+    estimatedMinutes: 6,
+    paymentNote:
+      "After you submit, we send month 1 invoice (R2,950). 3-month minimum, then cancel anytime with 30 days notice.",
+    whatHappensNext: [
+      "Within 1 hour: confirmation + R2,950 month-1 invoice",
+      "Within 48 hours: kickoff call + Google Posts approval workflow set up",
+      "Daily: AI scan runs across all 4 engines",
+      "Monthly: review + recommendation email",
+    ],
+    tallyFormId: null,
+    questions: [
+      {
+        number: 1,
+        q: "Business name + 1-sentence description",
+        why: "Used in every Google Post draft and every AI scan query.",
+      },
+      {
+        number: 2,
+        q: "Google Business Profile URL (or 'I don't have one yet')",
+        why: "Lite assumes a working GBP. If you don't have one, we'd suggest GBP Setup add-on first (R3,500 once-off) before starting Lite.",
+      },
+      {
+        number: 3,
+        q: "Top 3 services + your service area",
+        why: "These drive the Google Post topics, the daily AI scan queries, and the GBP touch-up focus.",
+      },
+      {
+        number: 4,
+        q: "3 competitors (URLs or names)",
+        why: "We track them daily on AI engines alongside you. You see the gap close in your monthly email.",
+      },
+      {
+        number: 5,
+        q: "Approval mode: do you want to approve every Google Post before publish, or auto-publish AI-drafted posts?",
+        why: "Auto-publish runs 4 posts/week with zero touch from you. Manual approval is safer if you're brand-sensitive but needs ~10 min/week from you.",
+      },
+      {
+        number: 6,
+        q: "What does 'success' look like 6 months from now? (e.g. 'phone rings 2× more', 'cited by ChatGPT for [service]')",
+        why: "Anchors the monthly recommendation email. Vague goals → vague recommendations.",
+      },
+    ],
+  },
+
+  "strategy-partner": {
+    tierId: "strategy-partner",
+    tierName: "Strategy Partner — R20,000/mo",
+    title: "Apply for Strategy Partner",
+    subtitle:
+      "10 questions, 15 minutes. Strategy Partner is an embedded fractional role, not a vendor relationship. This brief is also a fit-check — not every business needs this level.",
+    estimatedMinutes: 15,
+    paymentNote:
+      "After you submit, we book a 60-min fit-check call before invoicing. If we're a fit, month 1 invoice (R20,000) follows. 6-month minimum.",
+    whatHappensNext: [
+      "Within 24 hours: confirmation + 60-min fit-check call scheduled",
+      "After fit-check call: month 1 invoice (R20,000) + custom 90-day plan",
+      "Weekly: 30-min executive sync from week 1",
+      "Quarterly: strategy off-site day (4 hrs deep work)",
+    ],
+    tallyFormId: null,
+    questions: [
+      {
+        number: 1,
+        q: "Business name + sector + size (revenue band, headcount, or 'enterprise/mid-market/SMB')",
+        why: "Strategy Partner is sized for mid-market and up. If you're solo or SMB, AI Authority (R10,500) is usually the better fit.",
+      },
+      {
+        number: 2,
+        q: "Markets you operate in: SA only, SA + UK, SA + US, UK only, US only, or other combination",
+        why: "Strategy Partner includes multi-market support. Single-market clients usually don't need this tier.",
+      },
+      {
+        number: 3,
+        q: "Current digital footprint — website(s), GBP, LinkedIn (org + key leadership), and any other major properties",
+        why: "We need the whole stack on day 1. Strategy Partner = embedded role, so we need full visibility.",
+      },
+      {
+        number: 4,
+        q: "Annual revenue + average deal size (range is fine — 'between R5M and R15M revenue, deals R100k-R500k')",
+        why: "Strategy Partner is priced against deal size. R20k/mo only makes sense if 1-2 wins/year easily covers it.",
+      },
+      {
+        number: 5,
+        q: "Internal marketing team — who exists, what they own, who's our exec sponsor?",
+        why: "Strategy Partner = I work WITH your team. If there's no internal counterpart, the fit-check call becomes critical.",
+      },
+      {
+        number: 6,
+        q: "Top 3 services to dominate AI visibility for + 3 'aspirational' brands you'd like to be cited alongside",
+        why: "We saturate citation co-occurrence — getting AI engines to mention you in the same answer as the aspirationals. This works with depth, not breadth.",
+      },
+      {
+        number: 7,
+        q: "All-in marketing spend per month (us + ads + tools + agencies + contractors)",
+        why: "Strategy Partner coordinates with the whole spend. We avoid running organic against your own paid budget.",
+      },
+      {
+        number: 8,
+        q: "Custom dashboard — what metrics do YOU want to see weekly? (e.g. AI citation count, named-account mentions, share of voice vs competitor X)",
+        why: "We build the dashboard around what you'll actually look at. Generic agency dashboards get ignored.",
+      },
+      {
+        number: 9,
+        q: "What's failed before? Be specific — agency names if comfortable, what they promised, what actually happened",
+        why: "Strategy Partner is a high-trust engagement. Skip the diplomatic version — the more honest you are, the better the work.",
+      },
+      {
+        number: 10,
+        q: "12-month success: what's the revenue, lead volume, named-account, or visibility outcome we should be measured against?",
+        why: "Strategy Partner is priced against outcomes. If we can't measure it, we can't be a strategic partner.",
       },
     ],
   },

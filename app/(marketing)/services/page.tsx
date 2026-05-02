@@ -16,27 +16,35 @@ export const metadata: Metadata = {
 const servicesFaqs = [
   {
     q: "Why pay 50% deposit and 50% on delivery?",
-    a: "Splitting payment is the industry standard for project work. It builds trust both ways: we don't get paid in full until you sign off, and you don't risk full payment to a stranger. If we don't deliver what's quoted, you don't pay the second half. Monthly retainers work differently — billed in advance, cancel after 3 months.",
+    a: "Splitting payment is the industry standard for project work. It builds trust both ways: we don't get paid in full until you sign off, and you don't risk full payment to a stranger. If we don't deliver what's quoted, you don't pay the second half. Monthly retainers work differently — billed in advance, cancel anytime after the minimum.",
   },
   {
-    q: "Is the Growth retainer just social media management?",
-    a: "No. A social media manager schedules posts on Instagram. We do mostly invisible technical work: structured data, third-party citations, schema markup, answer-shaped content, AI citation monitoring. Some of our work shows on social. Most of it shows up in the signals AI engines use to decide who to recommend. Different work, different price.",
+    q: "Why monthly retainers? Aren't subscriptions just adding overhead?",
+    a: "Honest answer: AI visibility compounds. A once-off citation pack gets you 30 listings on day 30 — but on day 90, three of them have died, no new ones have appeared, and your competitors who run a retainer have added 18 more. Retainers exist because the work that moves AI engines (citations, content velocity, schema updates, GBP freshness) is repetitive maintenance, not a one-time setup. We sized Local Growth Lite at R2,950/mo so you can test compounding without committing to agency-tier cost. Cancel anytime after 3 months.",
   },
   {
-    q: "What if I'm not happy with the delivery?",
+    q: "I hate subscriptions. What's the cancellation policy?",
+    a: "Same as your gym, but actually honoured. 3-month minimum on all retainers (6-month on Strategy Partner). After that, cancel via email — no phone call, no retention pitch, no fine print. We deliver everything paid for and hand over all logins, content, and citations cleanly. Nothing held hostage.",
+  },
+  {
+    q: "Are these retainers just social media management?",
+    a: "No. A social media manager schedules posts on Instagram. We do mostly invisible technical work: structured data, third-party citations, schema markup, answer-shaped content, AI citation monitoring, GBP automation. Some of our work shows on social (LinkedIn especially, because LinkedIn powers AI search results). Most of it shows up in the signals AI engines use to decide who to recommend. Different work, different price.",
+  },
+  {
+    q: "How do I know which retainer is right for me?",
+    a: "Local Growth Lite (R2,950) if you have a working GBP and just want it to keep growing without you thinking about it. Local Growth (R5,500) if you also want active content + citations every month — this is where most clients land. AI Authority (R10,500) if AI visibility IS your growth strategy and you want LinkedIn brand presence + reputation monitoring + executive access. Strategy Partner (R20,000) if you're mid-market+, multi-region, and need a fractional Head of AI Visibility. Or just book a free 20-min call and we'll point at the right rung.",
+  },
+  {
+    q: "What if I'm not happy with delivery on once-off work?",
     a: "Every once-off project includes one round of revisions free. We'll discuss what's not right, agree on changes, deliver the revised version within 5 working days. If after revisions you still don't see what was quoted, you don't pay the second half.",
   },
   {
     q: "Why do you charge in ZAR, USD, and GBP?",
-    a: "We deliver work to international standards from a South African cost base. SA clients pay local rates. International clients pay rates aligned with global AEO consulting market. Same work, fair pricing for each region.",
+    a: "We deliver work to international standards from a South African cost base. SA clients pay local rates. International clients pay rates aligned with the global AEO consulting market — but still meaningfully below London/NYC agency pricing. Same work, fair pricing for each region.",
   },
   {
     q: "Is there a discount for first-case-study clients?",
     a: "Yes — Foundation Partners (first clients in a new vertical) receive up to 50% off in exchange for case study publication rights. Limited availability, message us directly to discuss.",
-  },
-  {
-    q: "What's the cancellation policy on monthly retainers?",
-    a: "3-month minimum, then month-to-month with 30 days' notice. We deliver everything paid for and hand over all work cleanly — no holding work hostage.",
   },
 ];
 
@@ -293,6 +301,116 @@ export default function ServicesPage() {
                         </li>
                       ))}
                     </ul>
+
+                    {/* Value-anchoring block — comparable price + ROI math
+                        + cancel terms. Renders for any tier that has these
+                        fields (today: retainers). Helps SA buyers price-anchor
+                        against subscriptions they already understand and gives
+                        international buyers explicit ROI math. */}
+                    {(tier.comparableTo || tier.roiMath || tier.cancelTerms) && (
+                      <div
+                        className={
+                          tier.highlight
+                            ? "mt-8 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-6"
+                            : "mt-8 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6"
+                        }
+                      >
+                        <div
+                          className={
+                            tier.highlight
+                              ? "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300"
+                              : "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700"
+                          }
+                        >
+                          What you're really paying for
+                        </div>
+
+                        {tier.comparableTo && (
+                          <div className="mt-3">
+                            <div
+                              className={
+                                tier.highlight
+                                  ? "text-[10px] font-semibold uppercase tracking-wider text-emerald-300/70"
+                                  : "text-[10px] font-semibold uppercase tracking-wider text-emerald-700/70"
+                              }
+                            >
+                              Comparable spend
+                            </div>
+                            <p
+                              className={
+                                tier.highlight
+                                  ? "mt-1 text-sm text-ink-100 leading-relaxed"
+                                  : "mt-1 text-sm text-ink-700 leading-relaxed"
+                              }
+                            >
+                              {tier.comparableTo}
+                            </p>
+                          </div>
+                        )}
+
+                        {tier.roiMath && (
+                          <div className="mt-4">
+                            <div
+                              className={
+                                tier.highlight
+                                  ? "text-[10px] font-semibold uppercase tracking-wider text-emerald-300/70"
+                                  : "text-[10px] font-semibold uppercase tracking-wider text-emerald-700/70"
+                              }
+                            >
+                              Break-even math
+                            </div>
+                            <p
+                              className={
+                                tier.highlight
+                                  ? "mt-1 text-sm text-ink-100 leading-relaxed"
+                                  : "mt-1 text-sm text-ink-700 leading-relaxed"
+                              }
+                            >
+                              {tier.roiMath.breakEven}
+                            </p>
+                            <p
+                              className={
+                                tier.highlight
+                                  ? "mt-2 text-sm text-ink-200 leading-relaxed"
+                                  : "mt-2 text-sm text-ink-600 leading-relaxed"
+                              }
+                            >
+                              <strong
+                                className={
+                                  tier.highlight ? "text-white" : "text-ink-900"
+                                }
+                              >
+                                Realistic target:
+                              </strong>{" "}
+                              {tier.roiMath.targetReturn}
+                            </p>
+                          </div>
+                        )}
+
+                        {tier.cancelTerms && (
+                          <div className="mt-4 border-t border-emerald-200/50 pt-3">
+                            <div
+                              className={
+                                tier.highlight
+                                  ? "text-[10px] font-semibold uppercase tracking-wider text-emerald-300/70"
+                                  : "text-[10px] font-semibold uppercase tracking-wider text-emerald-700/70"
+                              }
+                            >
+                              Cancel anytime
+                            </div>
+                            <p
+                              className={
+                                tier.highlight
+                                  ? "mt-1 text-xs italic text-ink-200 leading-relaxed"
+                                  : "mt-1 text-xs italic text-ink-600 leading-relaxed"
+                              }
+                            >
+                              {tier.cancelTerms}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Monthly work clarity block — for retainers only */}
                     {tier.monthlyWork && (
