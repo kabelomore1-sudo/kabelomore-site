@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/ui/jsonld";
 import { faqJsonLd, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { tiers, addOns, site } from "@/lib/site";
+import { SerpRealEstateMap } from "@/components/serp-real-estate-map";
 import { CircleCheck, ArrowRight, AlertCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Services & Pricing",
   description:
-    "Pick a service that fits where you are. Foundation Pack for businesses starting from zero. Starter Audit for those with a website wanting clarity. Growth and Premium retainers for ongoing AI visibility work. Pay 50% to start, 50% on delivery.",
+    "AI visibility consulting for medical practitioners, legal counsellors, and industrial businesses. Once-off projects from R5k. Monthly retainers from R2,950/mo to R20,000/mo covering GBP, LinkedIn, industry citations, reviews, and AI engine tracking.",
   alternates: { canonical: `${site.url}/services` },
 };
 
@@ -28,11 +29,15 @@ const servicesFaqs = [
   },
   {
     q: "Are these retainers just social media management?",
-    a: "No. A social media manager schedules posts on Instagram. We do mostly invisible technical work: structured data, third-party citations, schema markup, answer-shaped content, AI citation monitoring, GBP automation. Some of our work shows on social (LinkedIn especially, because LinkedIn powers AI search results). Most of it shows up in the signals AI engines use to decide who to recommend. Different work, different price.",
+    a: "No — and we deliberately don't do Instagram, TikTok, or generic Facebook posting. We focus on properties where medical, legal, and industrial buyers actually make decisions: Google Business Profile, LinkedIn (founder + company), industry-specific directories (Medical Board, Law Society, BBBEE, sector dirs), reviews (Google + HelloPeter + sector-specific), industry publications (Medical Brief, De Rebus, Engineering News), and AI engines. Every property feeds the same AEO strategy. A generic SMM agency posts on Instagram and calls it done. We own the search results page across every platform your buyers actually use.",
+  },
+  {
+    q: "Why no Instagram or TikTok?",
+    a: "Because medical specialists, legal counsellors, and industrial buyers don't make purchase decisions there. A patient choosing a cardiologist Googles their name and reads reviews. A procurement manager sourcing a fabricator searches industry directories and asks AI engines. A mid-market law firm gets shortlisted via LinkedIn and Law Society listings. Adding Instagram to your stack would consume budget that should compound on the channels that actually convert your buyer type.",
   },
   {
     q: "How do I know which retainer is right for me?",
-    a: "Local Growth Lite (R2,950) if you have a working GBP and just want it to keep growing without you thinking about it. Local Growth (R5,500) if you also want active content + citations every month — this is where most clients land. AI Authority (R10,500) if AI visibility IS your growth strategy and you want LinkedIn brand presence + reputation monitoring + executive access. Strategy Partner (R20,000) if you're mid-market+, multi-region, and need a fractional Head of AI Visibility. Or just book a free 20-min call and we'll point at the right rung.",
+    a: "Local Growth Lite (R2,950) for solo practitioners — single-doctor practice, sole-practitioner attorney, owner-run industrial firm. Local Growth (R5,500) for small-to-mid practices and firms (2-10 doctors, 3-15 attorneys, 5-30 staff industrial) — where most clients land. AI Authority (R10,500) for established firms (10+ doctors, 15+ attorneys, R50M+ revenue) wanting category leadership in their market. Strategy Partner (R20,000) for mid-market+ multi-region — fractional Head of AI Visibility role. Or book a free 20-min call and we'll point at the right rung.",
   },
   {
     q: "What if I'm not happy with delivery on once-off work?",
@@ -99,20 +104,26 @@ export default function ServicesPage() {
         <div className="mx-auto max-w-3xl text-center">
           <Eyebrow className="justify-center">Services & Pricing</Eyebrow>
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
-            Pick what fits where you are.
+            Own your search results.
+            <br />
+            <span className="text-ink-500">
+              Across every platform that matters.
+            </span>
           </h1>
           <p className="mt-5 text-lg text-ink-500">
-            From &quot;I have nothing yet&quot; to &quot;I want serious growth&quot; — there&apos;s a
-            starting point for everyone. Pay 50% to start on once-off work. 50%
-            on delivery. No surprises.
+            Built for medical practitioners, legal counsellors, and industrial
+            businesses. We make sure your firm shows up — across Google, GBP,
+            LinkedIn, industry directories, reviews, and AI engines — when your
+            customers search. No Instagram fluff. No TikTok dances. Just the
+            properties where your buyers actually decide.
           </p>
 
           {/* Funnel guidance — kills decision paralysis */}
           <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-accent-200 bg-accent-50 px-6 py-4 text-center">
             <p className="text-sm text-ink-700">
               <span className="font-semibold text-ink-900">Not sure which fits?</span>{" "}
-              Start with the free scan — we&apos;ll tell you exactly what&apos;s missing
-              and which package makes sense.{" "}
+              Start with the free scan — we&apos;ll tell you exactly which
+              properties are leaking visibility and what to fix first.{" "}
               <a
                 href="/scan"
                 className="font-semibold text-accent-600 underline underline-offset-2 hover:text-accent-700"
@@ -138,6 +149,38 @@ export default function ServicesPage() {
             </div>
           ))}
         </div>
+      </Section>
+
+      {/* SERP Real Estate Map — visual proof of what each retainer
+          actually covers. Replaces the abstract "AI visibility" pitch
+          with a concrete platform-by-platform map.
+          Insertion point: between hero and tier cards so buyers see
+          coverage BEFORE they read tier copy. */}
+      <Section variant="default" padding="default">
+        <div className="mx-auto max-w-4xl">
+          <Eyebrow>The real estate model</Eyebrow>
+          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+            What you actually own across the search results page.
+          </h2>
+          <p className="mt-4 text-base text-ink-500 leading-relaxed">
+            When your customer Googles your firm — or asks ChatGPT for
+            specialists in your category — the answer pulls from across
+            multiple properties. GBP, your website, LinkedIn, industry
+            directories, reviews, press. Each retainer covers a defined slice.
+            Here&apos;s exactly what each tier owns:
+          </p>
+        </div>
+
+        <div className="mt-10">
+          <SerpRealEstateMap />
+        </div>
+
+        <p className="mx-auto mt-6 max-w-3xl text-center text-xs italic text-ink-500">
+          We deliberately don&apos;t cover Instagram, TikTok, or generic Facebook
+          posting. Our buyers — medical, legal, industrial — make decisions on
+          LinkedIn, in industry pubs, and through search. We focus where decisions
+          actually happen.
+        </p>
       </Section>
 
       {/* Tiers */}

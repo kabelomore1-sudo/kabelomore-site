@@ -280,36 +280,39 @@ export const tiers: Tier[] = [
     payment: "Monthly billing in advance · 3-month minimum · cancel anytime after",
     delivery: "Ongoing",
     bestFor:
-      "Local SA businesses that want their AI visibility to keep growing on autopilot — without committing to a full agency retainer. The bridge between once-off work and full-service ongoing.",
+      "Solo practitioners and owner-operators — single-doctor practices, sole-practitioner attorneys, owner-run industrial firms. You already have a website and GBP. You don't have time to maintain them. You need them to keep working without thinking about it.",
     description:
-      "The lighter, lower-friction monthly option for local businesses. Google Posts run automatically, daily AI tracking watches your business across 4 engines, and we touch up your GBP twice a month. No content production, no citation building — that's what Local Growth (the next tier up) is for.",
+      "The lighter monthly option for professional firms with one practitioner or owner. We keep your core SERP real estate — website + GBP + LinkedIn — looking active without you lifting a finger. Daily AI tracking watches your visibility across 4 engines. Quarterly review request campaign keeps reviews flowing. No content production, no industry citations — that's what Local Growth is for.",
     receives: [
-      "Google Posts automation — 4 posts/week, AI-drafted, you approve or auto-publish",
-      "Daily AI Visibility tracking across all 4 engines (your business + 3 competitors)",
-      "2 manual GBP optimisations per month (photos, posts, Q&A, hours)",
+      "Daily AI Visibility tracking across 4 engines (your firm + 3 competitors)",
+      "4 GBP posts/week (AI-drafted, auto-published or you approve)",
+      "1 LinkedIn company page post/week (AI-drafted)",
+      "Quarterly review request campaign (template emails to recent customers)",
+      "2 manual GBP optimisations/month (photos, Q&A, hours, services)",
       "Quarterly AI scan with full report",
       "Email support — 48-hour response",
       "10% off any once-off add-on services",
     ],
     monthlyWork: {
       intro:
-        "Mostly automated. The point: AI Visibility maintenance without you thinking about it. Here's the breakdown:",
+        "Mostly automated. The point: professional credibility maintenance without you thinking about it.",
       items: [
-        { task: "Generating + scheduling 4 Google Posts/week (AI-drafted)", effort: "Auto" },
+        { task: "Generating + auto-publishing 4 GBP posts/week + 1 LinkedIn/week", effort: "Auto" },
         { task: "Daily AI scan across 4 engines (audit-agent runs nightly)", effort: "Auto" },
-        { task: "2 manual GBP touch-ups (photos, posts, Q&A)", effort: "1-2 hrs" },
+        { task: "2 manual GBP touch-ups (photos, Q&A, hours)", effort: "1-2 hrs" },
+        { task: "Quarterly review request campaign", effort: "1 hr/qtr" },
         { task: "Monthly review + recommendation email", effort: "1 hr" },
       ],
       notSocialMedia:
-        "This is set-and-forget AI visibility maintenance. Not social media management. The Google Posts and AI tracking happen automatically. Once a month we send you what changed and what to do about it.",
+        "This is professional credibility maintenance. We don't do Instagram or TikTok — your patients/clients/buyers aren't there. We make sure when someone Googles your practice or asks ChatGPT about specialists in your field, your name keeps showing up — without you posting anything yourself.",
     },
     comparableTo:
-      "A junior social media person in SA: R3-6k/mo for posts. A US Local SEO tool subscription: $100-300/mo. We bundle Google Post automation, AI tracking, and manual GBP work — at less than either alternative.",
+      "A junior SMM in SA: R3-6k/mo posting on Instagram (where most of your patients/clients aren't). A US local SEO tool subscription: $100-300/mo with no LinkedIn or review work. We bundle GBP + LinkedIn company + AI tracking + review prompting — at less than either.",
     roiMath: {
       breakEven:
-        "Pays for itself with one new customer per year. If your average customer is worth R5,000+, break-even is 0.7 customers from this work.",
+        "Pays for itself with one new patient/client/contract per year. If your average customer is worth R5,000+, break-even is 0.7 customers.",
       targetReturn:
-        "Annual cost: R35,400. Realistic target: 4-12 new customers via AI visibility = R20,000-R60,000+ revenue. Net gain at the low end matches cost; at the high end is 2-3× ROI in year 1.",
+        "Annual cost: R35,400. Realistic target: 4-12 new customers via AI visibility = R20,000-R60,000+ revenue. For medical specialists with R20k average procedure value, 2 new procedures = R40k = 12% ROI floor.",
     },
     cancelTerms:
       "3-month minimum. After that, cancel via email with 30 days notice. No phone calls, no retention pitch, no fine print.",
@@ -325,16 +328,18 @@ export const tiers: Tier[] = [
     payment: "Monthly billing in advance · 3-month minimum · cancel anytime after",
     delivery: "Ongoing",
     bestFor:
-      "Local SA businesses that want AI visibility to compound. Active content production + citation building on top of automated GBP work. Where most clients land.",
+      "Small-to-mid practices and firms — medical practices with 2-10 doctors, law firms with 3-15 attorneys, industrial businesses with 5-30 staff. You want to dominate when someone Googles or asks AI for specialists in your area. Where most clients land.",
     description:
-      "Everything in Lite, plus we actually produce content and build citations every month — the work that compounds your AI authority over time. Discovery & Strategy Sprint included free in your first month.",
+      "Active credibility-building for professional firms. Everything in Lite, plus we publish authoritative content on your site, build industry-specific citations, run review velocity, and ghost-write LinkedIn for your founder/principal. Every property feeds the same compounding AEO strategy. Discovery & Strategy Sprint included free in your first month.",
     receives: [
-      "Everything in Local Growth Lite (Google Posts automation + daily AI tracking + GBP touch-ups)",
-      "2 answer-shaped articles published on your site each month",
-      "5 new third-party citations established each quarter",
+      "Everything in Local Growth Lite (GBP + LinkedIn company + AI tracking + reviews)",
+      "2 long-form articles/month on your site (case studies, service deep-dives, FAQ pages)",
+      "LinkedIn founder/principal personal brand — 1 ghost-written post/week",
+      "LinkedIn company page — 3 posts/week (vs 1 in Lite)",
+      "5 new citations/quarter on industry-specific directories (Medical Board, Law Society, BBBEE, sector-specific)",
+      "Active review velocity: 5 review responses/month + 1 review request campaign/month",
       "Schema markup updates as new pages launch",
-      "Monthly AI citation report across all 4 engines (vs quarterly in Lite)",
-      "Monthly competitive intelligence report",
+      "Monthly competitive intelligence report (what your top 3 are doing)",
       "Monthly 30-min strategy call",
       "Discovery & Strategy Sprint in Month 1 (R3,500 value, free)",
       "48-hour priority support",
@@ -342,25 +347,28 @@ export const tiers: Tier[] = [
     ],
     monthlyWork: {
       intro:
-        "Roughly 20-35 hours of specialist work each month, on top of the automated Lite features. Not social media management. Here's the breakdown:",
+        "Roughly 25-40 hours of specialist work each month, on top of the automated Lite features. Integrated credibility-building for professional firms.",
       items: [
-        { task: "Researching, writing and publishing 2 detailed articles", effort: "16-24 hrs" },
-        { task: "Building 1-2 third-party citations per month", effort: "3-5 hrs" },
+        { task: "Researching, writing and publishing 2 long-form articles", effort: "16-24 hrs" },
+        { task: "LinkedIn founder ghost-writing — 4 posts/month", effort: "4-6 hrs" },
+        { task: "LinkedIn company page — 3 posts/week", effort: "3-4 hrs" },
+        { task: "Building 1-2 industry-specific citations/month", effort: "3-5 hrs" },
         { task: "Schema markup updates as new content publishes", effort: "1-2 hrs" },
+        { task: "Review responses + 1 request campaign/month", effort: "2-3 hrs" },
         { task: "Monthly AI scan + competitor monitoring + report", effort: "3-5 hrs" },
         { task: "Monthly 30-min strategy call + ad-hoc support", effort: "2-3 hrs" },
-        { task: "All Lite-tier automation (Google Posts, daily tracking, GBP touch-ups)", effort: "Mostly auto" },
+        { task: "All Lite-tier automation (GBP, daily tracking, review prompting)", effort: "Mostly auto" },
       ],
       notSocialMedia:
-        "This isn't social media management. The work is mostly technical and editorial — structured data, citations, and AI-shaped content. Some of it shows on your social feeds. Most of it shows up where you can't see it: in the signals AI engines use to decide who to recommend.",
+        "This is integrated professional credibility-building. The LinkedIn ghost-writing, the industry directory citations, the review velocity, the answer-shaped articles — all of it feeds the same goal: when someone in your service area asks Google or ChatGPT about specialists in your category, you're the answer. No Instagram, no TikTok — your buyers don't make decisions there.",
     },
     comparableTo:
-      "A SA full-service SMM agency: R6-9k/mo doing posts + reporting only. A US SEO retainer: $1,000-2,500/mo. We charge less than either AND actually move AI engines (which they don't).",
+      "A SA boutique digital marketing firm doing surface SEO + social: R8-15k/mo. A US AEO retainer: $1,000-2,500/mo. A traditional SMM agency in SA: R6-9k/mo for Instagram posts only. We do less generic work and more category-specific work — at less than any alternative.",
     roiMath: {
       breakEven:
-        "Pays for itself with one new customer per quarter. If average customer = R5,000+, you need ~14 new customers/year to break even. Most clients see 30-60.",
+        "One new client per quarter. For medical specialists (R3k consult + R20k procedure), break-even is one procedure. For law firms with R50k retainers, break-even is one matter every 9 months. For industrial with R100k+ contracts, one win pays for the year.",
       targetReturn:
-        "Annual cost: R66,000. Realistic target: 30 new customers × R5,000 = R150,000+ revenue. Net gain: R84,000+. Floor, not ceiling.",
+        "Annual cost: R66,000. Realistic for medical/legal practices: 5-15 new clients × R20k-R50k = R100k-R750k revenue. For industrial: 1-3 new contracts × R50k-R500k. 2-10× ROI in year 1.",
     },
     cancelTerms:
       "3-month minimum. After that, cancel via email with 30 days notice. No phone calls, no retention pitch, no fine print.",
@@ -376,45 +384,52 @@ export const tiers: Tier[] = [
     payment: "Monthly billing in advance · 3-month minimum · cancel anytime after",
     delivery: "Ongoing · first month is implementation",
     bestFor:
-      "Businesses where AI visibility IS the growth strategy. Aggressive content velocity, citation building, LinkedIn brand presence, and direct access. For businesses ready to dominate their category in AI search.",
+      "Established practices and firms — medical groups with 10+ doctors, law firms with 15-50 attorneys, industrial businesses with R50M+ revenue. You don't just want to show up — you want to BE the answer for your specialty in your market.",
     description:
-      "Everything in Local Growth, plus a heavy first-month implementation (schema + GBP rebuild + 5 citations + initial content), then 4 articles/month, LinkedIn management, reputation monitoring, and a monthly 60-min executive call. Direct access to me. 24-hour support SLA.",
+      "Comprehensive professional authority build. Everything in Local Growth, plus we ghost-write your founder's LinkedIn at scale, pitch you to industry publications (Medical Brief, De Rebus, Engineering News, BizCommunity), produce a monthly educational YouTube video, run an active review velocity programme, and optimize your knowledge panel. Direct executive access. 24-hour SLA.",
     receives: [
-      "Everything in Local Growth (Lite automation + content + citations + reporting)",
+      "Everything in Local Growth (articles + LinkedIn + citations + reviews)",
       "Discovery & Strategy Sprint in Month 1 (R3,500 value, free)",
-      "First-month implementation: full schema + GBP rebuild + 5 citations + initial content",
+      "First-month implementation: full schema + GBP rebuild + 10 industry citations + initial authority content",
       "30-day rescan with documented before/after",
-      "4 answer-shaped articles published each month (vs 2 in Local Growth)",
-      "8 Google Business Profile posts each month",
-      "LinkedIn company page management — 3 posts/week aligned with AEO strategy",
-      "Reputation monitoring + review response templates",
+      "4 long-form articles/month (vs 2 in Local Growth) — depth + authority",
+      "LinkedIn founder/principal personal brand — 3 ghost-written posts/week (vs 1)",
+      "LinkedIn company page — 5 posts/week + active engagement",
+      "8 GBP posts/month",
+      "Industry PR pitches — 2/month (Medical Brief, De Rebus, Engineering News, BizCommunity, sector-specific)",
+      "HARO / journalist quote sourcing — target 4 placements/quarter",
+      "YouTube channel: 1 educational video/month (you record DIY, we edit + caption + structure for AI)",
+      "Active review velocity: 10 review responses + 2 review request campaigns/month",
+      "Knowledge panel optimization (Wikipedia eligibility check + branded entity work)",
       "Monthly executive call (60-min, strategic level)",
       "Quarterly strategy review",
       "24-hour priority support SLA",
-      "Custom integrations (Cowork automation, dashboards)",
+      "Custom integrations (CRM, dashboards)",
     ],
     monthlyWork: {
       intro:
-        "60-100 hours of specialist work each month. The first month is implementation-heavy. After that:",
+        "60-100 hours of specialist work each month. The first month is implementation-heavy. After that, integrated professional authority work.",
       items: [
-        { task: "Researching, writing and publishing 4 detailed articles", effort: "32-48 hrs" },
-        { task: "Writing and scheduling 8 GBP posts + 12 LinkedIn posts", effort: "8-12 hrs" },
-        { task: "Schema markup, structured data updates", effort: "3-5 hrs" },
-        { task: "Citation building, monitoring, and refresh", effort: "4-6 hrs" },
-        { task: "Reputation monitoring + writing review responses", effort: "3-5 hrs" },
-        { task: "AI citation tracking + monthly + executive calls", effort: "6-8 hrs" },
-        { task: "Strategic work, custom integrations, project management", effort: "4-6 hrs" },
+        { task: "Researching, writing and publishing 4 long-form articles", effort: "32-48 hrs" },
+        { task: "LinkedIn ghost-writing (founder + company) — 12 posts/wk equivalent", effort: "8-12 hrs" },
+        { task: "Writing and scheduling 8 GBP posts/month", effort: "2-3 hrs" },
+        { task: "Industry PR pitches + HARO journalist sourcing", effort: "4-6 hrs" },
+        { task: "YouTube video editing + captioning + AI structuring", effort: "3-5 hrs" },
+        { task: "Review velocity programme (responses + request campaigns)", effort: "3-5 hrs" },
+        { task: "Schema + citation maintenance", effort: "3-5 hrs" },
+        { task: "AI tracking + monthly + executive calls", effort: "6-8 hrs" },
+        { task: "Knowledge panel + entity optimization work", effort: "2-4 hrs" },
       ],
       notSocialMedia:
-        "This is technical AEO work plus brand presence at the level a serious business needs. The LinkedIn posting is part of it because LinkedIn now powers AI search results. But the core work is what AI engines read to decide who to recommend — schema, citations, answer-shaped content — not Instagram graphics.",
+        "This is professional category leadership. LinkedIn for thought leadership. Industry pubs (Medical Brief, De Rebus, Engineering News) for credibility. YouTube for educational authority. Reviews for trust. Schema and citations for AI engines to confidently quote you. Zero Instagram, zero TikTok — your buyers/patients/clients aren't there.",
     },
     comparableTo:
-      "A boutique SA digital agency: R15-25k/mo doing surface SEO + posts. A US-based AEO/SEO retainer: $2,500-5,000/mo. A senior in-house marketer's salary: R50k+/mo plus tools. We do the AEO heavy lift — at less than half of any alternative.",
+      "A boutique SA marketing/PR firm: R20-40k/mo. A US AEO/PR retainer: $3-5k/mo. A senior in-house marketer's salary: R50k+/mo plus tools and agency stack. We do the integrated authority work — at less than half of any alternative.",
     roiMath: {
       breakEven:
-        "Pays for itself with one new customer per quarter at R5,000+. Most AI Authority clients see 60-150 new customers/year via AI search.",
+        "For medical: 1 high-value procedure/quarter (R20-50k). For legal: 1 matter/year (R100k+). For industrial: 1 contract/year (R200k+). Most AI Authority clients clear break-even in months 2-3.",
       targetReturn:
-        "Annual cost: R126,000. Realistic target: 60 new customers × R5,000 = R300,000+ revenue. Net gain: R174,000+. For B2B with R20k+ deals, 6 new customers = R120k = break even; 30 = R600k = 4.7× ROI.",
+        "Annual cost: R126,000. Realistic for medical specialists: 30-80 new patients × R20,000 = R600k-R1.6M. For B2B legal: 5-12 new clients × R100k = R500k-R1.2M. For industrial: 2-6 new contracts × R250k = R500k-R1.5M. 4-12× ROI in year 1.",
     },
     cancelTerms:
       "3-month minimum (covers the implementation-heavy first month + payback). After that, cancel via email with 30 days notice. No phone calls, no retention pitch, no fine print.",
@@ -430,41 +445,48 @@ export const tiers: Tier[] = [
     payment: "Monthly billing in advance · 6-month minimum · cancel anytime after",
     delivery: "Ongoing · embedded role",
     bestFor:
-      "Businesses where I'm essentially your fractional Head of AI Visibility. Quarterly strategy off-sites, custom dashboards, multi-region rollouts, and direct executive access. For mid-market firms scaling AI presence across SA, UK, or US markets simultaneously.",
+      "Mid-market+ professional firms operating across SA + UK and/or US. Medical groups with multi-region presence, law firms with international clients, industrial firms with multi-region exports. You need a fractional Head of AI Visibility — not a vendor.",
     description:
-      "Everything in AI Authority, plus I act as a strategic partner — not a vendor. Weekly executive sync. Quarterly off-site strategy day. Custom AI visibility dashboards built specifically for your business. Multi-market rollout support. Senior-level access for leadership decisions.",
+      "Embedded fractional Head of AI Visibility. Everything in AI Authority, plus we operate across multiple markets, run an active digital PR programme (target 1-2 placements/month), book you on industry podcasts, pitch by-lines to industry publications, build a custom AI visibility dashboard, and run quarterly strategy off-sites. Weekly executive sync. Direct WhatsApp.",
     receives: [
-      "Everything in AI Authority (4 articles, LinkedIn, reputation, monthly executive call)",
+      "Everything in AI Authority (in primary market)",
+      "Multi-region presence: SA + UK and/or US localized citations, reviews, schema, content",
+      "Active digital PR programme (HARO + targeted journalist pitches): 1-2 placements/month target",
+      "Podcast guest booking pipeline (industry podcasts): 1-2 bookings/quarter",
+      "Industry publication by-lines / contributions: 1 ghost-written by-line/quarter",
+      "Speaking gig pipeline (industry conferences, events)",
+      "Awards & recognition campaign management",
+      "Custom AI visibility dashboard (built around YOUR specific metrics)",
       "Weekly 30-min executive sync (vs monthly in AI Authority)",
-      "Quarterly strategy off-site day (4 hrs deep work, in-person if Pretoria/JHB or virtual)",
-      "Custom AI visibility dashboard built for your business",
-      "Multi-market support (SA + UK, or SA + US, or all three)",
-      "Direct mobile/WhatsApp access to me during business hours",
+      "Quarterly strategy off-site day (4 hrs deep work, in-person if SA or virtual)",
+      "Direct WhatsApp access during business hours",
       "Annual brand audit + competitive intelligence deep-dive",
       "First-look access to new tools and methods I'm building",
       "Priority custom integrations as your business grows",
     ],
     monthlyWork: {
       intro:
-        "100-160 hours of specialist + strategic work each month. The work mix tilts heavier toward strategy and partner-level engagement:",
+        "100-160 hours of specialist + strategic work each month. The work mix tilts heavier toward strategy and partner-level engagement.",
       items: [
-        { task: "Everything in AI Authority (content, citations, GBP, LinkedIn)", effort: "60-100 hrs" },
-        { task: "Weekly executive sync + ad-hoc strategic input", effort: "8-10 hrs" },
+        { task: "Everything in AI Authority (articles, LinkedIn, citations, reviews, YouTube)", effort: "60-100 hrs" },
+        { task: "Multi-region content + citation localisation", effort: "8-15 hrs" },
+        { task: "Active PR programme (HARO + journalist pitches + placements)", effort: "10-15 hrs" },
+        { task: "Podcast / speaking pipeline management", effort: "3-5 hrs" },
+        { task: "By-line ghost-writing + pitching to industry publications", effort: "4-6 hrs" },
         { task: "Custom dashboard build + maintenance", effort: "6-10 hrs" },
-        { task: "Multi-market research + localised content adaptation", effort: "8-15 hrs" },
-        { task: "Quarterly off-site prep + delivery (averaged monthly)", effort: "4-6 hrs" },
-        { task: "Annual brand + competitive deep-dive (averaged monthly)", effort: "2-4 hrs" },
+        { task: "Weekly executive sync (4-5 syncs/month)", effort: "4-5 hrs" },
+        { task: "Quarterly off-site prep + delivery (averaged monthly)", effort: "3-4 hrs" },
       ],
       notSocialMedia:
-        "This is fractional executive work. I'm not your social media manager — I'm your AI visibility strategist with hands-on delivery. The model is: I think about your AI presence the way a Head of Growth would, but at a fraction of the cost and with the technical execution built in.",
+        "This is fractional executive partnership. I act as your strategic AI visibility partner with technical execution built in. No Instagram, no TikTok — the buyer/patient/client base for medical, legal, and industrial mid-market doesn't make decisions there. We focus where decisions actually happen: LinkedIn, industry pubs, expert citations, AI engines, search.",
     },
     comparableTo:
-      "A fractional CMO or Head of Growth: R40-80k/mo in SA, $8-15k/mo in US. A senior in-house marketer + agency stack: R60k+/mo combined. We do this for less than half — and execution is built in, not outsourced.",
+      "A fractional CMO or Head of Growth: R40-80k/mo in SA, $8-15k/mo in US. A senior in-house marketer + agency stack: R60k+/mo combined. A boutique PR firm + AEO consultancy combined: R30-50k/mo. We do this for less than half — and execution is built in, not outsourced.",
     roiMath: {
       breakEven:
-        "Pays for itself with one mid-size B2B customer per year (R250k+ deal value). Or 4 new customers per month at R5k. Most Strategy Partner clients are B2B with deal values where 1-2 wins/year covers it.",
+        "1 mid-size B2B contract per year (R250k+). For medical groups: 5-10 new high-value patients/year. For law firms: 1-2 enterprise matters/year. For industrial: 1-2 multi-region contracts/year.",
       targetReturn:
-        "Annual cost: R240,000. Realistic target for B2B: 2-5 enterprise wins × R250k+ = R500k-R1.25M revenue. For volume retail/services: 80-150 new customers × R5k = R400k-R750k. Net gain: R200k-R1M+ in year 1.",
+        "Annual cost: R240,000. Realistic for mid-market B2B industrial: 2-5 enterprise wins × R250k+ = R500k-R1.25M. For medical groups: 100-300 new patients × R5k average = R500k-R1.5M. For law firms: 10-25 new matters × R100k = R1M-R2.5M. 3-10× ROI in year 1.",
     },
     cancelTerms:
       "6-month minimum (the dashboard build + multi-market setup takes that long to compound). After that, cancel via email with 60 days notice. No phone calls, no retention pitch, no fine print.",

@@ -35,10 +35,12 @@ All once-off projects bill 50% deposit to start, 50% on delivery. Monthly retain
 - **Optimization Lite** — R5,500 / $395 / £295. Sole-trader version of Optimization Pack. Schema + GBP + 5 citations + 1 priority page rewritten. 2-week delivery.
 - **Discovery & Strategy Sprint** — R3,500 / $295 / £225. 2-week strategy sprint: customer profile, competitor analysis, AI visibility baseline, written 6-month roadmap. Bundled free into the first month of any retainer.
 - **Starter Audit** — R5,000 / $295 / £235. For businesses with an existing website. Full 4-engine AI audit + competitive benchmark + top-10 fix list + 5-day delivery.
-- **Local Growth Lite retainer** — R2,950/mo / $210/mo / £180/mo. Lighter, lower-friction monthly option. Google Posts automation (4/week, AI-drafted), daily AI tracking across all 4 engines, 2 manual GBP touch-ups per month, quarterly AI scan. Mostly automated. NOT social media management. 3-month minimum, cancel anytime after.
-- **Local Growth retainer** — R5,500/mo / $395/mo / £335/mo. Where most clients land. Everything in Lite, plus 2 answer-shaped articles published monthly, 5 third-party citations per quarter, schema updates, monthly competitive intelligence + 30-min strategy call. Discovery Sprint included free in month 1. NOT social media management.
-- **AI Authority retainer** — R10,500/mo / $750/mo / £640/mo. Where AI visibility is the growth strategy. Everything in Local Growth, plus heavy month-1 implementation, 4 articles/month, LinkedIn management (3 posts/week), reputation monitoring, monthly 60-min executive call, 24-hour priority SLA. NOT social media management.
-- **Strategy Partner retainer** — R20,000/mo / $1,395/mo / £1,150/mo. Embedded fractional Head of AI Visibility. Everything in AI Authority, plus weekly executive sync, quarterly off-site strategy day, custom AI visibility dashboard, multi-market support (SA + UK + US), direct WhatsApp access. 6-month minimum.
+- **Local Growth Lite retainer** — R2,950/mo / $210/mo / £180/mo. For solo practitioners (single-doctor practices, sole-practitioner attorneys, owner-run industrial). GBP automation (4 posts/week), 1 LinkedIn company post/week, daily AI tracking across all 4 engines, quarterly review request campaign, 2 manual GBP touch-ups/month. Mostly automated professional credibility maintenance. 3-month minimum.
+- **Local Growth retainer** — R5,500/mo / $395/mo / £335/mo. For small-to-mid practices and firms (2-10 doctors, 3-15 attorneys, 5-30 staff industrial). Everything in Lite, plus 2 long-form articles/month, LinkedIn founder ghost-writing (1 post/week), LinkedIn company (3 posts/week), 5 industry-specific citations/quarter (Medical Board, Law Society, BBBEE, sector dirs), active review velocity (5 responses + 1 campaign/month), monthly competitive intelligence + strategy call. Discovery Sprint included free in month 1.
+- **AI Authority retainer** — R10,500/mo / $750/mo / £640/mo. For established firms (10+ doctors, 15+ attorneys, R50M+ industrial revenue). Everything in Local Growth, plus heavy month-1 implementation, 4 articles/month, LinkedIn founder ghost-writing (3 posts/week), 8 GBP posts/month, 2 industry PR pitches/month (Medical Brief, De Rebus, Engineering News, BizCommunity), HARO journalist sourcing, 1 educational YouTube video/month, active review velocity programme, knowledge panel optimization, monthly 60-min executive call, 24-hour priority SLA.
+- **Strategy Partner retainer** — R20,000/mo / $1,395/mo / £1,150/mo. Embedded fractional Head of AI Visibility for mid-market+ firms operating across SA + UK + US. Everything in AI Authority, plus multi-region citations + reviews + content, active digital PR programme (1-2 placements/month target), podcast guest booking pipeline, industry publication by-lines, speaking gig pipeline, custom AI visibility dashboard, weekly executive sync, quarterly off-site strategy day, direct WhatsApp access. 6-month minimum.
+
+**Important — what we deliberately don't do:** Instagram, TikTok, generic Facebook posting. Our buyers (medical, legal, industrial) don't make purchase decisions on those platforms. We focus where decisions actually happen: Google Business Profile, LinkedIn, industry directories, reviews, industry publications, AI engines.
 - **15 add-ons available** — schema deployment, citation packs, content authority, brand identity, GBP optimisation, review velocity systems, digital PR, and more. https://kabelomore.com/services
 
 ## How AI visibility works (5-step process)
@@ -49,13 +51,18 @@ All once-off projects bill 50% deposit to start, 50% on delivery. Monthly retain
 4. **Measure** — Rescan at 30 days. Document before/after citation rate.
 5. **Compound** — Continue ongoing optimisation as AI models update.
 
-## Who Kabelomore works best with
+## Who Kabelomore works best with (locked ICP)
 
-- Industrial and B2B specialists (equipment suppliers, manufacturers, fabricators, contractors)
-- Professional services (law firms, medical practices, accountants, consultancies)
-- BBBEE Level 1 & 2 businesses targeting enterprise and mining procurement
-- Specialty retail and hospitality where one customer is worth R5,000+ / $500+
-- Growing SMEs wanting first-mover advantage in AI search
+The ideal client profile is professional firms where average customer value is R5k-R500k+ and decisions are made through trust signals (LinkedIn, industry directories, reviews, industry publications) rather than visual social media.
+
+- **Medical practitioners** — specialists, dentists, aesthetics practices, GP groups, multi-doctor practices
+- **Legal counsellors** — attorneys, advocates, legal advisers, mid-market law firms
+- **Industrial businesses** — B2B equipment suppliers, fabricators, contractors, BBBEE-certified suppliers targeting enterprise and mining procurement
+
+Specifically NOT a fit (we'll honestly tell prospects this on the discovery call):
+- Pure B2C consumer brands targeting Instagram/TikTok audiences
+- Businesses where customer value is under R1,000 and volume is the model
+- Agencies/marketers looking for a white-label partner
 
 ## Live case study
 
