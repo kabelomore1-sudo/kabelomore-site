@@ -5,11 +5,12 @@ import Link from "next/link";
 import { Section, Eyebrow } from "./ui/section";
 import { Button } from "./ui/button";
 import { whatsappLink, site } from "@/lib/site";
-import {
-  classificationLabel,
-  classificationDescription,
-} from "@/lib/engines/classification";
-import { scoreLabel } from "@/lib/engines/scoring";
+import { classificationDescription } from "@/lib/engines/classification";
+import { ScoreGauge } from "./scan-charts/score-gauge";
+import { LayerRadar } from "./scan-charts/layer-radar";
+import { EngineHeatmap } from "./scan-charts/engine-heatmap";
+import { CitationBenchmark } from "./scan-charts/citation-benchmark";
+import { IssueDistribution } from "./scan-charts/issue-distribution";
 import type { ScanResult } from "@/lib/types/scan";
 import {
   ArrowRight,
@@ -104,50 +105,27 @@ export function ScanResultsClient({ scanId }: { scanId: string }) {
 
 // ─── Main results view (the conversion engine) ──────────────────
 function ResultsView({ result }: { result: ScanResult }) {
-  const cited = result.visibilityChecks.filter((v) => v.businessAppears).length;
-  const totalChecks = result.visibilityChecks.length;
-
   return (
     <>
-      {/* Hero with score */}
+      {/* HERO — Score gauge + classification + diagnosis */}
       <Section variant="tinted" padding="lg">
-        <div className="mx-auto max-w-4xl">
-          <Eyebrow>Your AI Visibility Scan · {result.businessName}</Eyebrow>
+        <div className="mx-auto max-w-5xl">
+          <Eyebrow>AI Visibility Scan · {result.businessName}</Eyebrow>
 
-          <div className="mt-6 grid gap-8 md:grid-cols-2 md:gap-12">
-            {/* Left: the big score */}
-            <div>
-              <div className="text-sm font-semibold uppercase tracking-[0.14em] text-accent-600">
-                AI Visibility Score
-              </div>
-              <div className="mt-2 flex items-end gap-2">
-                <span className="text-display-xl font-semibold tracking-tight text-ink-900">
-                  {result.score}
-                </span>
-                <span className="mb-3 text-2xl text-ink-500">/100</span>
-              </div>
-              <div className="mt-3 inline-flex rounded-full bg-ink-900 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white">
-                {scoreLabel(result.score)}
-              </div>
-
-              {/* Layer breakdown */}
-              <div className="mt-8 space-y-3">
-                <LayerBar label="Presence (website + GBP)" value={result.layers.presence} max={25} />
-                <LayerBar
-                  label="Authority (citations) — DOMINANT"
-                  value={result.layers.authority}
-                  max={40}
-                />
-                <LayerBar label="Consistency (NAP across web)" value={result.layers.consistency} max={20} />
-                <LayerBar label="Content (schema + structure)" value={result.layers.content} max={15} />
-              </div>
+          <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-14 md:items-center">
+            {/* Left: Score gauge (the hero number) */}
+            <div className="flex justify-center">
+              <ScoreGauge
+                score={result.score}
+                classification={result.classification}
+              />
             </div>
 
-            {/* Right: classification + diagnosis */}
+            {/* Right: diagnosis + 1-line summary */}
             <div>
               <div className="rounded-2xl border-2 border-accent-200 bg-accent-50/40 p-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-700">
-                  {classificationLabel(result.classification)}
+                  What this means
                 </div>
                 <p className="mt-3 text-sm text-ink-700 leading-relaxed">
                   {classificationDescription(result.classification)}
@@ -162,34 +140,104 @@ function ResultsView({ result }: { result: ScanResult }) {
                   {result.diagnosisFull}
                 </p>
               </div>
-
-              <div className="mt-6 grid grid-cols-2 gap-3 rounded-xl bg-white p-4">
-                <div>
-                  <div className="text-xs text-ink-500">Citations found</div>
-                  <div className="mt-1 text-2xl font-semibold text-ink-900">
-                    {result.detected.citationCount}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-ink-500">Cited in AI tests</div>
-                  <div className="mt-1 text-2xl font-semibold text-ink-900">
-                    {cited}/{totalChecks || "—"}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </Section>
 
-      {/* Top issues */}
+      {/* SCORE BREAKDOWN — Layer Radar chart */}
       <Section variant="default" padding="lg" containerSize="narrow">
-        <Eyebrow>Top issues we found</Eyebrow>
+        <div className="grid gap-12 md:grid-cols-2 md:items-center">
+          <div className="order-2 md:order-1">
+            <Eyebrow>Score breakdown</Eyebrow>
+            <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
+              Where your AI visibility is strong vs weak.
+            </h2>
+            <p className="mt-4 text-base text-ink-700 leading-relaxed">
+              Your score breaks down into four layers AI engines weight when
+              deciding whether to recommend a business. Bigger area in the
+              radar = stronger foundation. The dominant layer is{" "}
+              <span className="font-semibold text-ink-900">Authority</span> —
+              third-party citations that verify you exist.
+            </p>
+            <div className="mt-6 space-y-2 text-sm">
+              <LayerLine label="Presence" value={result.layers.presence} max={25} note="website + GBP" />
+              <LayerLine label="Authority" value={result.layers.authority} max={40} note="citations — DOMINANT" />
+              <LayerLine label="Consistency" value={result.layers.consistency} max={20} note="NAP across web" />
+              <LayerLine label="Content" value={result.layers.content} max={15} note="schema + structure" />
+            </div>
+          </div>
+          <div className="order-1 flex justify-center md:order-2">
+            <LayerRadar layers={result.layers} />
+          </div>
+        </div>
+      </Section>
+
+      {/* AI ENGINES VISIBILITY — heatmap */}
+      <Section variant="tinted" padding="lg" containerSize="narrow">
+        <Eyebrow>Visibility across AI engines</Eyebrow>
+        <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
+          Where AI is recommending you — and where it isn&apos;t.
+        </h2>
+        <div className="mt-8">
+          <EngineHeatmap
+            visibilityChecks={result.visibilityChecks}
+            businessName={result.businessName}
+          />
+        </div>
+      </Section>
+
+      {/* CITATIONS BENCHMARK */}
+      <Section variant="default" padding="lg" containerSize="narrow">
+        <Eyebrow>Citations — the dominant signal</Eyebrow>
+        <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
+          The single biggest factor in AI recommendation.
+        </h2>
+        <p className="mt-4 text-base text-ink-700 leading-relaxed">
+          AI engines verify businesses by counting third-party mentions on
+          trusted sites. Below the AI confidence threshold, recommendations
+          rarely happen — no matter how good your website is.
+        </p>
+        <div className="mt-8">
+          <CitationBenchmark
+            count={result.detected.citationCount}
+            level={result.detected.citationLevel}
+          />
+        </div>
+
+        {/* Show citation sources if any found */}
+        {result.detected.citationSources.length > 0 && (
+          <div className="mt-8 rounded-2xl border border-rule bg-white p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
+              Where you&apos;re currently mentioned ({result.detected.citationSources.length})
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {result.detected.citationSources.slice(0, 12).map((source) => (
+                <span
+                  key={source}
+                  className="rounded-full bg-ink-50 px-3 py-1 font-mono text-xs text-ink-700"
+                >
+                  {source}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </Section>
+
+      {/* Top issues */}
+      <Section variant="tinted" padding="lg" containerSize="narrow">
+        <Eyebrow>Issues found</Eyebrow>
         <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
           What&apos;s blocking AI engines from recommending you.
         </h2>
 
-        <div className="mt-10 space-y-4">
+        {/* Issue distribution donut */}
+        <div className="mt-8 rounded-2xl border border-rule bg-white p-6 md:p-8">
+          <IssueDistribution issues={result.issues} />
+        </div>
+
+        <div className="mt-8 space-y-4">
           {result.issues.slice(0, 5).map((issue, idx) => (
             <article
               key={issue.id}
@@ -438,6 +486,49 @@ function ResultsView({ result }: { result: ScanResult }) {
 }
 
 // ─── Helper components ───────────────────────────────────────────
+// Compact per-layer line (used alongside the LayerRadar) — value/max + small bar
+function LayerLine({
+  label,
+  value,
+  max,
+  note,
+}: {
+  label: string;
+  value: number;
+  max: number;
+  note: string;
+}) {
+  const pct = Math.round((value / max) * 100);
+  return (
+    <div className="flex items-baseline gap-3">
+      <div className="flex-1">
+        <div className="flex items-baseline justify-between">
+          <span className="text-sm font-semibold text-ink-900">{label}</span>
+          <span className="font-mono text-xs text-ink-500">
+            {value}/{max}
+          </span>
+        </div>
+        <div className="mt-1 text-xs text-ink-500">{note}</div>
+        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-ink-100">
+          <div
+            className={
+              pct >= 80
+                ? "h-full bg-emerald-500 transition-all duration-700"
+                : pct >= 50
+                  ? "h-full bg-accent-500 transition-all duration-700"
+                  : pct >= 25
+                    ? "h-full bg-amber-500 transition-all duration-700"
+                    : "h-full bg-red-500 transition-all duration-700"
+            }
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// LEGACY (unused after Phase 2 redesign) — kept for emergency rollback
 function LayerBar({ label, value, max }: { label: string; value: number; max: number }) {
   const pct = Math.round((value / max) * 100);
   return (
