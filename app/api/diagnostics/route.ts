@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import {
+  getLastSubmission,
+  getRecentEvents,
+} from "@/lib/scan-events";
 
 export const runtime = "nodejs";
 
@@ -108,6 +112,12 @@ export async function GET() {
     }
   }
 
+  // Pull recent in-memory events for live debugging (resets on redeploy).
+  // Surfaces last 20 events + last-submission snapshot so Kabelo can
+  // diagnose email delivery without grepping Vercel logs.
+  const lastSubmission = getLastSubmission();
+  const recentEvents = getRecentEvents(20);
+
   return NextResponse.json({
     status,
     timestamp: new Date().toISOString(),
@@ -119,11 +129,23 @@ export async function GET() {
     optionalMissing,
     anthropicTest,
     checks,
+    // Live debugging surface (in-memory, per Vercel function instance)
+    lastSubmission,
+    recentEvents,
+    testEmailEndpoint: {
+      url: "/api/test-email",
+      method: "POST",
+      body: '{ "token": "<TEST_EMAIL_TOKEN>", "to": "you@example.com" }',
+      note: "Set TEST_EMAIL_TOKEN env var in Vercel to enable. Use this to test Resend delivery without spending Anthropic credits.",
+      tokenSet: Boolean(process.env.TEST_EMAIL_TOKEN),
+    },
     helpfulLinks: {
       vercelEnvVars:
         "https://vercel.com/dashboard/[your-team]/kabelomore-site/settings/environment-variables",
       anthropicConsole: "https://console.anthropic.com/settings/keys",
       resendConsole: "https://resend.com/api-keys",
+      resendDomains: "https://resend.com/domains",
+      resendEmailLogs: "https://resend.com/emails",
       vercelKv:
         "https://vercel.com/dashboard/[your-team]/kabelomore-site/storage",
     },

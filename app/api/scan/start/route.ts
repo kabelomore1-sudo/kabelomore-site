@@ -18,10 +18,13 @@ import {
   getClientIp,
   formatRetryAfter,
 } from "@/lib/rate-limit";
+import {
+  recordEvent,
+  recordSubmission,
+  safeErrorMessage,
+} from "@/lib/scan-events";
 
 export const runtime = "nodejs";
-// Vercel Hobby plan max is 60s. Pro is 300s. We design for 60s with
-// careful per-engine timeouts inside the orchestrator.
 export const maxDuration = 60;
 
 const ScanStartSchema = z.object({
@@ -48,32 +51,41 @@ const ScanStartSchema = z.object({
   company: z.string().max(0).optional(),
 });
 
-/**
- * Hard timeout for the scan execution. Vercel Hobby max is 60s;
- * we cap our scan at 45s to leave buffer for email sends + the
- * JSON response. If the scan exceeds this, we gracefully fall back
- * to "Kabelo will deliver manually within 24 hours" — emails have
- * already been sent so the user has a clear next step.
- */
 const SCAN_HARD_TIMEOUT_MS = 45_000;
 
+/**
+ * Outcome flags returned to the client. The UI MUST render messages
+ * based on these flags only — never assume an email succeeded.
+ *
+ * This was the bug Kabelo caught: the UI claimed "we emailed you"
+ * when emails had silently failed inside try/catch. Now every email
+ * outcome is tracked explicitly and surfaced in the response.
+ */
+interface OutcomeFlags {
+  submissionSaved: boolean;
+  userEmailSent: boolean;
+  adminEmailSent: boolean;
+  scanCompleted: boolean;
+  manualFallback: boolean;
+}
+
 export async function POST(req: Request) {
-  // CRITICAL: wrap the entire handler in try/catch so we ALWAYS return
-  // JSON. Without this, an unhandled exception or a Vercel function
-  // timeout returns plain text ("An error occurred...") and the client
-  // JSON.parse chokes — that's the error symptom Kabelo saw in production.
   try {
     // ─── Pre-flight: detect missing required env vars and fail loudly ──
     if (!process.env.ANTHROPIC_API_KEY) {
-      console.error(
-        "[scan/start] ANTHROPIC_API_KEY is not set. Scan cannot run.",
-      );
+      recordEvent({ type: "scan_failed", error: "ANTHROPIC_API_KEY missing" });
       return NextResponse.json(
         {
           ok: false,
           message:
-            "The scan service isn't fully configured yet. Kabelo has been notified — he'll deliver your scan manually within 24 hours via email.",
-          configError: "ANTHROPIC_API_KEY missing",
+            "The scan service isn't configured yet. Please email kabelo@kabelomore.com and we'll handle this manually.",
+          flags: {
+            submissionSaved: false,
+            userEmailSent: false,
+            adminEmailSent: false,
+            scanCompleted: false,
+            manualFallback: false,
+          } satisfies OutcomeFlags,
         },
         { status: 503 },
       );
@@ -91,6 +103,10 @@ export async function POST(req: Request) {
 
     const parsed = ScanStartSchema.safeParse(body);
     if (!parsed.success) {
+      recordEvent({
+        type: "validation_failed",
+        error: parsed.error.issues[0]?.message,
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -101,15 +117,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // Honeypot tripped — silently succeed
+    // Honeypot tripped — silently succeed (don't tip off bots)
     if (parsed.data.company) {
+      recordEvent({ type: "honeypot_tripped" });
       return NextResponse.json({ ok: true, scanId: "honeypot" });
     }
 
-    // Rate-limit: per-IP (1 per 5 min) — burst protection.
+    // Rate-limit: per-IP (1 per 5 min)
     const clientIp = getClientIp(req);
     const ipCheck = checkLimit("ip", clientIp);
     if (!ipCheck.allowed) {
+      recordEvent({
+        type: "rate_limit_ip",
+        data: { retryAfterSeconds: ipCheck.retryAfterSeconds },
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -119,9 +140,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Rate-limit: per-email (1 per 24 hr) — duplicate-submission protection.
+    // Rate-limit: per-email (1 per 24 hr)
     const emailCheck = checkLimit("email", parsed.data.email.toLowerCase());
     if (!emailCheck.allowed) {
+      recordEvent({
+        type: "rate_limit_email",
+        data: { email: parsed.data.email.toLowerCase() },
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -130,6 +155,8 @@ export async function POST(req: Request) {
         { status: 429 },
       );
     }
+
+    recordEvent({ type: "validation_passed" });
 
     const submittedAt = new Date().toISOString();
     const scanId = generateScanId();
@@ -152,36 +179,75 @@ export async function POST(req: Request) {
       phone: parsed.data.phone || undefined,
     };
 
-    // Save profile + status (graceful — works without KV for local dev)
-    await safeStorageOp(() => saveProfile(scanId, profile));
-    await safeStorageOp(() => setStatus(scanId, "scanning"));
+    recordEvent({
+      type: "scan_submitted",
+      scanId,
+      data: {
+        businessName: profile.businessName,
+        email: profile.email,
+        industry: profile.industry,
+      },
+    });
 
-    // CRITICAL: AWAIT the email sends. Without await, Vercel serverless
-    // cancels pending promises when the response returns — so the emails
-    // silently never send. Past behaviour: 'no emails arrive on scan'.
-    //
-    // Each email is wrapped in its own try/catch so one failure doesn't
-    // block the others — partial delivery is better than no delivery.
+    // ─── Save profile ───────────────────────────────────────────────
+    let submissionSaved = true;
+    try {
+      await saveProfile(scanId, profile);
+      await setStatus(scanId, "scanning");
+      recordEvent({ type: "profile_saved", scanId });
+    } catch (err) {
+      submissionSaved = false;
+      recordEvent({
+        type: "scan_failed",
+        scanId,
+        error: `profile save: ${safeErrorMessage(err)}`,
+      });
+      // Continue — we can still try to send emails even without storage
+    }
 
-    // Email 1: Notify Kabelo of submission
+    // ─── Email 1: Notify Kabelo of submission ───────────────────────
+    const errors: string[] = [];
+    let adminEmailSent = false;
     try {
       await notifyKabeloOnSubmission(profile);
+      adminEmailSent = true;
+      recordEvent({ type: "admin_email_sent", scanId });
     } catch (err) {
-      console.error("[scan/start] notify-kabelo-submission failed:", err);
+      const msg = safeErrorMessage(err);
+      errors.push(`admin email: ${msg}`);
+      recordEvent({
+        type: "admin_email_failed",
+        scanId,
+        error: msg,
+      });
     }
 
-    // Email 2: User acknowledgment — confirms submission + sets expectation
+    // ─── Email 2: User acknowledgment ───────────────────────────────
+    let userEmailSent = false;
     try {
       await sendUserAcknowledgment(profile);
+      userEmailSent = true;
+      recordEvent({ type: "user_email_sent", scanId });
     } catch (err) {
-      console.error("[scan/start] user-acknowledgment failed:", err);
+      const msg = safeErrorMessage(err);
+      errors.push(`user email: ${msg}`);
+      recordEvent({
+        type: "user_email_failed",
+        scanId,
+        error: msg,
+      });
     }
 
-    // Run the scan with a hard timeout. If it succeeds, return the result.
-    // If it times out OR errors, gracefully return ok:false with a helpful
-    // message — emails are already sent so user has a clear next step.
+    // ─── Run the scan with hard timeout ─────────────────────────────
     let result: ScanResult | null = null;
-    let scanError: string | null = null;
+    let scanCompleted = false;
+
+    recordEvent({
+      type: "PAID_API_CALL_STARTED",
+      scanId,
+      data: { hardTimeoutMs: SCAN_HARD_TIMEOUT_MS },
+    });
+
     try {
       result = await Promise.race([
         runFullScan(profile),
@@ -192,65 +258,166 @@ export async function POST(req: Request) {
           ),
         ),
       ]);
+      scanCompleted = true;
+      recordEvent({
+        type: "PAID_API_CALL_FINISHED",
+        scanId,
+        data: { score: result.score },
+      });
+      recordEvent({ type: "scan_completed", scanId });
     } catch (err) {
-      scanError = err instanceof Error ? err.message : "Scan failed";
-      console.error(`[scan/start] runFullScan errored:`, err);
-      await safeStorageOp(() => setError(scanId, scanError!));
+      const msg = safeErrorMessage(err);
+      const isTimeout = msg.includes("timeout") || msg.includes("Scan exceeded");
+      errors.push(`scan: ${msg}`);
+      recordEvent({
+        type: isTimeout ? "scan_timed_out" : "PAID_API_CALL_FAILED",
+        scanId,
+        error: msg,
+      });
+      try {
+        await setError(scanId, msg);
+      } catch {
+        /* storage may be unconfigured */
+      }
     }
 
-    if (!result) {
-      // Scan failed or timed out. User has been emailed; Kabelo has been
-      // notified. Manual fallback path is now in motion.
-      return NextResponse.json(
-        {
-          ok: false,
+    const flags: OutcomeFlags = {
+      submissionSaved,
+      userEmailSent,
+      adminEmailSent,
+      scanCompleted,
+      manualFallback: !scanCompleted,
+    };
+
+    // ─── Compose HONEST message based on actual outcomes ────────────
+    const message = composeMessage(flags);
+
+    // Snapshot for diagnostics
+    recordSubmission({
+      scanId,
+      timestamp: submittedAt,
+      businessName: profile.businessName,
+      email: profile.email,
+      flags,
+      errors,
+    });
+
+    if (scanCompleted && result) {
+      // Save result + send completion email
+      try {
+        await saveResult(scanId, result);
+        await setStatus(scanId, "complete");
+      } catch {
+        /* storage non-fatal */
+      }
+
+      try {
+        await notifyKabeloOnCompletion(result, profile);
+        recordEvent({ type: "completion_email_sent", scanId });
+      } catch (err) {
+        recordEvent({
+          type: "completion_email_failed",
           scanId,
-          message:
-            "We've got your details and emailed you a confirmation. The automated scan didn't finish in time — Kabelo will run it manually and email your report within 24 hours.",
-          fallback: "manual",
-        },
-        { status: 200 },
-      );
+          error: safeErrorMessage(err),
+        });
+      }
+
+      recordEvent({
+        type: "response_returned",
+        scanId,
+        data: { ok: true },
+      });
+      return NextResponse.json({
+        ok: true,
+        scanId,
+        result,
+        message,
+        flags,
+      });
     }
 
-    // Scan succeeded — save + notify Kabelo with results, return to client
-    await safeStorageOp(() => saveResult(scanId, result!));
-    await safeStorageOp(() => setStatus(scanId, "complete"));
-
-    try {
-      await notifyKabeloOnCompletion(result, profile);
-    } catch (err) {
-      console.error("[scan/start] notify-kabelo-completion failed:", err);
-    }
-
-    return NextResponse.json({ ok: true, scanId, result });
+    // Scan didn't complete — return honest fallback response
+    recordEvent({
+      type: "response_returned",
+      scanId,
+      data: { ok: false, fallback: "manual" },
+    });
+    return NextResponse.json(
+      {
+        ok: false,
+        scanId,
+        message,
+        flags,
+        errors: errors.length > 0 ? errors : undefined,
+      },
+      { status: 200 },
+    );
   } catch (err) {
-    // Last-resort catch-all. We always return JSON — never plain text.
-    console.error("[scan/start] unhandled error:", err);
+    // Last-resort catch-all — always return JSON
+    recordEvent({
+      type: "scan_failed",
+      error: `unhandled: ${safeErrorMessage(err)}`,
+    });
     return NextResponse.json(
       {
         ok: false,
         message:
-          "We hit an unexpected snag on our end. Email kabelo@kabelomore.com directly and we'll deliver your scan manually within 24 hours.",
+          "We hit an unexpected snag. Please email kabelo@kabelomore.com directly — we'll deliver your scan within 24 hours.",
+        flags: {
+          submissionSaved: false,
+          userEmailSent: false,
+          adminEmailSent: false,
+          scanCompleted: false,
+          manualFallback: false,
+        } satisfies OutcomeFlags,
       },
       { status: 500 },
     );
   }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────
-
-async function safeStorageOp(op: () => Promise<unknown>): Promise<void> {
-  try {
-    await op();
-  } catch (err) {
-    console.error("[scan/start] storage op failed (non-fatal):", err);
+/**
+ * Compose a user-facing message from the actual outcome flags.
+ *
+ * CRITICAL: this function NEVER claims an email was sent unless the
+ * corresponding flag is true. The previous bug was a hardcoded
+ * "We emailed you a confirmation" string that ran even when emails failed.
+ */
+function composeMessage(flags: OutcomeFlags): string {
+  // Best case: scan completed inline
+  if (flags.scanCompleted) {
+    return "Your AI Visibility report is ready. Opening it now…";
   }
+
+  // Scan didn't complete — describe email outcomes truthfully
+  if (flags.userEmailSent && flags.adminEmailSent) {
+    return "Request received. We've emailed you a confirmation and Kabelo will deliver your full report within 24 hours.";
+  }
+
+  if (flags.adminEmailSent && !flags.userEmailSent) {
+    return "Request received and Kabelo has been notified. We couldn't deliver the confirmation email automatically — please check your spam folder, or email kabelo@kabelomore.com if it doesn't arrive.";
+  }
+
+  if (flags.userEmailSent && !flags.adminEmailSent) {
+    return "Request received. We've emailed you a confirmation, but our internal notification didn't go through. Please reply to the confirmation email or WhatsApp +27 76 035 1084 to ensure follow-up.";
+  }
+
+  // No emails got out — be honest
+  if (flags.submissionSaved) {
+    return "Request received and saved. We couldn't deliver email confirmations automatically — please email kabelo@kabelomore.com directly to ensure follow-up. Reference scan ID will be in our reply.";
+  }
+
+  // Worst case: nothing worked
+  return "Something went wrong on our end. Please email kabelo@kabelomore.com directly with your business details and we'll handle this manually.";
 }
+
+// ─── Email helpers ────────────────────────────────────────────────
 
 async function notifyKabeloOnSubmission(profile: BusinessProfile): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY not configured");
+  }
 
   const resend = new Resend(apiKey);
   const inboxEmail = process.env.SCAN_INBOX_EMAIL ?? site.contact.email;
@@ -285,18 +452,11 @@ async function notifyKabeloOnSubmission(profile: BusinessProfile): Promise<void>
   });
 }
 
-/**
- * Send the user a confirmation email immediately after submission.
- * Sets the "report within 24 hours" expectation regardless of whether
- * the automated scan completes inline or falls back to manual delivery.
- *
- * This was missing from the original flow — users submitted and heard
- * nothing for the next 30-50s while the scan ran. Now they get a
- * confirmation in their inbox before the scan even finishes.
- */
 async function sendUserAcknowledgment(profile: BusinessProfile): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY not configured");
+  }
 
   const resend = new Resend(apiKey);
   const fromEmail = process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
@@ -344,22 +504,23 @@ async function sendUserAcknowledgment(profile: BusinessProfile): Promise<void> {
 }
 
 async function notifyKabeloOnCompletion(
-  result: ScanResult & { stageReport?: import("@/lib/engines/scanOrchestrator").ScanStageReport },
+  result: ScanResult & {
+    stageReport?: import("@/lib/engines/scanOrchestrator").ScanStageReport;
+  },
   profile: BusinessProfile,
 ): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY not configured");
+  }
 
   const resend = new Resend(apiKey);
   const inboxEmail = process.env.SCAN_INBOX_EMAIL ?? site.contact.email;
   const fromEmail = process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
 
-  // Stage report — what worked vs what didn't
   const stages = result.stageReport;
   const stageEmoji = (s: string | undefined) =>
     s === "ok" ? "✅" : s === "partial" ? "⚠️" : s === "failed" ? "❌" : "—";
-
-  // Confidence flag — if any stage failed, mark scan as low-confidence
   const hasFailures = stages
     ? Object.values(stages).some((s) => s === "failed" || s === "partial")
     : false;

@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
-import { Loader2, Send, AlertTriangle, Sparkles } from "lucide-react";
+import {
+  Loader2,
+  Send,
+  AlertTriangle,
+  Sparkles,
+  Mail,
+  CheckCircle2,
+} from "lucide-react";
 import { cn } from "@/lib/cn";
 import { INDUSTRIES, COUNTRIES } from "@/lib/types/scan";
 import type { ScanResult } from "@/lib/types/scan";
@@ -24,10 +31,29 @@ type FormValues = {
   instagramUrl?: string;
 };
 
+// Outcome flags returned by /api/scan/start. The UI MUST render messages
+// based on these flags only — never assume an email succeeded based on
+// the absence of an explicit failure.
+interface OutcomeFlags {
+  submissionSaved: boolean;
+  userEmailSent: boolean;
+  adminEmailSent: boolean;
+  scanCompleted: boolean;
+  manualFallback: boolean;
+}
+
 type FormState =
   | { status: "idle" }
   | { status: "scanning"; stage: number }
   | { status: "success"; scanId: string; result: ScanResult }
+  | {
+      // Submission accepted but scan didn't complete inline. Render a
+      // banner whose tone (green / amber / rose) reflects which emails
+      // actually succeeded. Never lie.
+      status: "fallback";
+      message: string;
+      flags: OutcomeFlags;
+    }
   | { status: "error"; message: string; field?: string; values: FormValues };
 
 const inputClasses =
@@ -109,6 +135,13 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    // Double-submit guard — if a request is already in flight, ignore.
+    // This complements the state machine which unmounts the form on
+    // 'scanning'; this is belt + braces against fast double-clicks before
+    // React re-renders.
+    if (state.status === "scanning") return;
+
     const formData = new FormData(event.currentTarget);
     const values: FormValues = Object.fromEntries(formData.entries());
 
@@ -121,35 +154,36 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
         body: JSON.stringify(values),
       });
 
-      // CRITICAL: parse JSON defensively. If Vercel returns a plain-text
-      // error page (e.g. on a true gateway timeout), JSON.parse throws
-      // 'Unexpected token A...' and the user sees a confusing error.
-      // Fall back to a friendly message that matches the API's manual-
-      // fallback narrative so the user still has a clear next step.
+      // Defensive JSON parsing — if Vercel ever returns plain text, we
+      // surface a CONSERVATIVE message: assume nothing worked. Never lie.
       let data: {
         ok?: boolean;
         scanId?: string;
         result?: ScanResult;
         message?: string;
         field?: string;
-        fallback?: string;
+        flags?: OutcomeFlags;
       };
       try {
         data = await res.json();
       } catch {
-        // Plain-text or HTML response — likely a gateway-level timeout.
-        // The API's own try/catch normally prevents this, but we belt-
-        // and-brace at the client too.
         setState({
-          status: "error",
+          status: "fallback",
           message:
-            "We've received your details but the automated scan didn't finish in time. Kabelo will run it manually and email your report within 24 hours.",
-          values,
+            "Your request reached us but our system didn't return a normal response. Please email kabelo@kabelomore.com directly so we can confirm follow-up.",
+          flags: {
+            submissionSaved: false,
+            userEmailSent: false,
+            adminEmailSent: false,
+            scanCompleted: false,
+            manualFallback: true,
+          },
         });
         return;
       }
 
-      if (!res.ok || !data.ok) {
+      // Validation/rate-limit/config errors — true input problems.
+      if (!res.ok && !data.flags) {
         setState({
           status: "error",
           message:
@@ -161,11 +195,38 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
         return;
       }
 
-      // Scan completed inline — navigate to results page
+      // Scan completed inline (full success) → navigate to results page.
+      if (data.ok && data.scanId && data.result) {
+        setState({
+          status: "success",
+          scanId: data.scanId,
+          result: data.result,
+        });
+        return;
+      }
+
+      // ok:false but with flags = the API processed the submission but
+      // the scan didn't complete inline. The UI message reflects WHICH
+      // operations actually succeeded — flags drive the banner tone.
+      if (data.flags) {
+        setState({
+          status: "fallback",
+          message:
+            data.message ??
+            "Request received. Please check your inbox for confirmation.",
+          flags: data.flags,
+        });
+        return;
+      }
+
+      // Catch-all (shouldn't reach here, but be safe)
       setState({
-        status: "success",
-        scanId: data.scanId!,
-        result: data.result!,
+        status: "error",
+        message:
+          data.message ??
+          "Something went wrong. Please email kabelo@kabelomore.com directly.",
+        field: data.field,
+        values,
       });
     } catch (err) {
       setState({
@@ -183,42 +244,22 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
     return <ScanningProgress stageIndex={state.stage} />;
   }
 
+  // Fallback state — submission accepted but scan didn't complete inline.
+  // Render a banner whose tone reflects WHICH emails actually succeeded.
+  // Critical: this is the bug fix. The previous banner said "we emailed
+  // you" regardless of actual outcome. Now we render based on flags.
+  if (state.status === "fallback") {
+    return <FallbackBanner message={state.message} flags={state.flags} />;
+  }
+
   // Form is rendered for both "idle" and "error" states. Field defaults
   // restore the user's previous input on error so they don't lose typing.
   const defaults: FormValues = state.status === "error" ? state.values : {};
 
-  // Detect manual-fallback errors — these are NOT user input problems,
-  // they're "the automated scan didn't finish but Kabelo will deliver
-  // manually" cases. Show a positive green banner instead of amber.
-  const isManualFallback =
-    state.status === "error" &&
-    /manually|24 hours|within 24h/i.test(state.message);
-
   return (
     <form ref={formRef} onSubmit={onSubmit} className="space-y-5" noValidate>
-      {/* Manual-fallback banner — green, positive */}
-      {state.status === "error" && isManualFallback && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <div className="flex items-start gap-3">
-            <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-700" />
-            <div className="flex-1">
-              <div className="text-sm font-semibold text-ink-900">
-                Submission received — report on its way.
-              </div>
-              <div className="mt-1.5 text-xs text-ink-700">
-                {friendlyError(state.message, state.field)}
-              </div>
-              <div className="mt-2 text-xs text-ink-600">
-                Check your inbox for a confirmation email. Reply to it if you
-                want to add anything before Kabelo runs your scan.
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Standard error banner — amber, "fix and resubmit" */}
-      {state.status === "error" && !isManualFallback && (
+      {state.status === "error" && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700" />
@@ -614,4 +655,149 @@ function industryLabel(ind: (typeof INDUSTRIES)[number]): string {
     case "automotive": return "Automotive";
     case "other": return "Other";
   }
+}
+
+/**
+ * Fallback banner — rendered when the API processed the submission but
+ * the scan didn't complete inline. Banner tone reflects which emails
+ * actually succeeded:
+ *
+ *   Both emails sent     → green "report on its way"
+ *   Partial / failed     → amber "couldn't email, contact directly"
+ *   Nothing worked       → rose "something went wrong, email Kabelo"
+ *
+ * NEVER claims an email was sent unless the corresponding flag is true.
+ */
+function FallbackBanner({
+  message,
+  flags,
+}: {
+  message: string;
+  flags: OutcomeFlags;
+}) {
+  const allEmailsSent = flags.userEmailSent && flags.adminEmailSent;
+  const anyEmailSent = flags.userEmailSent || flags.adminEmailSent;
+  const submissionGood = flags.submissionSaved;
+
+  // Determine banner tone + icon
+  const tone = allEmailsSent
+    ? "success"
+    : anyEmailSent || submissionGood
+      ? "warning"
+      : "danger";
+
+  const config = {
+    success: {
+      borderClass: "border-emerald-200",
+      bgClass: "bg-emerald-50",
+      iconClass: "text-emerald-700",
+      Icon: CheckCircle2,
+      title: "Submission received — report on its way.",
+    },
+    warning: {
+      borderClass: "border-amber-200",
+      bgClass: "bg-amber-50",
+      iconClass: "text-amber-700",
+      Icon: Mail,
+      title: "Submission received — but check the details below.",
+    },
+    danger: {
+      borderClass: "border-rose-200",
+      bgClass: "bg-rose-50",
+      iconClass: "text-rose-700",
+      Icon: AlertTriangle,
+      title: "Something went wrong on our end.",
+    },
+  }[tone];
+
+  const Icon = config.Icon;
+
+  return (
+    <div
+      className={`rounded-3xl border-2 ${config.borderClass} ${config.bgClass} p-7 md:p-9`}
+    >
+      <div className="flex items-start gap-4">
+        <Icon
+          className={`mt-0.5 h-6 w-6 flex-shrink-0 ${config.iconClass}`}
+        />
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-ink-900">
+            {config.title}
+          </h3>
+          <p className="mt-3 text-sm text-ink-700 leading-relaxed md:text-base">
+            {message}
+          </p>
+
+          {/* Honest status grid — mirrors actual flags */}
+          <div className="mt-5 grid gap-2 text-xs sm:grid-cols-2">
+            <FlagRow
+              ok={flags.submissionSaved}
+              labelOk="Your details are saved"
+              labelFail="Your details could not be saved"
+            />
+            <FlagRow
+              ok={flags.userEmailSent}
+              labelOk="Confirmation email sent to you"
+              labelFail="Confirmation email did NOT send"
+            />
+            <FlagRow
+              ok={flags.adminEmailSent}
+              labelOk="Kabelo has been notified"
+              labelFail="Kabelo could NOT be notified automatically"
+            />
+            <FlagRow
+              ok={flags.scanCompleted}
+              labelOk="Automated scan completed"
+              labelFail="Automated scan did not complete (manual run within 24h)"
+            />
+          </div>
+
+          {/* If anything failed, surface the contact path explicitly */}
+          {!allEmailsSent && (
+            <div className="mt-5 rounded-xl border border-ink-200 bg-white p-4 text-xs text-ink-700">
+              <strong className="text-ink-900">Need to be sure?</strong> Email{" "}
+              <a
+                href="mailto:kabelo@kabelomore.com"
+                className="font-medium text-accent-600 hover:text-accent-700"
+              >
+                kabelo@kabelomore.com
+              </a>{" "}
+              directly or WhatsApp{" "}
+              <a
+                href="https://wa.me/27760351084"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-accent-600 hover:text-accent-700"
+              >
+                +27 76 035 1084
+              </a>
+              . Mention your business name and we'll deliver your scan within
+              24 hours.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FlagRow({
+  ok,
+  labelOk,
+  labelFail,
+}: {
+  ok: boolean;
+  labelOk: string;
+  labelFail: string;
+}) {
+  return (
+    <div className="flex items-start gap-2">
+      {ok ? (
+        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" />
+      ) : (
+        <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+      )}
+      <span className="text-ink-700">{ok ? labelOk : labelFail}</span>
+    </div>
+  );
 }
