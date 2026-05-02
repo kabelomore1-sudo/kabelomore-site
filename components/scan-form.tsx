@@ -121,24 +121,51 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
         body: JSON.stringify(values),
       });
 
-      const data = await res.json();
+      // CRITICAL: parse JSON defensively. If Vercel returns a plain-text
+      // error page (e.g. on a true gateway timeout), JSON.parse throws
+      // 'Unexpected token A...' and the user sees a confusing error.
+      // Fall back to a friendly message that matches the API's manual-
+      // fallback narrative so the user still has a clear next step.
+      let data: {
+        ok?: boolean;
+        scanId?: string;
+        result?: ScanResult;
+        message?: string;
+        field?: string;
+        fallback?: string;
+      };
+      try {
+        data = await res.json();
+      } catch {
+        // Plain-text or HTML response — likely a gateway-level timeout.
+        // The API's own try/catch normally prevents this, but we belt-
+        // and-brace at the client too.
+        setState({
+          status: "error",
+          message:
+            "We've received your details but the automated scan didn't finish in time. Kabelo will run it manually and email your report within 24 hours.",
+          values,
+        });
+        return;
+      }
 
       if (!res.ok || !data.ok) {
         setState({
           status: "error",
           message:
             data.message ??
-            "Something went wrong. Please try again or email kabelo@kabelomore.com.",
+            "Something went wrong. Please email kabelo@kabelomore.com directly.",
           field: data.field,
           values,
         });
         return;
       }
 
+      // Scan completed inline — navigate to results page
       setState({
         status: "success",
-        scanId: data.scanId,
-        result: data.result,
+        scanId: data.scanId!,
+        result: data.result!,
       });
     } catch (err) {
       setState({
@@ -160,10 +187,38 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
   // restore the user's previous input on error so they don't lose typing.
   const defaults: FormValues = state.status === "error" ? state.values : {};
 
+  // Detect manual-fallback errors — these are NOT user input problems,
+  // they're "the automated scan didn't finish but Kabelo will deliver
+  // manually" cases. Show a positive green banner instead of amber.
+  const isManualFallback =
+    state.status === "error" &&
+    /manually|24 hours|within 24h/i.test(state.message);
+
   return (
     <form ref={formRef} onSubmit={onSubmit} className="space-y-5" noValidate>
-      {/* Error banner — sticky at top of form when present */}
-      {state.status === "error" && (
+      {/* Manual-fallback banner — green, positive */}
+      {state.status === "error" && isManualFallback && (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+          <div className="flex items-start gap-3">
+            <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-700" />
+            <div className="flex-1">
+              <div className="text-sm font-semibold text-ink-900">
+                Submission received — report on its way.
+              </div>
+              <div className="mt-1.5 text-xs text-ink-700">
+                {friendlyError(state.message, state.field)}
+              </div>
+              <div className="mt-2 text-xs text-ink-600">
+                Check your inbox for a confirmation email. Reply to it if you
+                want to add anything before Kabelo runs your scan.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Standard error banner — amber, "fix and resubmit" */}
+      {state.status === "error" && !isManualFallback && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700" />
