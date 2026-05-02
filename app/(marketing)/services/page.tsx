@@ -1,48 +1,52 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Section, Eyebrow } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/ui/jsonld";
 import { faqJsonLd, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { tiers, addOns, site } from "@/lib/site";
+import { publicPackages } from "@/lib/public-packages";
+import { PublicPackagesGrid } from "@/components/public-packages-grid";
 import { SerpRealEstateMap } from "@/components/serp-real-estate-map";
 import { TierComparisonTable } from "@/components/tier-comparison-table";
-import { CircleCheck, ArrowRight, AlertCircle } from "lucide-react";
+import { TrackPageView } from "@/components/track-page-view";
+import { ArrowRight, MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Services & Pricing",
+  title: "Services & Pricing — Three guided paths, not 14 options",
   description:
-    "AI visibility consulting for medical practitioners, legal counsellors, and industrial businesses. Once-off projects from R5k. Monthly retainers from R2,950/mo to R20,000/mo covering GBP, LinkedIn, industry citations, reviews, and AI engine tracking.",
+    "Three packages for medical, legal, and industrial firms: Starter (basics first), Growth (compound visibility every month), Premium (visibility + automation). Take the 10-min Discovery to get matched — or browse all options.",
   alternates: { canonical: `${site.url}/services` },
 };
 
 const servicesFaqs = [
+  {
+    q: "Why only 3 packages? I expected more options.",
+    a: "Three packages because three is the right number of decisions to make at first contact. Starter (foundations), Growth (compounding monthly visibility — where most clients land), or Premium / Systems (visibility plus automation). Each one branches into a custom scope after Discovery — we have 14 internal tiers we map to behind the scenes. You don't pick from 14. We pick the right fit from your answers.",
+  },
+  {
+    q: "What if my situation is unusual?",
+    a: "Take the 10-min Discovery. If your answers don't trigger a confident match, we surface the 'Talk to Kabelo' option directly — no automated recommendation that doesn't fit. For complex cases (multi-region firms, atypical sectors, custom integrations), Kabelo personally reviews your answers and recommends a custom scope.",
+  },
   {
     q: "Why pay 50% deposit and 50% on delivery?",
     a: "Splitting payment is the industry standard for project work. It builds trust both ways: we don't get paid in full until you sign off, and you don't risk full payment to a stranger. If we don't deliver what's quoted, you don't pay the second half. Monthly retainers work differently — billed in advance, cancel anytime after the minimum.",
   },
   {
     q: "Why monthly retainers? Aren't subscriptions just adding overhead?",
-    a: "Honest answer: AI visibility compounds. A once-off citation pack gets you 30 listings on day 30 — but on day 90, three of them have died, no new ones have appeared, and your competitors who run a retainer have added 18 more. Retainers exist because the work that moves AI engines (citations, content velocity, schema updates, GBP freshness) is repetitive maintenance, not a one-time setup. We sized Local Growth Lite at R2,950/mo so you can test compounding without committing to agency-tier cost. Cancel anytime after 3 months.",
+    a: "AI visibility compounds. A once-off citation pack gets you 30 listings on day 30 — but on day 90, three of them have died, no new ones have appeared, and your competitors who run a retainer have added 18 more. Retainers exist because the work that moves AI engines (citations, content velocity, schema updates, GBP freshness) is repetitive maintenance, not a one-time setup.",
   },
   {
     q: "I hate subscriptions. What's the cancellation policy?",
-    a: "Same as your gym, but actually honoured. 3-month minimum on all retainers (6-month on Strategy Partner). After that, cancel via email — no phone call, no retention pitch, no fine print. We deliver everything paid for and hand over all logins, content, and citations cleanly. Nothing held hostage.",
+    a: "Same as your gym, but actually honoured. 3-month minimum on all retainers. After that, cancel via email — no phone call, no retention pitch, no fine print. We deliver everything paid for and hand over all logins, content, and citations cleanly. Nothing held hostage.",
   },
   {
     q: "Are these retainers just social media management?",
-    a: "No — and we deliberately don't do Instagram, TikTok, or generic Facebook posting. We focus on properties where medical, legal, and industrial buyers actually make decisions: Google Business Profile, LinkedIn (founder + company), industry-specific directories (Medical Board, Law Society, BBBEE, sector dirs), reviews (Google + HelloPeter + sector-specific), industry publications (Medical Brief, De Rebus, Engineering News), and AI engines. Every property feeds the same AEO strategy. A generic SMM agency posts on Instagram and calls it done. We own the search results page across every platform your buyers actually use.",
+    a: "No — and we deliberately don't do Instagram, TikTok, or generic Facebook posting. We focus on properties where medical, legal, and industrial buyers actually make decisions: Google Business Profile, LinkedIn, industry-specific directories, reviews, industry publications, and AI engines. Every property feeds the same AEO strategy. We own the search results page across every platform your buyers actually use.",
   },
   {
-    q: "Why no Instagram or TikTok?",
-    a: "Because medical specialists, legal counsellors, and industrial buyers don't make purchase decisions there. A patient choosing a cardiologist Googles their name and reads reviews. A procurement manager sourcing a fabricator searches industry directories and asks AI engines. A mid-market law firm gets shortlisted via LinkedIn and Law Society listings. Adding Instagram to your stack would consume budget that should compound on the channels that actually convert your buyer type.",
-  },
-  {
-    q: "How do I know which retainer is right for me?",
-    a: "Local Growth Lite (R2,950) for solo practitioners — single-doctor practice, sole-practitioner attorney, owner-run industrial firm. Local Growth (R5,500) for small-to-mid practices and firms (2-10 doctors, 3-15 attorneys, 5-30 staff industrial) — where most clients land. AI Authority (R10,500) for established firms (10+ doctors, 15+ attorneys, R50M+ revenue) wanting category leadership in their market. Strategy Partner (R20,000) for mid-market+ multi-region — fractional Head of AI Visibility role. Or book a free 20-min call and we'll point at the right rung.",
-  },
-  {
-    q: "What if I'm not happy with delivery on once-off work?",
-    a: "Every once-off project includes one round of revisions free. We'll discuss what's not right, agree on changes, deliver the revised version within 5 working days. If after revisions you still don't see what was quoted, you don't pay the second half.",
+    q: "How do you handle my website if I don't have one?",
+    a: "We build what fits your business — from a single AI-readable landing page to a full multi-page business website — all optimised for visibility, trust, and conversion. We don't sell rigid 'X-page' packages. After your scan + Discovery, we recommend the right scope based on your actual services and customers. Sometimes that's one page. Sometimes it's six. The work is positioned as AI-optimised infrastructure, not generic web design.",
   },
   {
     q: "Why do you charge in ZAR, USD, and GBP?",
@@ -50,16 +54,9 @@ const servicesFaqs = [
   },
   {
     q: "Is there a discount for first-case-study clients?",
-    a: "Yes — Foundation Partners (first clients in a new vertical) receive up to 50% off in exchange for case study publication rights. Limited availability, message us directly to discuss.",
+    a: "Yes — Foundation Partners (first clients in a new vertical) receive up to 50% off in exchange for case study publication rights. Limited availability, message Kabelo directly to discuss.",
   },
 ];
-
-const categoryLabels = {
-  scan: { label: "Try us first", color: "text-ink-500" },
-  foundation: { label: "Build from zero", color: "text-accent-700" },
-  audit: { label: "Get clarity", color: "text-gold-600" },
-  retainer: { label: "Ongoing growth", color: "text-emerald-700" },
-};
 
 const addOnCategoryLabels: Record<string, { label: string; description: string }> = {
   setup: {
@@ -83,12 +80,17 @@ const addOnCategoryLabels: Record<string, { label: string; description: string }
 export default function ServicesPage() {
   return (
     <>
+      <TrackPageView event="services_view" />
+
       <JsonLd
         data={[
           breadcrumbJsonLd([
             { label: "Home", href: "/" },
             { label: "Services", href: "/services" },
           ]),
+          // Schema still references all internal tiers for AI engine
+          // discovery — public face is 3, but the underlying offers are
+          // discoverable via structured data.
           ...tiers.map((t) =>
             serviceJsonLd({
               name: t.name,
@@ -100,580 +102,246 @@ export default function ServicesPage() {
         ]}
       />
 
-      {/* Hero */}
+      {/* ─────────────────────────────────────────────────────────────
+          HERO — 2 CTAs only.
+          Primary: 'Get matched to the right package' → /discover
+          Secondary: 'View packages' → scrolls to the 3-card grid below
+          ───────────────────────────────────────────────────────────── */}
       <Section variant="tinted" padding="lg">
         <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">Services & Pricing</Eyebrow>
+          <Eyebrow className="justify-center">Services</Eyebrow>
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
-            Own your search results.
+            Most businesses don&apos;t need
             <br />
-            <span className="text-ink-500">
-              Across every platform that matters.
-            </span>
+            <span className="text-ink-500">more options. They need the right next step.</span>
           </h1>
           <p className="mt-5 text-lg text-ink-500">
-            Built for medical practitioners, legal counsellors, and industrial
-            businesses. We deploy{" "}
-            <strong className="text-ink-900">The Real Estate Method</strong> —
-            our 7-property framework covering Google, GBP, LinkedIn, industry
-            directories, reviews, press, and AI engines. No Instagram fluff. No
-            TikTok dances. Just the properties where your buyers actually decide.
+            Three packages, all running{" "}
+            <Link
+              href="/about"
+              className="font-medium text-ink-700 underline decoration-accent-300 underline-offset-4 hover:text-accent-700"
+            >
+              The Real Estate Method
+            </Link>
+            . Tell us about your business — we&apos;ll match you to the right
+            one. Or browse all three if you&apos;d rather choose yourself.
           </p>
 
-          {/* Funnel guidance — kills decision paralysis */}
-          <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-accent-200 bg-accent-50 px-6 py-4 text-center">
-            <p className="text-sm text-ink-700">
-              <span className="font-semibold text-ink-900">Not sure which fits?</span>{" "}
-              Start with the{" "}
-              <a
-                href="/scan"
-                className="font-semibold text-accent-600 underline underline-offset-2 hover:text-accent-700"
-              >
-                free AI scan
-              </a>{" "}
-              — or read the{" "}
-              <a
-                href="/resources"
-                className="font-semibold text-accent-600 underline underline-offset-2 hover:text-accent-700"
-              >
-                47-point sector checklists
-              </a>{" "}
-              for your industry first.
-            </p>
-          </div>
-        </div>
-
-        {/* Trust strip — teal checkmark + stronger weight per polish sprint */}
-        <div className="mx-auto mt-10 grid max-w-3xl gap-3 sm:grid-cols-3">
-          {[
-            "50% deposit, 50% on delivery",
-            "One round of revisions included",
-            "Updates every 3 days",
-          ].map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-rule bg-white p-4 text-center text-sm font-semibold text-ink-900 shadow-soft"
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button href="/discover" variant="primary" size="lg">
+              Get matched to the right package <ArrowRight className="h-4 w-4" />
+            </Button>
+            <a
+              href="#packages"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-7 text-base font-semibold text-ink-900 transition-all hover:bg-ink-50 hover:shadow-soft"
             >
-              <span className="mr-1.5 text-accent-500">✓</span> {item}
-            </div>
-          ))}
+              View packages
+            </a>
+          </div>
+
+          <p className="mt-5 text-sm text-ink-400">
+            10-min Discovery · Personalised recommendation in 24 hours · No card
+          </p>
         </div>
       </Section>
 
-      {/* SERP Real Estate Map — visual proof of what each retainer
-          actually covers. Replaces the abstract "AI visibility" pitch
-          with a concrete platform-by-platform map.
-          Insertion point: between hero and tier cards so buyers see
-          coverage BEFORE they read tier copy. */}
-      <Section variant="default" padding="default">
-        <div className="mx-auto max-w-4xl">
-          <Eyebrow>The real estate model</Eyebrow>
+      {/* ─────────────────────────────────────────────────────────────
+          PUBLIC PACKAGES — 3 cards.
+          Growth is highlighted as 'Recommended' with visual amplification.
+          ───────────────────────────────────────────────────────────── */}
+      <Section variant="default" padding="lg" id="packages">
+        <div className="mx-auto max-w-3xl text-center">
+          <Eyebrow className="justify-center">Three paths</Eyebrow>
           <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
-            What you actually own across the search results page.
+            Pick what fits where you are.
           </h2>
           <p className="mt-4 text-base text-ink-500 leading-relaxed">
-            When your customer Googles your firm — or asks ChatGPT for
-            specialists in your category — the answer pulls from across
-            multiple properties. GBP, your website, LinkedIn, industry
-            directories, reviews, press. Each retainer covers a defined slice.
-            Here&apos;s exactly what each tier owns:
+            Most clients land on Growth. But if you don&apos;t have the basics
+            in place, start with Starter. If you&apos;re already running at
+            scale, Premium fits.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 max-w-6xl">
+          <PublicPackagesGrid />
+        </div>
+
+        {/* Soft 'Talk to Kabelo' fallback below the grid */}
+        <div className="mx-auto mt-12 max-w-2xl rounded-2xl border border-rule bg-ink-50/60 p-6 text-center">
+          <div className="flex items-center justify-center gap-2 text-sm font-semibold text-ink-900">
+            <MessageCircle className="h-4 w-4 text-accent-600" />
+            Not sure this fits?
+          </div>
+          <p className="mt-2 text-sm text-ink-600 leading-relaxed">
+            Take the{" "}
+            <Link
+              href="/discover"
+              className="font-medium text-accent-600 hover:text-accent-700"
+            >
+              10-min Discovery
+            </Link>{" "}
+            and we&apos;ll recommend the right package based on your specific
+            answers — or honestly tell you we&apos;re not the right fit yet.
+          </p>
+          <p className="mt-3 text-xs text-ink-500">
+            Prefer a human? WhatsApp Kabelo on{" "}
+            <a
+              href="https://wa.me/27760351084"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-accent-600 hover:text-accent-700"
+            >
+              +27 76 035 1084
+            </a>{" "}
+            — typical reply within 1 business hour.
+          </p>
+        </div>
+      </Section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SERP REAL ESTATE MAP — methodology proof.
+          Stays public because it explains what each package actually
+          covers across the 7 properties.
+          ───────────────────────────────────────────────────────────── */}
+      <Section variant="tinted" padding="lg">
+        <div className="mx-auto max-w-4xl">
+          <Eyebrow>The Real Estate Method</Eyebrow>
+          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+            What every package actually covers.
+          </h2>
+          <p className="mt-4 text-base text-ink-500 leading-relaxed">
+            All 7 properties customers use to find businesses like yours.
+            Different packages cover different depths — but the methodology is
+            the same. No Instagram fluff. No TikTok dances. Just the platforms
+            where your buyers actually decide.
           </p>
         </div>
 
         <div className="mt-10">
           <SerpRealEstateMap />
         </div>
-
-        <p className="mx-auto mt-6 max-w-3xl text-center text-xs italic text-ink-500">
-          We deliberately don&apos;t cover Instagram, TikTok, or generic Facebook
-          posting. Our buyers — medical, legal, industrial — make decisions on
-          LinkedIn, in industry pubs, and through search. We focus where decisions
-          actually happen.
-        </p>
       </Section>
 
-      {/* All-9-tier comparison table — quick decision aid before deep cards.
-          Anchors point to each tier's #id below so click-to-jump works. */}
-      <Section variant="tinted" padding="default">
-        <div className="mx-auto max-w-3xl">
-          <Eyebrow>Quick comparison</Eyebrow>
-          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
-            Compare all 9 services side by side.
-          </h2>
-          <p className="mt-4 text-base text-ink-500 leading-relaxed">
-            One look. All tiers. Click any service to jump to its full detail.
-          </p>
-        </div>
-        <div className="mx-auto mt-8 max-w-6xl">
-          <TierComparisonTable />
-        </div>
-      </Section>
-
-      {/* Tiers */}
+      {/* ─────────────────────────────────────────────────────────────
+          COMPARE ALL OPTIONS — expandable, hidden by default.
+          For self-serve buyers who want to see the full internal tier
+          ladder. The 14 internal tiers are still in the data — they're
+          just not the primary face.
+          ───────────────────────────────────────────────────────────── */}
       <Section variant="default" padding="default">
-        <div className="mx-auto max-w-3xl">
-          <Eyebrow>Core services</Eyebrow>
-          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
-            Choose your starting point.
-          </h2>
-        </div>
-
-        <div className="mt-8 grid gap-6 md:gap-8">
-          {tiers.map((tier) => {
-            const cat = categoryLabels[tier.category];
-            return (
-              <article
-                key={tier.id}
-                id={tier.id}
-                className={
-                  tier.highlight
-                    ? "relative overflow-hidden rounded-3xl bg-ink-900 p-6 text-white shadow-lift md:p-10"
-                    : "rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10"
-                }
-              >
-                {tier.highlight && (
-                  <div className="absolute right-8 top-8 hidden rounded-full bg-accent-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white md:block">
-                    Most popular
-                  </div>
-                )}
-
-                <div className="grid gap-10 md:grid-cols-12 md:gap-12">
-                  <div className="md:col-span-5">
-                    <div
-                      className={
-                        tier.highlight
-                          ? "text-xs font-semibold uppercase tracking-[0.14em] text-accent-400"
-                          : `text-xs font-semibold uppercase tracking-[0.14em] ${cat.color}`
-                      }
-                    >
-                      {cat.label}
-                    </div>
-                    <h2 className="mt-3 text-display-md font-semibold tracking-tight">
-                      {tier.name}
-                    </h2>
-                    <p
-                      className={
-                        tier.highlight
-                          ? "mt-4 text-base text-ink-200 leading-relaxed"
-                          : "mt-4 text-base text-ink-700 leading-relaxed"
-                      }
-                    >
-                      <strong className={tier.highlight ? "text-white" : "text-ink-900"}>
-                        Best for:
-                      </strong>{" "}
-                      {tier.bestFor}
-                    </p>
-                    <p
-                      className={
-                        tier.highlight
-                          ? "mt-4 text-base text-ink-300 leading-relaxed"
-                          : "mt-4 text-base text-ink-500 leading-relaxed"
-                      }
-                    >
-                      {tier.description}
-                    </p>
-
-                    <div className="mt-8 space-y-3">
-                      <div>
-                        <div
-                          className={
-                            tier.highlight
-                              ? "text-xs uppercase tracking-wider text-ink-300"
-                              : "text-xs uppercase tracking-wider text-ink-400"
-                          }
-                        >
-                          South Africa
-                        </div>
-                        <div className="text-3xl font-semibold tracking-tight">
-                          {tier.price.sa}
-                        </div>
-                      </div>
-                      <div>
-                        <div
-                          className={
-                            tier.highlight
-                              ? "text-xs uppercase tracking-wider text-ink-300"
-                              : "text-xs uppercase tracking-wider text-ink-400"
-                          }
-                        >
-                          International
-                        </div>
-                        <div
-                          className={
-                            tier.highlight
-                              ? "text-xl font-semibold tracking-tight text-ink-100"
-                              : "text-xl font-semibold tracking-tight text-ink-700"
-                          }
-                        >
-                          {tier.price.intl}
-                        </div>
-                      </div>
-                      <div
-                        className={
-                          tier.highlight
-                            ? "inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-accent-300"
-                            : "inline-flex rounded-full bg-accent-50 px-3 py-1 text-xs font-medium text-accent-700"
-                        }
-                      >
-                        {tier.payment}
-                      </div>
-                      <div
-                        className={
-                          tier.highlight
-                            ? "text-sm text-ink-300"
-                            : "text-sm text-ink-500"
-                        }
-                      >
-                        Delivery: {tier.delivery}
-                      </div>
-                    </div>
-
-                    <div className="mt-10">
-                      <Button
-                        href={tier.cta.href}
-                        variant={tier.highlight ? "ink" : "primary"}
-                        size="md"
-                      >
-                        {tier.cta.label}
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-7">
-                    <div
-                      className={
-                        tier.highlight
-                          ? "text-xs font-semibold uppercase tracking-[0.14em] text-ink-300"
-                          : "text-xs font-semibold uppercase tracking-[0.14em] text-ink-400"
-                      }
-                    >
-                      What you receive
-                    </div>
-                    <ul className="mt-5 space-y-2">
-                      {tier.receives.map((b) => (
-                        <li key={b} className="flex items-start gap-3 text-sm">
-                          <CircleCheck
-                            className={
-                              tier.highlight
-                                ? "mt-0.5 h-5 w-5 flex-shrink-0 text-accent-400"
-                                : "mt-0.5 h-5 w-5 flex-shrink-0 text-accent-500"
-                            }
-                          />
-                          <span
-                            className={
-                              tier.highlight ? "text-ink-100" : "text-ink-700"
-                            }
-                          >
-                            {b}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* Value-anchoring block — comparable price + ROI math
-                        + cancel terms. Renders for any tier that has these
-                        fields (today: retainers). Helps SA buyers price-anchor
-                        against subscriptions they already understand and gives
-                        international buyers explicit ROI math. */}
-                    {(tier.comparableTo || tier.roiMath || tier.cancelTerms) && (
-                      <div
-                        className={
-                          tier.highlight
-                            ? "mt-8 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-6"
-                            : "mt-8 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6"
-                        }
-                      >
-                        <div
-                          className={
-                            tier.highlight
-                              ? "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300"
-                              : "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700"
-                          }
-                        >
-                          What you're really paying for
-                        </div>
-
-                        {tier.comparableTo && (
-                          <div className="mt-3">
-                            <div
-                              className={
-                                tier.highlight
-                                  ? "text-[10px] font-semibold uppercase tracking-wider text-emerald-300/70"
-                                  : "text-[10px] font-semibold uppercase tracking-wider text-emerald-700/70"
-                              }
-                            >
-                              Comparable spend
-                            </div>
-                            <p
-                              className={
-                                tier.highlight
-                                  ? "mt-1 text-sm text-ink-100 leading-relaxed"
-                                  : "mt-1 text-sm text-ink-700 leading-relaxed"
-                              }
-                            >
-                              {tier.comparableTo}
-                            </p>
-                          </div>
-                        )}
-
-                        {tier.roiMath && (
-                          <div className="mt-4">
-                            <div
-                              className={
-                                tier.highlight
-                                  ? "text-[10px] font-semibold uppercase tracking-wider text-emerald-300/70"
-                                  : "text-[10px] font-semibold uppercase tracking-wider text-emerald-700/70"
-                              }
-                            >
-                              Break-even math
-                            </div>
-                            <p
-                              className={
-                                tier.highlight
-                                  ? "mt-1 text-sm text-ink-100 leading-relaxed"
-                                  : "mt-1 text-sm text-ink-700 leading-relaxed"
-                              }
-                            >
-                              {tier.roiMath.breakEven}
-                            </p>
-                            <p
-                              className={
-                                tier.highlight
-                                  ? "mt-2 text-sm text-ink-200 leading-relaxed"
-                                  : "mt-2 text-sm text-ink-600 leading-relaxed"
-                              }
-                            >
-                              <strong
-                                className={
-                                  tier.highlight ? "text-white" : "text-ink-900"
-                                }
-                              >
-                                Realistic target:
-                              </strong>{" "}
-                              {tier.roiMath.targetReturn}
-                            </p>
-                          </div>
-                        )}
-
-                        {tier.cancelTerms && (
-                          <div className="mt-4 border-t border-emerald-200/50 pt-3">
-                            <div
-                              className={
-                                tier.highlight
-                                  ? "text-[10px] font-semibold uppercase tracking-wider text-emerald-300/70"
-                                  : "text-[10px] font-semibold uppercase tracking-wider text-emerald-700/70"
-                              }
-                            >
-                              Cancel anytime
-                            </div>
-                            <p
-                              className={
-                                tier.highlight
-                                  ? "mt-1 text-xs italic text-ink-200 leading-relaxed"
-                                  : "mt-1 text-xs italic text-ink-600 leading-relaxed"
-                              }
-                            >
-                              {tier.cancelTerms}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Skin-in-the-game callout — Naval-shaped performance
-                        pricing option. Renders only on tiers with this field
-                        defined (today: Strategy Partner only). Filters for
-                        sophisticated buyers and signals confidence in the work. */}
-                    {tier.skinInTheGame && (
-                      <div className="mt-6 rounded-2xl border border-purple-200 bg-purple-50/40 p-6">
-                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-purple-700">
-                          Performance-aligned option
-                        </div>
-                        <h4 className="mt-2 text-base font-semibold text-ink-900">
-                          {tier.skinInTheGame.headline}
-                        </h4>
-                        <p className="mt-3 text-sm text-ink-700 leading-relaxed">
-                          {tier.skinInTheGame.body}
-                        </p>
-                        <p className="mt-3 text-xs italic text-ink-500">
-                          {tier.skinInTheGame.qualifier}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Monthly work clarity block — for retainers only */}
-                    {tier.monthlyWork && (
-                      <div
-                        className={
-                          tier.highlight
-                            ? "mt-8 rounded-2xl border border-white/10 bg-white/5 p-6"
-                            : "mt-8 rounded-2xl border border-amber-200 bg-amber-50/50 p-6"
-                        }
-                      >
-                        <div className="flex items-start gap-3">
-                          <AlertCircle
-                            className={
-                              tier.highlight
-                                ? "mt-0.5 h-5 w-5 flex-shrink-0 text-amber-400"
-                                : "mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
-                            }
-                          />
-                          <div className="flex-1">
-                            <div
-                              className={
-                                tier.highlight
-                                  ? "text-xs font-semibold uppercase tracking-[0.14em] text-amber-300"
-                                  : "text-xs font-semibold uppercase tracking-[0.14em] text-amber-700"
-                              }
-                            >
-                              Why monthly? What's actually happening?
-                            </div>
-                            <p
-                              className={
-                                tier.highlight
-                                  ? "mt-2 text-sm text-ink-200 leading-relaxed"
-                                  : "mt-2 text-sm text-ink-700 leading-relaxed"
-                              }
-                            >
-                              {tier.monthlyWork.intro}
-                            </p>
-                            <ul className="mt-4 space-y-1.5">
-                              {tier.monthlyWork.items.map((item) => (
-                                <li
-                                  key={item.task}
-                                  className="flex items-start justify-between gap-3 text-xs"
-                                >
-                                  <span
-                                    className={
-                                      tier.highlight ? "text-ink-100" : "text-ink-700"
-                                    }
-                                  >
-                                    · {item.task}
-                                  </span>
-                                  <span
-                                    className={
-                                      tier.highlight
-                                        ? "flex-shrink-0 font-mono text-amber-300"
-                                        : "flex-shrink-0 font-mono text-amber-700"
-                                    }
-                                  >
-                                    {item.effort}
-                                  </span>
-                                </li>
-                              ))}
-                            </ul>
-                            <p
-                              className={
-                                tier.highlight
-                                  ? "mt-4 text-xs italic text-ink-300 leading-relaxed"
-                                  : "mt-4 text-xs italic text-ink-500 leading-relaxed"
-                              }
-                            >
-                              {tier.monthlyWork.notSocialMedia}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </Section>
-
-      {/* Add-Ons */}
-      <Section variant="tinted" padding="lg">
-        {/* Visual rule + eyebrow per polish sprint — signals a clear
-            section transition from full-width tier cards to 2-col add-ons */}
-        <hr className="mb-12 border-rule" />
-
-        <div className="mx-auto max-w-3xl">
-          <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
-            <span>•</span> Add-ons & standalone services
-          </p>
-          <h2 className="mt-2 text-display-md font-semibold tracking-tight text-ink-900">
-            Specialty services. Buy alone or attach to any tier.
-          </h2>
-          <p className="mt-4 text-base text-ink-500 leading-relaxed">
-            Need just one specific thing fixed? Buy any add-on standalone — no commitment to a retainer required.
-            Or attach to your tier for the work that fits.
-          </p>
-        </div>
-
-        <div className="mt-12 space-y-12">
-          {(["setup", "content", "growth", "ongoing"] as const).map((category) => {
-            const items = addOns.filter((a) => a.category === category);
-            const meta = addOnCategoryLabels[category];
-            return (
-              <div key={category}>
-                <div className="mb-6">
-                  <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
-                    {meta.label}
-                  </div>
-                  <p className="mt-2 text-sm text-ink-500">{meta.description}</p>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {items.map((addon) => (
-                    <article
-                      key={addon.id}
-                      className="rounded-2xl border border-rule bg-white p-6 shadow-soft transition-all hover:shadow-card"
-                    >
-                      <h3 className="text-lg font-semibold text-ink-900">
-                        {addon.name}
-                      </h3>
-                      <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                        <span className="text-xl font-semibold text-ink-900">
-                          {addon.price.sa}
-                        </span>
-                        <span className="text-sm text-ink-500">
-                          {addon.price.intl}
-                        </span>
-                      </div>
-                      <div className="mt-2 inline-flex rounded-full bg-accent-50 px-2 py-1 text-[10px] uppercase tracking-wider text-accent-700">
-                        {addon.payment}
-                      </div>
-                      <p className="mt-4 text-sm text-ink-700 leading-relaxed">
-                        {addon.description}
-                      </p>
-                      <details className="mt-4 group">
-                        <summary className="cursor-pointer text-xs font-medium text-accent-600 hover:text-accent-700 list-none">
-                          What you receive →
-                        </summary>
-                        <ul className="mt-3 space-y-1.5">
-                          {addon.receives.map((r) => (
-                            <li
-                              key={r}
-                              className="flex items-start gap-2 text-xs text-ink-600"
-                            >
-                              <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-accent-500" />
-                              {r}
-                            </li>
-                          ))}
-                        </ul>
-                      </details>
-                      <div className="mt-5">
-                        <Button
-                          href={addon.cta.href}
-                          variant="ink"
-                          size="sm"
-                        >
-                          {addon.cta.label}
-                          <ArrowRight className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
+        <details className="group mx-auto max-w-6xl rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-8">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
+                For self-serve buyers
               </div>
-            );
-          })}
-        </div>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink-900">
+                Compare all internal tiers side-by-side
+              </h2>
+              <p className="mt-2 text-sm text-ink-500">
+                The full ladder — 9 retainer + foundation tiers — for buyers
+                who want to choose themselves. Most clients don&apos;t need
+                this. Discovery picks the right one for you.
+              </p>
+            </div>
+            <span className="flex-shrink-0 rounded-full bg-ink-100 px-3 py-1 text-sm font-medium text-ink-700 transition-transform group-open:rotate-45">
+              +
+            </span>
+          </summary>
+
+          <div className="mt-8">
+            <TierComparisonTable />
+          </div>
+        </details>
       </Section>
 
-      {/* FAQs */}
+      {/* ─────────────────────────────────────────────────────────────
+          SPECIALTY ADD-ONS — expandable, hidden by default.
+          15 specialty services for specific one-off needs.
+          Most clients won't need these. Hidden so they don't add to
+          decision fatigue.
+          ───────────────────────────────────────────────────────────── */}
+      <Section variant="tinted" padding="default">
+        <details className="group mx-auto max-w-5xl rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-8">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
+                For specific one-off needs
+              </div>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink-900">
+                Specialty services + standalone add-ons
+              </h2>
+              <p className="mt-2 text-sm text-ink-500">
+                Citation packs, schema deployments, content rewrites, brand
+                identity, digital PR. Buy alone or attach to any package. Most
+                clients don&apos;t need these — the recommended package
+                bundles what matters.
+              </p>
+            </div>
+            <span className="flex-shrink-0 rounded-full bg-ink-100 px-3 py-1 text-sm font-medium text-ink-700 transition-transform group-open:rotate-45">
+              +
+            </span>
+          </summary>
+
+          <div className="mt-8 space-y-10">
+            {(["setup", "content", "growth", "ongoing"] as const).map(
+              (category) => {
+                const items = addOns.filter((a) => a.category === category);
+                const meta = addOnCategoryLabels[category];
+                return (
+                  <div key={category}>
+                    <div className="mb-5">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
+                        {meta.label}
+                      </div>
+                      <p className="mt-2 text-sm text-ink-500">
+                        {meta.description}
+                      </p>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {items.map((addon) => (
+                        <article
+                          key={addon.id}
+                          className="rounded-2xl border border-rule bg-white p-6 shadow-soft transition-all hover:shadow-card"
+                        >
+                          <h3 className="text-lg font-semibold text-ink-900">
+                            {addon.name}
+                          </h3>
+                          <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                            <span className="text-xl font-semibold text-ink-900">
+                              {addon.price.sa}
+                            </span>
+                            <span className="text-sm text-ink-500">
+                              {addon.price.intl}
+                            </span>
+                          </div>
+                          <p className="mt-3 text-sm text-ink-700 leading-relaxed">
+                            {addon.description}
+                          </p>
+                          <div className="mt-5">
+                            <Button
+                              href={addon.cta.href}
+                              variant="ink"
+                              size="sm"
+                            >
+                              {addon.cta.label}
+                              <ArrowRight className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                );
+              },
+            )}
+          </div>
+        </details>
+      </Section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          FAQs — kept, with new entries explaining the 3-package model
+          ───────────────────────────────────────────────────────────── */}
       <Section variant="default" padding="lg" containerSize="narrow">
         <Eyebrow>Common questions</Eyebrow>
         <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
@@ -700,28 +368,31 @@ export default function ServicesPage() {
         </div>
       </Section>
 
-      {/* CTA */}
+      {/* ─────────────────────────────────────────────────────────────
+          FINAL CTA — leads with Discovery, secondary scan
+          ───────────────────────────────────────────────────────────── */}
       <Section variant="tinted" padding="default">
         <div className="mx-auto max-w-3xl rounded-3xl bg-ink-gradient p-12 text-center text-white shadow-lift">
-          <h2 className="text-display-md font-semibold tracking-tight">
-            Not sure where to start?
+          <h2 className="text-display-md font-semibold tracking-tight text-white">
+            Stop choosing. Start matching.
           </h2>
           <p className="mt-4 text-base text-ink-300">
-            Get a free AI scan. We tell you exactly what AI says about your business today.
-            No card, no follow-up. 24-hour turnaround.
+            10 minutes. We&apos;ll tell you exactly which package fits — or
+            honestly say we&apos;re not the right call.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button href="/scan" variant="ink" size="lg">
-              Get a free AI scan <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button
-              href="/how-we-work"
-              variant="ghost"
-              size="lg"
-              className="text-white hover:bg-white/10"
+            <a
+              href="/discover"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-7 text-base font-semibold text-ink-900 shadow-md transition-all duration-200 hover:bg-ink-50 hover:shadow-lift"
             >
-              See how we work
-            </Button>
+              Take the Discovery <ArrowRight className="h-4 w-4" />
+            </a>
+            <a
+              href="/scan"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/40 px-6 text-base font-medium text-white transition-all duration-200 hover:border-white/60 hover:bg-white/15"
+            >
+              Just give me a free scan
+            </a>
           </div>
         </div>
       </Section>
