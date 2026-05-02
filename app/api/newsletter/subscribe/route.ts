@@ -112,28 +112,61 @@ export async function POST(req: Request) {
       console.error("[newsletter-subscribe] notify-kabelo failed", err);
     }
 
-    // 3. Welcome the subscriber
+    // 3. Welcome the subscriber — enriched welcome that delivers value
+    //    immediately. Source-aware: if they came from a sector resource
+    //    page, link them straight back to that checklist.
+    const sectorLinkLine = (() => {
+      if (source.includes("medical"))
+        return `  Direct link back to your checklist:\n  ${site.url}/resources/medical`;
+      if (source.includes("legal"))
+        return `  Direct link back to your checklist:\n  ${site.url}/resources/legal`;
+      if (source.includes("industrial"))
+        return `  Direct link back to your checklist:\n  ${site.url}/resources/industrial`;
+      return `  All three sector checklists (Medical, Legal, Industrial):\n  ${site.url}/resources`;
+    })();
+
     try {
       await resend.emails.send({
         from: `Kabelo More <${fromEmail}>`,
         to: [email],
-        subject: "Welcome to The AEO Letter",
+        subject: "Welcome to The AEO Letter — and The Real Estate Method",
         text: [
           "Hi,",
           "",
-          "Thanks for subscribing to The AEO Letter.",
+          "Thanks for subscribing. Quick framing on what you've signed up for:",
           "",
-          "What you'll get:",
-          "  · Weekly tactics drawn from real audits I'm running for medical, legal, and industrial firms",
-          "  · One pattern, one fix, one quotable insight per email",
-          "  · No fluff. No fake urgency. No 'we have a deal for you'",
+          "EVERY ISSUE delivers one of three things:",
+          "  1. A pattern from a real audit I just ran (anonymised)",
+          "  2. A specific fix that moves AI engines (with the exact step)",
+          "  3. A quotable insight you can share with colleagues",
           "",
-          "First issue arrives Thursday.",
+          "ALWAYS Thursday morning, SA time. Always one email. Never a 'limited offer.'",
           "",
-          "If you'd like a free AI Visibility Scan for your firm in the meantime, you can request one here:",
-          `  ${site.url}/scan`,
+          "WHAT TO READ NOW:",
           "",
-          "— Kabelo",
+          "  The Real Estate Method — the 7-property framework I run for every",
+          "  client. The full methodology lives at kabelomore.com/about and the",
+          "  47-point sector checklists live at kabelomore.com/resources.",
+          "",
+          sectorLinkLine,
+          "",
+          "WHAT'S NEXT:",
+          "",
+          "  Issue 1 arrives next Thursday. It walks through one industrial",
+          "  audit I ran last week — the firm went from 0 AI citations to 4 in",
+          "  21 days by fixing one schema property. The exact steps will be",
+          "  in the email.",
+          "",
+          "WANT A FREE SCAN BEFORE THAT?",
+          "",
+          `  Request one at ${site.url}/scan — 24-hour turnaround, PDF report,`,
+          "  no card. I run 2-4 of these a week and write up patterns from each.",
+          "",
+          "If The Real Estate Method isn't relevant to your firm right now,",
+          "unsubscribe in one click — no hard feelings, no retention dance.",
+          "",
+          "— Kabelo More",
+          "  AI Visibility Consultant · Pretoria",
           `  ${site.url}`,
         ].join("\n"),
       });

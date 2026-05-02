@@ -286,8 +286,8 @@ export const medicalChecklist: SectorChecklist = {
         },
         {
           id: "med-c5",
-          text: "Sector-specific specialist body (SA Heart Association, SASOG, Plastic Surgery Society of SA, etc.)",
-          why: "Specialty-specific trust = highest-trust citation for specialty queries.",
+          text: "Sector-specific specialist body listings — SA Heart Association, SASOG, Plastic Surgery Society of SA, SADA (SA Dental Association), Aesthetic Medicine Society of SA",
+          why: "Specialty-specific trust = highest-trust citation for specialty queries. SADA and Aesthetic Medicine Society are particularly underused by SA dentists and aesthetics practices.",
           effort: "quick",
           impact: "growth",
         },
@@ -348,8 +348,8 @@ export const medicalChecklist: SectorChecklist = {
         },
         {
           id: "med-r5",
-          text: "Review request automation: post-procedure email/SMS asking for review",
-          why: "Reviews don't happen organically at scale. Automated request = 5-10× review volume.",
+          text: "Review request automation: post-procedure email/SMS asking for review (POPI-compliant — explicit opt-in for testimonial use)",
+          why: "Reviews don't happen organically at scale. Automated request = 5-10× review volume. POPI requires explicit consent for using patient identifiers in testimonials — bake this into the request workflow.",
           effort: "medium",
           impact: "authority",
         },
@@ -361,8 +361,8 @@ export const medicalChecklist: SectorChecklist = {
       items: [
         {
           id: "med-a1",
-          text: "Test 'Best [specialty] in [city]' on ChatGPT, Claude, Gemini, Perplexity — appear in answer?",
-          why: "The headline test. If you're not in the answer for your home query, nothing else compounds.",
+          text: "Test 'Best [specialty] in [city]' on ChatGPT, Claude, Gemini, Perplexity — appear in answer? (Apple Intelligence + Microsoft Copilot integration coming Q1 2027)",
+          why: "The headline test. If you're not in the answer for your home query, nothing else compounds. Apple Intelligence reaches every iPhone user — the 5th major engine to optimize for.",
           effort: "quick",
           impact: "foundation",
           tool: "Free AI Visibility Scan at kabelomore.com/scan",
@@ -684,8 +684,8 @@ export const legalChecklist: SectorChecklist = {
         },
         {
           id: "leg-c5",
-          text: "Specialist body listings (Society of Construction Lawyers, IPLA, MLBA, etc.)",
-          why: "Specialty-specific = highest-trust citation for specialty queries.",
+          text: "Specialist body listings — Society of Construction Lawyers, IPLA, MLBA, ALSA, CCMA Practitioner Roll (for labour law firms), etc.",
+          why: "Specialty-specific = highest-trust citation for specialty queries. CCMA Practitioner Roll is particularly under-claimed by SA labour law firms — direct buyer-intent platform.",
           effort: "medium",
           impact: "growth",
         },
@@ -746,8 +746,8 @@ export const legalChecklist: SectorChecklist = {
         },
         {
           id: "leg-r5",
-          text: "Client testimonial workflow: mandatory request after every matter close (POPI-compliant)",
-          why: "Testimonials don't happen organically. Workflow = 5-10× testimonial volume.",
+          text: "Client testimonial workflow: mandatory request at matter close, POPI-compliant (explicit consent for naming + matter-type disclosure)",
+          why: "Testimonials don't happen organically. Workflow = 5-10× testimonial volume. POPI requires explicit, written consent before using a client's name or matter details in testimonials — bake this into your engagement letter clauses to stay compliant from day one.",
           effort: "medium",
           impact: "authority",
         },
@@ -759,8 +759,8 @@ export const legalChecklist: SectorChecklist = {
       items: [
         {
           id: "leg-a1",
-          text: "Test 'Best [practice area] attorney in [city]' across all 4 engines",
-          why: "The headline test. If you're not in the answer, nothing else compounds.",
+          text: "Test 'Best [practice area] attorney in [city]' across ChatGPT, Claude, Gemini, Perplexity (Apple Intelligence + Copilot tracking added Q1 2027)",
+          why: "The headline test. If you're not in the answer, nothing else compounds. Apple Intelligence will be how iPhone-using in-house counsel research firms — must optimize for it once tracking is live.",
           effort: "quick",
           impact: "foundation",
           tool: "Free AI Visibility Scan at kabelomore.com/scan",
@@ -1075,8 +1075,8 @@ export const industrialChecklist: SectorChecklist = {
         },
         {
           id: "ind-c4",
-          text: "Sector-specific procurement portals (DMRE Mining Suppliers, NTC for telecoms, etc.)",
-          why: "Specialty-specific = highest-trust citation for sector-specific procurement queries.",
+          text: "Sector-specific procurement portals — DMRE Mining Suppliers, NTC (telecoms), SACEEC (capital equipment exporters), SAFAS (foundries), Black Industrialists Programme (BIP) listings if funded",
+          why: "Specialty-specific = highest-trust citation for sector-specific procurement queries. SACEEC, SAFAS, and BIP are particularly underused: SACEEC opens export tender visibility, BIP is the highest-trust trust signal for funded SA-Black industrialists targeting government + corporate procurement.",
           effort: "medium",
           impact: "growth",
         },
@@ -1157,8 +1157,8 @@ export const industrialChecklist: SectorChecklist = {
       items: [
         {
           id: "ind-a1",
-          text: "Test 'BBBEE Level [X] supplier for [capability] in [region]' across all 4 engines",
-          why: "Real procurement query pattern. If you're not in the answer, you're not in the shortlist.",
+          text: "Test 'BBBEE Level [X] supplier for [capability] in [region]' across ChatGPT, Claude, Gemini, Perplexity (Apple Intelligence + Copilot tracking added Q1 2027)",
+          why: "Real procurement query pattern. If you're not in the answer, you're not in the shortlist. Procurement officers increasingly use Microsoft Copilot inside Office for supplier research — Q1 2027 tracking essential.",
           effort: "quick",
           impact: "foundation",
           tool: "Free AI Visibility Scan at kabelomore.com/scan",

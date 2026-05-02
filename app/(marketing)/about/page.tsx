@@ -195,6 +195,20 @@ export default function AboutPage() {
             builds through public documentation.
           </p>
 
+          <h2>The Real Estate Method</h2>
+          <p>
+            Every audit, retainer, and deliverable runs on a named framework I
+            call <strong>The Real Estate Method</strong> — a 7-property model
+            covering website + schema, Google Business Profile, LinkedIn,
+            industry citations, reviews, industry press, and AI engines. The
+            full methodology + sector-specific checklists (47 points each for
+            medical, legal, and industrial firms) live free at{" "}
+            <a href="/resources">kabelomore.com/resources</a>. Naming the
+            method is deliberate: by 2027 every freelancer will claim AEO. A
+            named, documented, reproducible framework is what makes the work
+            citable, teachable, and defensible.
+          </p>
+
           <h2>What makes this hard to copy</h2>
           <p>
             By 2027, every freelance marketer will claim &quot;AI visibility.&quot;

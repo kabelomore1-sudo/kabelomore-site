@@ -40,7 +40,9 @@ export default function ResourcesPage() {
       {/* Hero */}
       <Section variant="tinted" padding="lg">
         <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">Free resources</Eyebrow>
+          <Eyebrow className="justify-center">
+            The Real Estate Method · Free resources
+          </Eyebrow>
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
             Free AEO checklists,
             <br />
@@ -49,8 +51,22 @@ export default function ResourcesPage() {
           <p className="mt-5 text-lg text-ink-500">
             47 specific checks each. Built for medical practitioners, legal
             counsellors, and industrial businesses. Public, ungated, and
-            print-to-PDF friendly. The same methodology I use for paying clients
-            — distilled into something you can use today.
+            print-to-PDF friendly.{" "}
+            <Link
+              href="/about"
+              className="font-medium text-accent-600 underline underline-offset-2 hover:text-accent-700"
+            >
+              The Real Estate Method
+            </Link>{" "}
+            distilled into something you can use today — or have me run for
+            you via a{" "}
+            <Link
+              href="/scan"
+              className="font-medium text-accent-600 underline underline-offset-2 hover:text-accent-700"
+            >
+              free AI scan
+            </Link>
+            .
           </p>
         </div>
 

@@ -16,6 +16,8 @@ import {
 } from "@/lib/sector-checklists";
 import { SectorChecklistRenderer } from "@/components/sector-checklist";
 import { NewsletterSignup } from "@/components/newsletter-signup";
+import { AuthorByline } from "@/components/author-byline";
+import { SectorInternationalNote } from "@/components/sector-international-note";
 import { ArrowRight } from "lucide-react";
 
 interface PageProps {
@@ -107,7 +109,9 @@ export default async function SectorChecklistPage({ params }: PageProps) {
               ← All resources
             </Link>
           </div>
-          <Eyebrow className="mt-6">Free AEO checklist</Eyebrow>
+          <Eyebrow className="mt-6">
+            The Real Estate Method · Free checklist
+          </Eyebrow>
           <h1 className="mt-3 text-display-lg font-semibold tracking-tight text-ink-900 md:text-display-xl">
             {checklist.title}
           </h1>
@@ -118,6 +122,18 @@ export default async function SectorChecklistPage({ params }: PageProps) {
             <strong className="text-ink-900">Built for:</strong>{" "}
             {checklist.audience}
           </p>
+
+          {/* Author byline — establishes E-E-A-T for AI engines + visual
+              trust for human readers before they read 47 specific items */}
+          <div className="mt-8">
+            <AuthorByline date={datePublished} />
+          </div>
+
+          {/* International disclosure — SA-tuned content. Catches UK/US
+              readers before they bounce on irrelevant SA platforms */}
+          <div className="mt-6">
+            <SectorInternationalNote sectorSlug={checklist.slug} />
+          </div>
         </div>
       </Section>
 

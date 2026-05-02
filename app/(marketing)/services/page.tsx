@@ -113,24 +113,32 @@ export default function ServicesPage() {
           </h1>
           <p className="mt-5 text-lg text-ink-500">
             Built for medical practitioners, legal counsellors, and industrial
-            businesses. We make sure your firm shows up — across Google, GBP,
-            LinkedIn, industry directories, reviews, and AI engines — when your
-            customers search. No Instagram fluff. No TikTok dances. Just the
-            properties where your buyers actually decide.
+            businesses. We deploy{" "}
+            <strong className="text-ink-900">The Real Estate Method</strong> —
+            our 7-property framework covering Google, GBP, LinkedIn, industry
+            directories, reviews, press, and AI engines. No Instagram fluff. No
+            TikTok dances. Just the properties where your buyers actually decide.
           </p>
 
           {/* Funnel guidance — kills decision paralysis */}
           <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-accent-200 bg-accent-50 px-6 py-4 text-center">
             <p className="text-sm text-ink-700">
               <span className="font-semibold text-ink-900">Not sure which fits?</span>{" "}
-              Start with the free scan — we&apos;ll tell you exactly which
-              properties are leaking visibility and what to fix first.{" "}
+              Start with the{" "}
               <a
                 href="/scan"
                 className="font-semibold text-accent-600 underline underline-offset-2 hover:text-accent-700"
               >
-                Get free scan →
-              </a>
+                free AI scan
+              </a>{" "}
+              — or read the{" "}
+              <a
+                href="/resources"
+                className="font-semibold text-accent-600 underline underline-offset-2 hover:text-accent-700"
+              >
+                47-point sector checklists
+              </a>{" "}
+              for your industry first.
             </p>
           </div>
         </div>

@@ -42,6 +42,38 @@ export const site = {
 } as const;
 
 /**
+ * The Real Estate Method — our named methodology.
+ *
+ * Strategic naming move (Naval-shaped): every consultant in 2027 will
+ * say "we do AEO." The defensible position is to own a named framework
+ * with specific knowledge attached. The Real Estate Method is what we
+ * deploy when running audits, building retainers, or teaching — every
+ * deliverable references it.
+ *
+ * The name connects to the SERP Real Estate Map (live on /services) and
+ * the 7-property structure used across the audit playbook + sector
+ * checklists. Memorable, intuitive, trademarkable.
+ */
+export const methodology = {
+  name: "The Real Estate Method",
+  fullName: "The Real Estate Method for AI Visibility",
+  tagline: "How to own every property your customers search.",
+  shortPitch:
+    "Most AI-visibility advice fixates on one channel — schema, or LinkedIn, or citations. The Real Estate Method covers all 7 properties AI engines actually harvest from, in priority order, and weighted to your sector.",
+  // The seven properties (mirror SERP Real Estate Map + Audit Playbook)
+  properties: [
+    "Website + Schema",
+    "Google Business Profile",
+    "LinkedIn (founder + company)",
+    "Industry citations + directories",
+    "Reviews velocity",
+    "Industry press / PR",
+    "AI engine tracking",
+  ],
+  trademark: "The Real Estate Method™",
+} as const;
+
+/**
  * Build a wa.me link with optional pre-filled message text.
  * Used by every WhatsApp CTA across the site.
  */
@@ -56,9 +88,9 @@ export const navigation = {
     { label: "Services", href: "/services" },
     { label: "How we work", href: "/how-we-work" },
     { label: "Resources", href: "/resources" },
+    { label: "Newsletter", href: "/newsletter" },
     { label: "Case Studies", href: "/case-studies" },
     { label: "About", href: "/about" },
-    { label: "Blog", href: "/blog" },
   ],
   cta: { label: "Free AI Scan", href: "/scan" },
 } as const;

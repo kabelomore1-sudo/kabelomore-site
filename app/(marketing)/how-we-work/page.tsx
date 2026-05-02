@@ -145,9 +145,12 @@ export default function HowWeWorkPage() {
             <span className="text-ink-500">to delivery, step by step.</span>
           </h1>
           <p className="mt-5 text-lg text-ink-500">
-            Pay 50% to start, 50% on delivery. Structured brief takes 10 minutes.
-            Status updates every 3 days. One round of revisions included.
-            No surprises, no hidden fees.
+            Every engagement runs on{" "}
+            <strong className="text-ink-900">The Real Estate Method</strong> —
+            our 7-property framework for owning every search-result space your
+            customers ever see. Pay 50% to start, 50% on delivery. 10-minute
+            brief. Updates every 3 days. One round of revisions included. No
+            surprises.
           </p>
         </div>
 

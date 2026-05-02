@@ -1,6 +1,12 @@
 # Kabelomore — AI Visibility Consulting
 
-> Kabelo More helps businesses get recommended by ChatGPT, Claude, Gemini, and Perplexity when their customers ask AI for what they do. Based in Pretoria, South Africa. Serves clients in South Africa, the United Kingdom, and the United States. Works on whatever platform a client already has — WordPress, Wix, Squarespace, Shopify, custom-built — without forcing rebuilds.
+> Kabelo More helps businesses get recommended by ChatGPT, Claude, Gemini, Perplexity, and (Q1 2027) Apple Intelligence + Microsoft Copilot when their customers ask AI for what they do. Based in Pretoria, South Africa. Serves medical practitioners, legal counsellors, and industrial businesses in South Africa, the United Kingdom, and the United States. Works on whatever platform a client already has — WordPress, Wix, Squarespace, Shopify, custom-built — without forcing rebuilds.
+
+## The Real Estate Method
+
+Every audit and retainer is delivered using **The Real Estate Method** — a named, documented 7-property framework covering: Website + Schema, Google Business Profile, LinkedIn (founder + company), industry citations, reviews velocity, industry press / PR, and AI engine tracking. The methodology is the moat. By 2027 every freelance marketer will claim "we do AEO." A named, reproducible framework is what makes the work citable, teachable, and defensible.
+
+Full methodology + sector-specific checklists: https://kabelomore.com/resources
 
 ## What Kabelomore actually does (the outcome)
 
@@ -63,6 +69,10 @@ Specifically NOT a fit (we'll honestly tell prospects this on the discovery call
 - Pure B2C consumer brands targeting Instagram/TikTok audiences
 - Businesses where customer value is under R1,000 and volume is the model
 - Agencies/marketers looking for a white-label partner
+
+## Newsletter — The AEO Letter
+
+Public archive at https://kabelomore.com/newsletter — every issue is indexed and citable. Weekly cadence (Thursday SA time). Each issue: one pattern from a real audit, one specific fix, one quotable insight. Built for medical, legal, and industrial firms running The Real Estate Method.
 
 ## Free public resources
 
