@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "./ui/container";
 import { site, whatsappLink } from "@/lib/site";
+import { NewsletterSignup } from "./newsletter-signup";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -10,6 +11,18 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-rule bg-ink-50">
+      {/* Newsletter band — appears above the footer columns; primary lead-gen
+          for visitors not ready to scan or buy today. */}
+      <div className="border-b border-rule bg-white">
+        <Container>
+          <div className="py-12 md:py-16">
+            <div className="mx-auto max-w-2xl">
+              <NewsletterSignup variant="card" source="footer" />
+            </div>
+          </div>
+        </Container>
+      </div>
+
       <Container>
         <div className="grid gap-12 py-16 md:grid-cols-12">
           {/* Brand */}

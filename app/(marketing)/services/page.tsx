@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/ui/jsonld";
 import { faqJsonLd, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { tiers, addOns, site } from "@/lib/site";
 import { SerpRealEstateMap } from "@/components/serp-real-estate-map";
+import { TierComparisonTable } from "@/components/tier-comparison-table";
 import { CircleCheck, ArrowRight, AlertCircle } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -181,6 +182,23 @@ export default function ServicesPage() {
           LinkedIn, in industry pubs, and through search. We focus where decisions
           actually happen.
         </p>
+      </Section>
+
+      {/* All-9-tier comparison table — quick decision aid before deep cards.
+          Anchors point to each tier's #id below so click-to-jump works. */}
+      <Section variant="tinted" padding="default">
+        <div className="mx-auto max-w-3xl">
+          <Eyebrow>Quick comparison</Eyebrow>
+          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+            Compare all 9 services side by side.
+          </h2>
+          <p className="mt-4 text-base text-ink-500 leading-relaxed">
+            One look. All tiers. Click any service to jump to its full detail.
+          </p>
+        </div>
+        <div className="mx-auto mt-8 max-w-6xl">
+          <TierComparisonTable />
+        </div>
       </Section>
 
       {/* Tiers */}

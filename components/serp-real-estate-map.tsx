@@ -70,11 +70,11 @@ const platforms: PlatformRow[] = [
   },
   {
     platform: "Reviews velocity",
-    description: "Google · HelloPeter · Trustpilot · sector-specific",
-    lite: { level: "partial", note: "Quarterly request" },
-    growth: { level: "full", note: "5 responses/mo + 1 campaign" },
-    authority: { level: "full", note: "10 responses + 2 campaigns/mo" },
-    partner: { level: "full", note: "Multi-region velocity" },
+    description: "Google + HelloPeter (SA) · Trustpilot · Realself · Avvo · sector-specific",
+    lite: { level: "partial", note: "Quarterly Google + HelloPeter request" },
+    growth: { level: "full", note: "5 responses/mo + 1 campaign (Google + HelloPeter)" },
+    authority: { level: "full", note: "10 responses + 2 campaigns/mo (multi-platform)" },
+    partner: { level: "full", note: "Multi-region velocity + crisis response" },
   },
   {
     platform: "Industry press / PR",
@@ -213,7 +213,10 @@ export function SerpRealEstateMap() {
               scope="col"
               className="px-3 py-4 text-center text-xs font-semibold uppercase tracking-wider text-ink-700 md:px-4"
             >
-              <div>Strategy Partner</div>
+              <div>Fractional Head</div>
+              <div className="mt-0.5 text-[9px] font-normal normal-case text-ink-500">
+                of AI Visibility
+              </div>
               <div className="mt-1 font-mono text-[10px] font-normal text-ink-400">
                 R20,000/mo
               </div>

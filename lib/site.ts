@@ -287,7 +287,8 @@ export const tiers: Tier[] = [
       "Daily AI Visibility tracking across 4 engines (your firm + 3 competitors)",
       "4 GBP posts/week (AI-drafted, auto-published or you approve)",
       "1 LinkedIn company page post/week (AI-drafted)",
-      "Quarterly review request campaign (template emails to recent customers)",
+      "Quarterly review request campaign (Google + HelloPeter — template emails to recent customers)",
+      "Monthly HelloPeter monitoring (we flag new reviews + draft responses for you)",
       "2 manual GBP optimisations/month (photos, Q&A, hours, services)",
       "Quarterly AI scan with full report",
       "Email support — 48-hour response",
@@ -337,7 +338,7 @@ export const tiers: Tier[] = [
       "LinkedIn founder/principal personal brand — 1 ghost-written post/week",
       "LinkedIn company page — 3 posts/week (vs 1 in Lite)",
       "5 new citations/quarter on industry-specific directories (Medical Board, Law Society, BBBEE, sector-specific)",
-      "Active review velocity: 5 review responses/month + 1 review request campaign/month",
+      "Active review velocity across Google + HelloPeter + sector platforms: 5 review responses/month + 1 review request campaign/month",
       "Schema markup updates as new pages launch",
       "Monthly competitive intelligence report (what your top 3 are doing)",
       "Monthly 30-min strategy call",
@@ -399,7 +400,7 @@ export const tiers: Tier[] = [
       "Industry PR pitches — 2/month (Medical Brief, De Rebus, Engineering News, BizCommunity, sector-specific)",
       "HARO / journalist quote sourcing — target 4 placements/quarter",
       "YouTube channel: 1 educational video/month (you record DIY, we edit + caption + structure for AI)",
-      "Active review velocity: 10 review responses + 2 review request campaigns/month",
+      "Active review velocity across Google + HelloPeter + sector-specific platforms (Realself, Avvo, Trustpilot etc.): 10 review responses + 2 review request campaigns/month + crisis-response playbook for negative reviews",
       "Knowledge panel optimization (Wikipedia eligibility check + branded entity work)",
       "Monthly executive call (60-min, strategic level)",
       "Quarterly strategy review",
@@ -439,13 +440,13 @@ export const tiers: Tier[] = [
   {
     id: "strategy-partner",
     rank: 8,
-    name: "Strategy Partner",
+    name: "Fractional Head of AI Visibility",
     category: "retainer",
     price: { sa: "R20,000 / mo", intl: "$1,395 / £1,150 / mo" },
     payment: "Monthly billing in advance · 6-month minimum · cancel anytime after",
-    delivery: "Ongoing · embedded role",
+    delivery: "Ongoing · embedded executive role",
     bestFor:
-      "Mid-market+ professional firms operating across SA + UK and/or US. Medical groups with multi-region presence, law firms with international clients, industrial firms with multi-region exports. You need a fractional Head of AI Visibility — not a vendor.",
+      "Mid-market+ professional firms operating across SA + UK and/or US. Medical groups with multi-region presence, law firms with international clients, industrial firms with multi-region exports. You need a fractional executive — not a vendor. Reports into your CEO or CMO; sits in your leadership cadence.",
     description:
       "Embedded fractional Head of AI Visibility. Everything in AI Authority, plus we operate across multiple markets, run an active digital PR programme (target 1-2 placements/month), book you on industry podcasts, pitch by-lines to industry publications, build a custom AI visibility dashboard, and run quarterly strategy off-sites. Weekly executive sync. Direct WhatsApp.",
     receives: [
@@ -490,7 +491,7 @@ export const tiers: Tier[] = [
     },
     cancelTerms:
       "6-month minimum (the dashboard build + multi-market setup takes that long to compound). After that, cancel via email with 60 days notice. No phone calls, no retention pitch, no fine print.",
-    cta: { label: "Apply for Strategy Partner", href: "/brief/strategy-partner" },
+    cta: { label: "Apply for Fractional Role", href: "/brief/strategy-partner" },
     highlight: false,
   },
 ];

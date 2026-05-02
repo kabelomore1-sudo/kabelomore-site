@@ -531,10 +531,10 @@ export const briefs: Record<string, BriefConfig> = {
 
   "strategy-partner": {
     tierId: "strategy-partner",
-    tierName: "Strategy Partner — R20,000/mo",
-    title: "Apply for Strategy Partner",
+    tierName: "Fractional Head of AI Visibility — R20,000/mo",
+    title: "Apply for the Fractional Head of AI Visibility role",
     subtitle:
-      "10 questions, 15 minutes. Strategy Partner is an embedded fractional role, not a vendor relationship. This brief is also a fit-check — not every business needs this level.",
+      "10 questions, 15 minutes. This is an embedded executive role, not a vendor relationship — you're hiring me into your leadership cadence at fractional cost. This brief is also a fit-check — not every business needs this level.",
     estimatedMinutes: 15,
     paymentNote:
       "After you submit, we book a 60-min fit-check call before invoicing. If we're a fit, month 1 invoice (R20,000) follows. 6-month minimum.",
