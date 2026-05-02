@@ -210,9 +210,15 @@ export default function AboutPage() {
           </p>
 
           <h2>What makes this hard to copy</h2>
+          <p className="lead">
+            AI can generate content. It cannot replicate real case studies,
+            real results, and real implementation — done in public, on real
+            businesses, in your sector.
+          </p>
           <p>
             By 2027, every freelance marketer will claim &quot;AI visibility.&quot;
-            What won&apos;t be replicable is the specific stack:
+            The signal that matters won&apos;t be claims — it&apos;ll be
+            evidence:
           </p>
           <ul>
             <li>

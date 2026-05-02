@@ -172,14 +172,14 @@ export const tiers: Tier[] = [
     payment: "50% to start · 50% on delivery",
     delivery: "4 weeks",
     bestFor:
-      "Businesses with no website yet. We build everything from scratch — set up to be found by AI from day one. (Already have a website? See Optimization Pack instead.)",
+      "Businesses with no website yet — or one so dated it's holding you back. We build the right size for what you actually sell, optimized for Google + AI search from day one. (Already have a website you're happy with? See Optimization Pack instead.)",
     description:
-      "Don't have a website yet? We build everything you need to be found online. A clean website, your Google Business Profile, your Facebook and Instagram setup, and the technical bits that AI engines need to recommend you. Most agencies skip the technical part. We don't. After delivery you get a free 10-min walkthrough on how to update content yourself, or you can add the optional Self-Edit Admin Panel (R2,500) for a WordPress-like editing experience.",
+      "Don't have a website yet? We build what fits your business — a single landing page, a starter site, or a full multi-page site, depending on what your services and customers actually need. Plus your Google Business Profile, your business directory listings, and the technical bits that AI engines need to recommend you. Most agencies skip the technical part. We don't. After delivery you get a free 10-min walkthrough on how to update content yourself, or you can add the optional Self-Edit Admin Panel (R2,500) for a WordPress-like editing experience.",
     receives: [
-      "Live 5-page website on your own domain (we register it if you don't have one)",
+      "Website built to fit your business — single landing page, starter site, or full multi-page site (we choose the right scope based on your services and customers)",
       "Google Business Profile claimed, verified, and fully set up",
-      "Schema markup deployed — the code AI engines read",
-      "Facebook and Instagram pages set up or refreshed, with 5 starter posts on each",
+      "AI-readable code added so Google + AI engines understand who you are",
+      "Light social setup where it makes sense for your sector",
       "10 listings on trusted business directories",
       "Business email (you@yourbusiness.co.za)",
       "30-minute walkthrough call + free 10-min self-edit walkthrough",

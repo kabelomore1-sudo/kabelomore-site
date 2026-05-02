@@ -156,7 +156,7 @@ export default function HomePage() {
             </div>
 
             <p className="mt-5 text-sm text-ink-400">
-              24h turnaround · No card · Custom report after submission · No forced packages
+              24h turnaround · No card · No forced packages
             </p>
 
             {/* Pricing pre-qualifier — reduces post-scan sticker shock */}

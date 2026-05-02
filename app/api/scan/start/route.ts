@@ -13,6 +13,11 @@ import {
 import { runFullScan } from "@/lib/engines/scanOrchestrator";
 import { INDUSTRIES, COUNTRIES } from "@/lib/types/scan";
 import type { BusinessProfile, ScanResult } from "@/lib/types/scan";
+import {
+  checkLimit,
+  getClientIp,
+  formatRetryAfter,
+} from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 // Vercel Hobby plan max is 60s. Pro is 300s. We design for 60s with
@@ -99,6 +104,31 @@ export async function POST(req: Request) {
     // Honeypot tripped — silently succeed
     if (parsed.data.company) {
       return NextResponse.json({ ok: true, scanId: "honeypot" });
+    }
+
+    // Rate-limit: per-IP (1 per 5 min) — burst protection.
+    const clientIp = getClientIp(req);
+    const ipCheck = checkLimit("ip", clientIp);
+    if (!ipCheck.allowed) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: `You've already submitted a scan recently. Please wait ${formatRetryAfter(ipCheck.retryAfterSeconds)} before submitting another. If you need help sooner, email kabelo@kabelomore.com directly.`,
+        },
+        { status: 429 },
+      );
+    }
+
+    // Rate-limit: per-email (1 per 24 hr) — duplicate-submission protection.
+    const emailCheck = checkLimit("email", parsed.data.email.toLowerCase());
+    if (!emailCheck.allowed) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: `A scan for this email was already submitted within the last 24 hours. Check your inbox — your previous report should be on its way. Need to update something? Reply to your confirmation email or message kabelo@kabelomore.com.`,
+        },
+        { status: 429 },
+      );
     }
 
     const submittedAt = new Date().toISOString();
