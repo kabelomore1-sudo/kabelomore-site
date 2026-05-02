@@ -59,6 +59,10 @@ export function FounderAvatar({
 
   // Use plain <img> (not next/image) so we can handle 404 gracefully via onError.
   // Bundle cost is negligible at the small sizes we use.
+  //
+  // CRITICAL: object-position 50% 22% — focuses the circular crop on the FACE.
+  // The photo is full-body so default centering would crop to torso/legs.
+  // 22% from top puts the face roughly center of the visible circle.
   return (
     <img
       src="/images/kabelo-more.jpg"
@@ -66,7 +70,11 @@ export function FounderAvatar({
       width={size}
       height={size}
       className={`flex-shrink-0 rounded-full object-cover shadow-soft ${ringClass} ${className}`}
-      style={{ width: size, height: size }}
+      style={{
+        width: size,
+        height: size,
+        objectPosition: "50% 22%",
+      }}
       onError={() => setErrored(true)}
       loading="lazy"
     />
@@ -100,12 +108,18 @@ export function FounderAvatarLandscape({
     );
   }
 
+  // For the About page hero — show face + upper torso + some context
+  // (the world around him reads as "real, lived experience" not stock).
+  // object-position 50% 18% keeps face high in the frame.
   return (
     <img
       src="/images/kabelo-more.jpg"
       alt="Kabelo More — AI Visibility Consultant, Pretoria"
       className={`rounded-2xl object-cover shadow-lift ${className}`}
-      style={{ aspectRatio: "4 / 5", objectPosition: "center top" }}
+      style={{
+        aspectRatio: "4 / 5",
+        objectPosition: "50% 18%",
+      }}
       onError={() => setErrored(true)}
     />
   );
