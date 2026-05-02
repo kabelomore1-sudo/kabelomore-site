@@ -31,8 +31,8 @@ export function VisualPillars() {
         <PillarHeader
           number="01"
           icon={Code2}
-          title="Schema markup — the invisible code AI reads"
-          subtitle="AI engines don't read your website like humans do. They look for structured data tags. If they're missing, AI can't tell what your business is."
+          title="Your website is missing the right code for AI to read it"
+          subtitle="AI engines don't read websites the way humans do. They look for structured tags that say 'this is a business, here's what it does, here's where it's based.' Most SA websites don't have these tags — so AI has to guess, and usually doesn't recommend you."
         />
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -95,8 +95,8 @@ export function VisualPillars() {
         <PillarHeader
           number="02"
           icon={MapPin}
-          title="Citations — third-party mentions on trusted sites"
-          subtitle="AI engines verify businesses by checking if other sites mention them. The more consistent mentions, the more AI trusts you exist."
+          title="Trusted directories don't list you (HelloPeter, Brabys, sector-specific)"
+          subtitle="AI engines verify businesses by checking if trusted SA sites mention them. HelloPeter, Brabys, HPCSA, LSSA, BBBEE Verification, industry directories — the more places confirm you exist, the more AI trusts you and recommends you."
         />
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -151,8 +151,8 @@ export function VisualPillars() {
         <PillarHeader
           number="03"
           icon={FileText}
-          title="Answer-shaped content — written for AI to quote"
-          subtitle="AI engines pull direct quotes when answering customer questions. Brochure copy can't be quoted. Answer-shaped content can."
+          title="Your content doesn't answer the questions customers actually ask"
+          subtitle="AI pulls direct quotes from websites when answering customer questions. Marketing copy ('we are a leading provider of...') can't be quoted. Real answers to real questions ('how often must crane chains be inspected?') get pulled into AI answers as authoritative sources."
         />
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">

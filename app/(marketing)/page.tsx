@@ -17,6 +17,9 @@ import {
   Briefcase,
   Sparkles,
   ArrowUpRight,
+  Zap,
+  ClipboardList,
+  BookOpen,
 } from "lucide-react";
 
 const homepageFaqs = [
@@ -110,7 +113,7 @@ export default function HomePage() {
             </Eyebrow>
 
             <h1 className="mt-6 text-display-xl font-semibold tracking-tight text-ink-900">
-              When your customer asks AI for{" "}
+              When your customer asks Google or AI for{" "}
               <span className="relative inline-block whitespace-nowrap">
                 <span className="relative z-10">your service</span>
                 <span className="absolute inset-x-0 bottom-1 h-3 -z-0 bg-accent-100" />
@@ -121,10 +124,16 @@ export default function HomePage() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-500 md:text-xl">
-              For most South African and UK firms, the answer is no. We fix that —
-              on whatever website you currently have, in 2-4 weeks, for a flat fee.
-              Free scan first, so you see exactly what AI says about you before
-              you spend a cent.
+              For most South African medical, legal, and industrial firms, the
+              answer is no. We fix that with{" "}
+              <Link
+                href="/about"
+                className="font-semibold text-ink-700 underline decoration-accent-300 underline-offset-4 hover:text-accent-700 hover:decoration-accent-500"
+              >
+                The Real Estate Method
+              </Link>{" "}
+              — covering all 7 places customers actually search to find businesses
+              like yours.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -133,13 +142,21 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-ink-900 px-7 text-base font-semibold text-white shadow-lift transition-all duration-200 hover:bg-ink-800 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2"
                 style={{ height: "3rem" }}
               >
-                See what AI says about you — free scan
+                Free 30-second scan
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="/discover"
+                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-7 text-base font-semibold text-ink-900 transition-all duration-200 hover:bg-ink-50 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2"
+                style={{ height: "3rem" }}
+              >
+                Take the 10-min Discovery
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>
 
             <p className="mt-5 text-sm text-ink-400">
-              24h turnaround · No card · No forced packages · Custom quote after scan
+              24h turnaround · No card · Custom report after submission · No forced packages
             </p>
 
             {/* Pricing pre-qualifier — reduces post-scan sticker shock */}
@@ -189,6 +206,100 @@ export default function HomePage() {
           </div>
         </Container>
       </section>
+
+      {/* ─── PICK YOUR PATH — three cards into the funnel ────────────
+          Reinforces nav with body content. Each card is a real
+          conversion path, not a marketing hook. */}
+      <Section variant="default" padding="default">
+        <div className="mx-auto max-w-3xl text-center">
+          <Eyebrow className="justify-center">Where to start</Eyebrow>
+          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+            Three free ways to see where you stand.
+          </h2>
+          <p className="mt-4 text-base text-ink-500 leading-relaxed">
+            All free. All public. Pick whichever matches the time you have.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
+          {[
+            {
+              icon: Zap,
+              accent: "bg-ink-900 text-white",
+              eyebrow: "30 seconds",
+              title: "Quick scan",
+              body: "Submit your business + city. We test 4 AI engines on the queries your customers run. PDF report in 24h.",
+              cta: "Run the free scan",
+              href: "/scan",
+            },
+            {
+              icon: ClipboardList,
+              accent: "bg-accent-500 text-white",
+              eyebrow: "10 minutes",
+              title: "Deep Discovery",
+              body: "15-question intake covering services, customers, competitors, goals. Personalised SEO + AI report in 24h.",
+              cta: "Take the Discovery",
+              href: "/discover",
+            },
+            {
+              icon: BookOpen,
+              accent: "bg-emerald-500 text-white",
+              eyebrow: "Read it now",
+              title: "Sector checklists",
+              body: "47-point AEO checklists for medical, legal, and industrial firms. Public, ungated, print-friendly.",
+              cta: "Read the checklists",
+              href: "/resources",
+            },
+          ].map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link
+                key={card.title}
+                href={card.href}
+                className="group flex flex-col rounded-2xl border border-rule bg-white p-7 shadow-soft transition-all hover:-translate-y-0.5 hover:border-accent-300 hover:shadow-lift"
+              >
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl ${card.accent}`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-ink-400">
+                  {card.eyebrow}
+                </div>
+                <h3 className="mt-2 text-xl font-semibold tracking-tight text-ink-900">
+                  {card.title}
+                </h3>
+                <p className="mt-3 flex-1 text-sm text-ink-700 leading-relaxed">
+                  {card.body}
+                </p>
+                <div className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-accent-600 group-hover:text-accent-700">
+                  {card.cta}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Methodology + Index secondary links — for visitors who want
+            more before they click into a tool */}
+        <div className="mx-auto mt-10 max-w-3xl text-center text-sm text-ink-500">
+          Want context first?{" "}
+          <Link
+            href="/about"
+            className="font-medium text-accent-600 hover:text-accent-700"
+          >
+            Read The Real Estate Method
+          </Link>
+          {" · "}
+          <Link
+            href="/leaderboard"
+            className="font-medium text-accent-600 hover:text-accent-700"
+          >
+            See the SA AEO Index
+          </Link>
+        </div>
+      </Section>
 
       {/* ─── VISUAL: AI Response Mockup (the gut punch) ───────────── */}
       <AiResponseMockup />
