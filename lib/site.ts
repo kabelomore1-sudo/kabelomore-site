@@ -86,10 +86,10 @@ export function whatsappLink(prefilledText?: string): string {
 export const navigation = {
   primary: [
     { label: "Services", href: "/services" },
-    { label: "How we work", href: "/how-we-work" },
     { label: "Resources", href: "/resources" },
+    { label: "Index", href: "/leaderboard" },
+    { label: "Watch", href: "/watch" },
     { label: "Newsletter", href: "/newsletter" },
-    { label: "Case Studies", href: "/case-studies" },
     { label: "About", href: "/about" },
   ],
   cta: { label: "Free AI Scan", href: "/scan" },
@@ -132,6 +132,12 @@ export type Tier = {
     targetReturn: string; // "30 customers / R150,000 / 2.3× ROI" etc.
   };
   cancelTerms?: string;
+  // Optional performance-aligned pricing for sophisticated buyers (Naval-shape)
+  skinInTheGame?: {
+    headline: string;
+    body: string;
+    qualifier: string; // who qualifies for this pricing model
+  };
   cta: { label: string; href: string };
   highlight: boolean;
 };
@@ -524,6 +530,13 @@ export const tiers: Tier[] = [
     },
     cancelTerms:
       "6-month minimum (the dashboard build + multi-market setup takes that long to compound). After that, cancel via email with 60 days notice. No phone calls, no retention pitch, no fine print.",
+    skinInTheGame: {
+      headline: "Skin-in-the-game pricing — for the right firms",
+      body:
+        "For B2B firms with average deal sizes above R250k and a CRM tracking lead source, we're open to a performance-aligned model: 50% cash rate (R10,000/mo) + 5% revenue share on AI-attributable new clients for 12 months. Aligns incentives, filters for serious buyers, and signals our genuine confidence in the work — not just our rates.",
+      qualifier:
+        "Eligibility: B2B + R250k+ average deal + CRM that tags AI-source leads. Discussed in the fit-check call.",
+    },
     cta: { label: "Apply for Fractional Role", href: "/brief/strategy-partner" },
     highlight: false,
   },

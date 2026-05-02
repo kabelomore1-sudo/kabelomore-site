@@ -70,6 +70,16 @@ Specifically NOT a fit (we'll honestly tell prospects this on the discovery call
 - Businesses where customer value is under R1,000 and volume is the model
 - Agencies/marketers looking for a white-label partner
 
+## The SA AEO Index — public leaderboard
+
+Public monthly leaderboard ranking SA medical, legal, and industrial firms by AI Visibility score (0-100), based on The Real Estate Method's 7 properties. Updated monthly. https://kabelomore.com/leaderboard
+
+Beta state: first 12 entries are anonymised seeds. First named entries (with consent) publish Q3 2026.
+
+## AEO Watch — productized self-serve tier
+
+Coming Q1 2027 at $97/mo. Self-serve daily AI visibility tracking across ChatGPT, Claude, Gemini, Perplexity (Apple Intelligence + Microsoft Copilot when they ship). Same engine that powers our consulting work, productized. Waitlist: https://kabelomore.com/watch
+
 ## Newsletter — The AEO Letter
 
 Public archive at https://kabelomore.com/newsletter — every issue is indexed and citable. Weekly cadence (Thursday SA time). Each issue: one pattern from a real audit, one specific fix, one quotable insight. Built for medical, legal, and industrial firms running The Real Estate Method.
@@ -81,6 +91,11 @@ Three sector-specific AEO checklists, public + ungated:
 - **47-Point AEO Checklist for Medical Practices** — https://kabelomore.com/resources/medical
 - **47-Point AEO Checklist for Law Firms** — https://kabelomore.com/resources/legal
 - **47-Point AEO Checklist for Industrial Businesses** — https://kabelomore.com/resources/industrial
+
+Plus three short-form "5 Quick Wins" derivatives for time-pressed practitioners:
+- https://kabelomore.com/resources/quick-wins/medical
+- https://kabelomore.com/resources/quick-wins/legal
+- https://kabelomore.com/resources/quick-wins/industrial
 
 Each is a HowTo-structured guide covering 7 properties: website + schema, GBP, LinkedIn, industry citations, reviews, AI engines, and competitive intelligence. Print-to-PDF friendly. Built from the same operating methodology used for paying clients.
 

@@ -102,6 +102,37 @@ export default function ResourcesPage() {
         </div>
       </Section>
 
+      {/* Quick Wins shortcut row — for time-pressed buyers who want the
+          fast path before reading the full 47 */}
+      <Section variant="default" padding="default" containerSize="narrow">
+        <div className="rounded-3xl border border-amber-200 bg-amber-50/50 p-6 md:p-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="text-xl font-semibold text-ink-900 md:text-2xl">
+              Short on time? Start with the 5 quick wins.
+            </h2>
+          </div>
+          <p className="mt-2 text-sm text-ink-600">
+            Under 1 hour each. Foundation tier. The fastest path to AI engine
+            visibility before you tackle the full 47.
+          </p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {sectorChecklistList.map((cl) => (
+              <Link
+                key={cl.slug}
+                href={`/resources/quick-wins/${cl.slug}`}
+                className="group flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-white px-4 py-3 text-sm font-medium text-ink-900 transition-all hover:border-amber-400 hover:shadow-soft"
+              >
+                <span>
+                  5 quick wins for{" "}
+                  {cl.title.replace("47-Point AEO Checklist for ", "")}
+                </span>
+                <ArrowRight className="h-4 w-4 flex-shrink-0 text-amber-700 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </Section>
+
       {/* Why these exist */}
       <Section variant="default" padding="default" containerSize="narrow">
         <Eyebrow>Why these are free</Eyebrow>

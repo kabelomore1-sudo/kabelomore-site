@@ -3,6 +3,7 @@ import { site } from "@/lib/site";
 import { getAllPosts } from "@/lib/blog";
 import { sectorChecklistList } from "@/lib/sector-checklists";
 import { newsletterIssues } from "@/lib/newsletter-issues";
+import { leaderboardEntries } from "@/lib/leaderboard";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -16,6 +17,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site.url}/process`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.url}/scan`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${site.url}/resources`, lastModified: now, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${site.url}/leaderboard`, lastModified: now, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${site.url}/watch`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.url}/newsletter`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${site.url}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${site.url}/case-studies`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
@@ -32,15 +35,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  // Each sector checklist is a high-priority resource page
-  const resourcePages: MetadataRoute.Sitemap = sectorChecklistList.map(
-    (cl) => ({
-      url: `${site.url}/resources/${cl.slug}`,
-      lastModified: now,
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    }),
+  // Each sector checklist is a high-priority resource page (full + quick wins)
+  const resourcePages: MetadataRoute.Sitemap = sectorChecklistList.flatMap(
+    (cl) => [
+      {
+        url: `${site.url}/resources/${cl.slug}`,
+        lastModified: now,
+        changeFrequency: "monthly" as const,
+        priority: 0.8,
+      },
+      {
+        url: `${site.url}/resources/quick-wins/${cl.slug}`,
+        lastModified: now,
+        changeFrequency: "monthly" as const,
+        priority: 0.75,
+      },
+    ],
   );
+
+  // Reference leaderboardEntries to ensure the file is part of the build
+  // graph (any future per-entry public profile pages would be enumerated here)
+  void leaderboardEntries;
 
   // Each newsletter issue is its own indexed page (compounds AI citations)
   const newsletterPages: MetadataRoute.Sitemap = newsletterIssues.map(

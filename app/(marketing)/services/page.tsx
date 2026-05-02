@@ -481,6 +481,27 @@ export default function ServicesPage() {
                       </div>
                     )}
 
+                    {/* Skin-in-the-game callout — Naval-shaped performance
+                        pricing option. Renders only on tiers with this field
+                        defined (today: Strategy Partner only). Filters for
+                        sophisticated buyers and signals confidence in the work. */}
+                    {tier.skinInTheGame && (
+                      <div className="mt-6 rounded-2xl border border-purple-200 bg-purple-50/40 p-6">
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-purple-700">
+                          Performance-aligned option
+                        </div>
+                        <h4 className="mt-2 text-base font-semibold text-ink-900">
+                          {tier.skinInTheGame.headline}
+                        </h4>
+                        <p className="mt-3 text-sm text-ink-700 leading-relaxed">
+                          {tier.skinInTheGame.body}
+                        </p>
+                        <p className="mt-3 text-xs italic text-ink-500">
+                          {tier.skinInTheGame.qualifier}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Monthly work clarity block — for retainers only */}
                     {tier.monthlyWork && (
                       <div
