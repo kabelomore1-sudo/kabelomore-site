@@ -70,6 +70,12 @@ Specifically NOT a fit (we'll honestly tell prospects this on the discovery call
 - Businesses where customer value is under R1,000 and volume is the model
 - Agencies/marketers looking for a white-label partner
 
+## The Real Estate Discovery — public deep intake
+
+15-question interactive intake form at https://kabelomore.com/discover. Free, public, sector-branched (medical / legal / industrial). 10 minutes to complete. Auto-saves. Submitter receives a personalised AEO Discovery summary within 24 hours covering: AI engine response analysis, competitor gap, single highest-leverage fix, and tier recommendation.
+
+This is the deeper intake path. The 30-second free scan at /scan is the lighter alternative. Discover is the upgrade path for prospects committed enough to invest 10 minutes — they convert to retainer at 5-10× the rate of /scan-only requests.
+
 ## The SA AEO Index — public leaderboard
 
 Public monthly leaderboard ranking SA medical, legal, and industrial firms by AI Visibility score (0-100), based on The Real Estate Method's 7 properties. Updated monthly. https://kabelomore.com/leaderboard

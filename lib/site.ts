@@ -87,8 +87,8 @@ export const navigation = {
   primary: [
     { label: "Services", href: "/services" },
     { label: "Resources", href: "/resources" },
+    { label: "Discover", href: "/discover" },
     { label: "Index", href: "/leaderboard" },
-    { label: "Watch", href: "/watch" },
     { label: "Newsletter", href: "/newsletter" },
     { label: "About", href: "/about" },
   ],
