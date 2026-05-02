@@ -151,16 +151,28 @@ export default function HowWeWorkPage() {
           </p>
         </div>
 
-        {/* Trust bar */}
+        {/* Trust bar — distinct top borders per phase color */}
         <div className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
           {[
-            { label: "Pay 50% to start", sub: "Industry standard" },
-            { label: "Updates every 3 days", sub: "Always know status" },
-            { label: "One round of revisions", sub: "Included free" },
+            {
+              label: "Pay 50% to start",
+              sub: "Industry standard",
+              border: "border-t-2 border-accent-400",
+            },
+            {
+              label: "Updates every 3 days",
+              sub: "Always know status",
+              border: "border-t-2 border-amber-400",
+            },
+            {
+              label: "One round of revisions",
+              sub: "Included free",
+              border: "border-t-2 border-emerald-400",
+            },
           ].map((item) => (
             <div
               key={item.label}
-              className="rounded-2xl border border-rule bg-white p-5 text-center shadow-soft"
+              className={`rounded-2xl border border-rule bg-white p-5 text-center shadow-soft ${item.border}`}
             >
               <div className="text-base font-semibold text-ink-900">
                 {item.label}
@@ -174,21 +186,49 @@ export default function HowWeWorkPage() {
       {/* The 4 steps */}
       <Section variant="default" padding="lg">
         <div className="space-y-12">
-          {steps.map((step, idx) => {
+          {steps.map((step) => {
             const Icon = step.icon;
+
+            // Phase-based color palette per step number — creates rhythm
+            // across the 4-step flow:
+            //   01-02 = client phase (accent teal)
+            //   03    = work phase (amber)
+            //   04    = delivery (emerald)
+            const phase = (() => {
+              if (step.number === "01" || step.number === "02") {
+                return {
+                  icon: "bg-accent-500",
+                  border: "border-l-4 border-accent-400",
+                  label: "text-accent-600",
+                };
+              }
+              if (step.number === "03") {
+                return {
+                  icon: "bg-amber-500",
+                  border: "border-l-4 border-amber-400",
+                  label: "text-amber-600",
+                };
+              }
+              return {
+                icon: "bg-emerald-500",
+                border: "border-l-4 border-emerald-400",
+                label: "text-emerald-600",
+              };
+            })();
+
             return (
               <article
                 key={step.number}
-                className="grid gap-6 rounded-3xl border border-rule bg-white p-8 shadow-soft md:grid-cols-12 md:gap-10 md:p-12"
+                className={`grid gap-6 rounded-3xl border border-rule bg-white p-8 shadow-soft md:grid-cols-12 md:gap-10 md:p-12 ${phase.border}`}
               >
                 {/* Left col: step number + icon */}
                 <div className="md:col-span-3">
                   <div
-                    className={`flex h-14 w-14 items-center justify-center rounded-2xl ${step.accentColor} text-white shadow-soft`}
+                    className={`flex h-14 w-14 items-center justify-center rounded-2xl ${phase.icon} text-white shadow-soft`}
                   >
                     <Icon className="h-6 w-6" />
                   </div>
-                  <div className="mt-4 font-mono text-sm text-accent-600">
+                  <div className={`mt-4 font-mono text-sm ${phase.label}`}>
                     Step {step.number}
                   </div>
                   <div className="mt-2 text-2xl font-semibold tracking-tight text-ink-900">
@@ -270,7 +310,8 @@ export default function HowWeWorkPage() {
         </div>
       </Section>
 
-      {/* CTA */}
+      {/* CTA — primary button uses white-on-dark for max contrast.
+          Teal-on-navy was visually sinking into the dark gradient. */}
       <Section variant="default" padding="default">
         <div className="mx-auto max-w-3xl rounded-3xl bg-ink-gradient p-12 text-center text-white shadow-lift">
           <h2 className="text-display-md font-semibold tracking-tight">
@@ -281,12 +322,21 @@ export default function HowWeWorkPage() {
             Or browse the services and pick one that fits.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button href="/scan" variant="ink" size="lg">
-              Get a free AI scan <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button href="/services" variant="ghost" size="lg" className="text-white hover:bg-white/10">
+            {/* Primary: white pill, dark text — high contrast on navy */}
+            <a
+              href="/scan"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-7 text-base font-semibold text-ink-900 shadow-md transition-all duration-200 hover:bg-ink-50 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900"
+            >
+              Get a free AI scan
+              <ArrowRight className="h-4 w-4" />
+            </a>
+            {/* Secondary: outlined-on-dark for definition */}
+            <a
+              href="/services"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/40 px-6 text-base font-medium text-white transition-all duration-200 hover:border-white/60 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900"
+            >
               Browse services
-            </Button>
+            </a>
           </div>
         </div>
       </Section>
