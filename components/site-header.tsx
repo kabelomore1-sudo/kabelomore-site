@@ -3,14 +3,22 @@ import { Button } from "./ui/button";
 import { Container } from "./ui/container";
 import { navigation, site } from "@/lib/site";
 import { FounderAvatar } from "./founder-avatar";
+import { HeaderNavDesktop, HeaderNavMobile } from "./header-nav";
 
 /**
  * Site header — personal-brand styled, like Neil Patel's site.
+ *
+ * Sticky top of every page. Two rows on mobile (brand + horizontal
+ * scroll-pill nav), one row on desktop (brand + inline nav + CTA).
  *
  * The FounderAvatar component renders Kabelo's photo (if uploaded to
  * /public/images/kabelo-more.jpg) or falls back to a KM monogram on a
  * dark→amber gradient. Auto-detects file presence — no code change
  * needed when photo is dropped in place.
+ *
+ * The nav links + active-state highlighting live in `HeaderNav*`
+ * client components — they need usePathname() to detect the active
+ * route, so they're isolated to keep this header server-rendered.
  */
 export function SiteHeader() {
   return (
@@ -37,34 +45,22 @@ export function SiteHeader() {
             </span>
           </Link>
 
-          {/* Primary nav */}
-          <nav className="hidden md:flex items-center gap-7">
-            {navigation.primary.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-sm text-ink-500 hover:text-ink-900"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          {/* Desktop primary nav (active-aware) */}
+          <HeaderNavDesktop />
 
           {/* CTA */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/contact"
-              className="hidden sm:inline-flex text-sm text-ink-500 hover:text-ink-900"
-            >
-              Contact
-            </Link>
             <Button href={navigation.cta.href} variant="primary" size="sm">
               {navigation.cta.label}
             </Button>
           </div>
         </div>
       </Container>
+
+      {/* Mobile primary nav — horizontal scroll pills, active-aware.
+          Lives inside the same sticky header so it remains visible at
+          all times. Hidden on md+ where the inline desktop nav covers it. */}
+      <HeaderNavMobile />
     </header>
   );
 }
-

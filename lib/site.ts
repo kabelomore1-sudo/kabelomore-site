@@ -84,13 +84,19 @@ export function whatsappLink(prefilledText?: string): string {
 }
 
 export const navigation = {
+  // Primary nav follows the buyer journey:
+  //   Overview → Scan → Services → How it works → Proof → Pricing → Contact
+  // Each entry is a top-level destination — one click, never deeper than
+  // one level. Resources / Discover / Index / Newsletter / About are now
+  // surfaced via the footer (support content, not the main conversion path).
   primary: [
+    { label: "Overview", href: "/" },
+    { label: "Scan", href: "/scan" },
     { label: "Services", href: "/services" },
-    { label: "Resources", href: "/resources" },
-    { label: "Discover", href: "/discover" },
-    { label: "Index", href: "/leaderboard" },
-    { label: "Newsletter", href: "/newsletter" },
-    { label: "About", href: "/about" },
+    { label: "How it works", href: "/how-we-work" },
+    { label: "Proof", href: "/case-studies" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "Contact", href: "/contact" },
   ],
   cta: { label: "Free AI Scan", href: "/scan" },
 } as const;
