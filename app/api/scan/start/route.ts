@@ -24,6 +24,11 @@ import {
   safeErrorMessage,
 } from "@/lib/scan-events";
 import { sendEmailOrThrow } from "@/lib/resend-helper";
+import {
+  getScanMode,
+  isPaidApiAllowed,
+  acceptsSubmissions,
+} from "@/lib/scan-mode";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -72,8 +77,31 @@ interface OutcomeFlags {
 
 export async function POST(req: Request) {
   try {
-    // ─── Pre-flight: detect missing required env vars and fail loudly ──
-    if (!process.env.ANTHROPIC_API_KEY) {
+    // ─── Pre-flight: SCAN_MODE switch (operator-controlled kill switch)
+    //   'disabled'  = refuse all submissions (emergency stop)
+    //   'manual'    = accept submissions but skip paid Anthropic API
+    //   'automated' = original behaviour with 45s timeout
+    if (!acceptsSubmissions()) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            "Scan submissions are temporarily paused. Please email kabelo@kabelomore.com directly and we'll deliver your report manually within 24 hours.",
+          mode: getScanMode(),
+          flags: {
+            submissionSaved: false,
+            userEmailSent: false,
+            adminEmailSent: false,
+            scanCompleted: false,
+            manualFallback: true,
+          } satisfies OutcomeFlags,
+        },
+        { status: 503 },
+      );
+    }
+
+    // Anthropic key is only required when paid API is allowed (automated mode)
+    if (isPaidApiAllowed() && !process.env.ANTHROPIC_API_KEY) {
       recordEvent({ type: "scan_failed", error: "ANTHROPIC_API_KEY missing" });
       return NextResponse.json(
         {
@@ -239,47 +267,61 @@ export async function POST(req: Request) {
       });
     }
 
-    // ─── Run the scan with hard timeout ─────────────────────────────
+    // ─── Run the scan with hard timeout — only in 'automated' mode ───
+    // In 'manual' mode (default), skip the paid Anthropic call entirely.
+    // Submission is saved + emails sent + Kabelo runs scan via CLI within 24h.
+    // This is the safest default until automated scans reliably complete
+    // inside Vercel's 60s function limit.
     let result: ScanResult | null = null;
     let scanCompleted = false;
+    const paidApiAllowed = isPaidApiAllowed();
 
-    recordEvent({
-      type: "PAID_API_CALL_STARTED",
-      scanId,
-      data: { hardTimeoutMs: SCAN_HARD_TIMEOUT_MS },
-    });
+    if (paidApiAllowed) {
+      recordEvent({
+        type: "PAID_API_CALL_STARTED",
+        scanId,
+        data: { hardTimeoutMs: SCAN_HARD_TIMEOUT_MS, mode: "automated" },
+      });
 
-    try {
-      result = await Promise.race([
-        runFullScan(profile),
-        new Promise<never>((_, reject) =>
-          setTimeout(
-            () => reject(new Error("Scan exceeded 45s hard timeout")),
-            SCAN_HARD_TIMEOUT_MS,
-          ),
-        ),
-      ]);
-      scanCompleted = true;
-      recordEvent({
-        type: "PAID_API_CALL_FINISHED",
-        scanId,
-        data: { score: result.score },
-      });
-      recordEvent({ type: "scan_completed", scanId });
-    } catch (err) {
-      const msg = safeErrorMessage(err);
-      const isTimeout = msg.includes("timeout") || msg.includes("Scan exceeded");
-      errors.push(`scan: ${msg}`);
-      recordEvent({
-        type: isTimeout ? "scan_timed_out" : "PAID_API_CALL_FAILED",
-        scanId,
-        error: msg,
-      });
       try {
-        await setError(scanId, msg);
-      } catch {
-        /* storage may be unconfigured */
+        result = await Promise.race([
+          runFullScan(profile),
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Scan exceeded 45s hard timeout")),
+              SCAN_HARD_TIMEOUT_MS,
+            ),
+          ),
+        ]);
+        scanCompleted = true;
+        recordEvent({
+          type: "PAID_API_CALL_FINISHED",
+          scanId,
+          data: { score: result.score },
+        });
+        recordEvent({ type: "scan_completed", scanId });
+      } catch (err) {
+        const msg = safeErrorMessage(err);
+        const isTimeout = msg.includes("timeout") || msg.includes("Scan exceeded");
+        errors.push(`scan: ${msg}`);
+        recordEvent({
+          type: isTimeout ? "scan_timed_out" : "PAID_API_CALL_FAILED",
+          scanId,
+          error: msg,
+        });
+        try {
+          await setError(scanId, msg);
+        } catch {
+          /* storage may be unconfigured */
+        }
       }
+    } else {
+      // Manual mode — log it explicitly so logs show why no API call ran
+      recordEvent({
+        type: "scan_failed",
+        scanId,
+        data: { mode: "manual", reason: "manual_mode_no_paid_call" },
+      });
     }
 
     const flags: OutcomeFlags = {
@@ -337,11 +379,14 @@ export async function POST(req: Request) {
       });
     }
 
-    // Scan didn't complete — return honest fallback response
+    // Scan didn't complete — return honest fallback response.
+    // The 'errors' array surfaces the exact Resend / scan failure
+    // reason in the API response so it's debuggable from the client
+    // without requiring Vercel log access.
     recordEvent({
       type: "response_returned",
       scanId,
-      data: { ok: false, fallback: "manual" },
+      data: { ok: false, fallback: "manual", mode: getScanMode() },
     });
     return NextResponse.json(
       {
@@ -349,6 +394,7 @@ export async function POST(req: Request) {
         scanId,
         message,
         flags,
+        mode: getScanMode(),
         errors: errors.length > 0 ? errors : undefined,
       },
       { status: 200 },
@@ -378,37 +424,54 @@ export async function POST(req: Request) {
 }
 
 /**
- * Compose a user-facing message from the actual outcome flags.
+ * Compose a user-facing message from the actual outcome flags + mode.
  *
  * CRITICAL: this function NEVER claims an email was sent unless the
- * corresponding flag is true. The previous bug was a hardcoded
- * "We emailed you a confirmation" string that ran even when emails failed.
+ * corresponding flag is true. NEVER claims a scan ran unless it actually
+ * completed. The original bug was a hardcoded 'we emailed you' string.
+ *
+ * In MANUAL mode (current default), we don't promise an automated scan —
+ * we promise Kabelo runs the scan manually within 24h. Same UX, no false
+ * promises about an automated pipeline that isn't reliable yet.
  */
 function composeMessage(flags: OutcomeFlags): string {
-  // Best case: scan completed inline
+  const mode = getScanMode();
+
+  // Best case: scan completed inline (only possible in 'automated' mode)
   if (flags.scanCompleted) {
     return "Your AI Visibility report is ready. Opening it now…";
   }
 
-  // Scan didn't complete — describe email outcomes truthfully
+  // ─── MANUAL MODE — explicit, honest about delivery model ─────────
+  if (mode === "manual") {
+    if (flags.userEmailSent && flags.adminEmailSent) {
+      return "Request received. We've emailed you a confirmation and Kabelo will personally run your AI Visibility scan + deliver the report within 24 hours.";
+    }
+    if (flags.adminEmailSent && !flags.userEmailSent) {
+      return "Request received and Kabelo has been notified — he'll deliver your report within 24 hours. We couldn't send the confirmation email automatically; please check your spam folder.";
+    }
+    if (flags.userEmailSent && !flags.adminEmailSent) {
+      return "Request received. We've emailed you a confirmation, but our internal notification didn't go through. Please reply to your confirmation email so Kabelo knows to follow up.";
+    }
+    if (flags.submissionSaved) {
+      return "Request received and saved — but we couldn't send confirmation emails automatically. Please email kabelo@kabelomore.com directly with your business name to ensure Kabelo follows up.";
+    }
+    return "Something went wrong on our end. Please email kabelo@kabelomore.com directly with your business details.";
+  }
+
+  // ─── AUTOMATED MODE — scan didn't complete inline ────────────────
   if (flags.userEmailSent && flags.adminEmailSent) {
     return "Request received. We've emailed you a confirmation and Kabelo will deliver your full report within 24 hours.";
   }
-
   if (flags.adminEmailSent && !flags.userEmailSent) {
     return "Request received and Kabelo has been notified. We couldn't deliver the confirmation email automatically — please check your spam folder, or email kabelo@kabelomore.com if it doesn't arrive.";
   }
-
   if (flags.userEmailSent && !flags.adminEmailSent) {
     return "Request received. We've emailed you a confirmation, but our internal notification didn't go through. Please reply to the confirmation email or WhatsApp +27 76 035 1084 to ensure follow-up.";
   }
-
-  // No emails got out — be honest
   if (flags.submissionSaved) {
-    return "Request received and saved. We couldn't deliver email confirmations automatically — please email kabelo@kabelomore.com directly to ensure follow-up. Reference scan ID will be in our reply.";
+    return "Request received and saved. We couldn't deliver email confirmations automatically — please email kabelo@kabelomore.com directly to ensure follow-up.";
   }
-
-  // Worst case: nothing worked
   return "Something went wrong on our end. Please email kabelo@kabelomore.com directly with your business details and we'll handle this manually.";
 }
 

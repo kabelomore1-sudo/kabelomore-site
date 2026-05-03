@@ -3,6 +3,7 @@ import {
   getLastSubmission,
   getRecentEvents,
 } from "@/lib/scan-events";
+import { getScanMode } from "@/lib/scan-mode";
 
 export const runtime = "nodejs";
 
@@ -118,6 +119,14 @@ export async function GET() {
   const lastSubmission = getLastSubmission();
   const recentEvents = getRecentEvents(20);
 
+  const scanMode = getScanMode();
+  const scanModeNote =
+    scanMode === "manual"
+      ? "MANUAL mode — submissions saved + emails sent, NO Anthropic API call. Kabelo runs scans via CLI within 24h. Safest default. Set SCAN_MODE=automated in Vercel env vars to enable inline Anthropic scans."
+      : scanMode === "automated"
+        ? "AUTOMATED mode — submissions trigger Anthropic API calls with 45s timeout. Each scan costs ~$0.10-0.30. Set SCAN_MODE=manual in Vercel env vars to disable paid calls."
+        : "DISABLED — all scan submissions are refused with 503. Emergency stop. Set SCAN_MODE=manual or automated to re-enable.";
+
   return NextResponse.json({
     status,
     timestamp: new Date().toISOString(),
@@ -125,6 +134,12 @@ export async function GET() {
       status === "ready"
         ? "All required env vars are set. Scan should work."
         : `Missing required env vars: ${requiredMissing.join(", ")}`,
+    scanMode: {
+      current: scanMode,
+      paidApiCallsAllowed: scanMode === "automated",
+      acceptsSubmissions: scanMode !== "disabled",
+      note: scanModeNote,
+    },
     requiredMissing,
     optionalMissing,
     anthropicTest,
