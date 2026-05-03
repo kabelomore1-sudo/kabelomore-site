@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Resend } from "resend";
 import { site } from "@/lib/site";
+import { sendEmailOrThrow } from "@/lib/resend-helper";
 
 export const runtime = "nodejs";
 
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
   if (apiKey) {
     try {
       const resend = new Resend(apiKey);
-      await resend.emails.send({
+      await sendEmailOrThrow(resend, {
         from: `Kabelomore Scans <${fromEmail}>`,
         to: [inboxEmail],
         replyTo: data.email,

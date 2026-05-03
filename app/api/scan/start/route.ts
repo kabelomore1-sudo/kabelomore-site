@@ -23,6 +23,7 @@ import {
   recordSubmission,
   safeErrorMessage,
 } from "@/lib/scan-events";
+import { sendEmailOrThrow } from "@/lib/resend-helper";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -423,7 +424,7 @@ async function notifyKabeloOnSubmission(profile: BusinessProfile): Promise<void>
   const inboxEmail = process.env.SCAN_INBOX_EMAIL ?? site.contact.email;
   const fromEmail = process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
 
-  await resend.emails.send({
+  await sendEmailOrThrow(resend, {
     from: `Kabelomore Scans <${fromEmail}>`,
     to: [inboxEmail],
     replyTo: profile.email,
@@ -463,7 +464,7 @@ async function sendUserAcknowledgment(profile: BusinessProfile): Promise<void> {
 
   const firstName = profile.contactName.split(" ")[0] ?? "there";
 
-  await resend.emails.send({
+  await sendEmailOrThrow(resend, {
     from: `Kabelo More <${fromEmail}>`,
     to: [profile.email],
     replyTo: site.contact.email,
@@ -528,7 +529,7 @@ async function notifyKabeloOnCompletion(
     ? `[LOW CONFIDENCE — manual verification recommended]`
     : `[high confidence]`;
 
-  await resend.emails.send({
+  await sendEmailOrThrow(resend, {
     from: `Kabelomore Scans <${fromEmail}>`,
     to: [inboxEmail],
     replyTo: profile.email,

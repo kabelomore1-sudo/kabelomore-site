@@ -19,6 +19,7 @@ import { z } from "zod";
 import { Resend } from "resend";
 import { site } from "@/lib/site";
 import { discoveryQuestions } from "@/lib/discovery-questions";
+import { sendEmailOrThrow } from "@/lib/resend-helper";
 
 export const runtime = "nodejs";
 
@@ -103,7 +104,7 @@ export async function POST(req: Request) {
 
     // 1. Notify Kabelo with full responses
     try {
-      await resend.emails.send({
+      await sendEmailOrThrow(resend, {
         from: `Kabelomore Discovery <${fromEmail}>`,
         to: [inboxEmail],
         replyTo: email,
@@ -138,7 +139,7 @@ export async function POST(req: Request) {
 
     // 2. Send user a copy of their answers + next steps
     try {
-      await resend.emails.send({
+      await sendEmailOrThrow(resend, {
         from: `Kabelo More <${fromEmail}>`,
         to: [email],
         subject: "Your Real Estate Discovery — confirmed",

@@ -22,6 +22,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Resend } from "resend";
 import { site } from "@/lib/site";
+import { sendEmailOrThrow } from "@/lib/resend-helper";
 
 export const runtime = "nodejs";
 
@@ -95,7 +96,7 @@ export async function POST(req: Request) {
 
     // 2. Notify Kabelo
     try {
-      await resend.emails.send({
+      await sendEmailOrThrow(resend, {
         from: `The AEO Letter <${fromEmail}>`,
         to: [inboxEmail],
         replyTo: email,
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
     })();
 
     try {
-      await resend.emails.send({
+      await sendEmailOrThrow(resend, {
         from: `Kabelo More <${fromEmail}>`,
         to: [email],
         subject: "Welcome to The AEO Letter — and The Real Estate Method",

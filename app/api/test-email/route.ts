@@ -91,56 +91,53 @@ export async function POST(req: Request) {
 
   const resend = new Resend(apiKey);
   const fromConfig = `Kabelomore Test <${fromEmail}>`;
+  const emailParams = {
+    from: fromConfig,
+    to: [targetEmail],
+    subject: `[TEST] Resend delivery check — ${sentAt}`,
+    text: [
+      "This is a diagnostic test email from kabelomore.com.",
+      "",
+      `Sent at:     ${sentAt}`,
+      `From:        ${fromConfig}`,
+      `To:          ${targetEmail}`,
+      "",
+      "If you're receiving this, Resend delivery from this configuration",
+      "is working. If scan emails are still failing, the issue is in the",
+      "scan flow code, not the email transport.",
+      "",
+      "If you did NOT expect this email, ignore it — someone with the",
+      "TEST_EMAIL_TOKEN ran a diagnostic check.",
+      "",
+      "— Kabelomore diagnostic system",
+    ].join("\n"),
+  };
 
-  try {
-    const result = await resend.emails.send({
-      from: fromConfig,
-      to: [targetEmail],
-      subject: `[TEST] Resend delivery check — ${sentAt}`,
-      text: [
-        "This is a diagnostic test email from kabelomore.com.",
-        "",
-        `Sent at:     ${sentAt}`,
-        `From:        ${fromConfig}`,
-        `To:          ${targetEmail}`,
-        `Reply-to:    (not set)`,
-        "",
-        "If you're receiving this, Resend delivery from this configuration",
-        "is working. If scan emails are still failing, the issue is in the",
-        "scan flow code, not the email transport.",
-        "",
-        "If you did NOT expect this email, ignore it — someone with the",
-        "TEST_EMAIL_TOKEN ran a diagnostic check.",
-        "",
-        "— Kabelomore diagnostic system",
-      ].join("\n"),
-    });
+  // Call Resend SDK directly so we can inspect BOTH success and error
+  // cases. Critical: Resend resolves successfully even on API errors —
+  // the error appears in result.error, not as a thrown exception.
+  // This endpoint surfaces both for diagnosis.
+  const result = await resend.emails.send(emailParams).catch((err) => ({
+    data: null,
+    error: {
+      name: "FetchError",
+      message: err instanceof Error ? err.message : String(err),
+    } as { name?: string; message?: string },
+  }));
 
-    recordEvent({
-      type: "admin_email_sent",
-      data: {
-        kind: "test",
-        to: targetEmail,
-        resendId: result.data?.id,
-      },
-    });
+  if (result.error) {
+    const errorRecord = result.error as unknown as {
+      name?: string;
+      message?: string;
+      statusCode?: number;
+    };
+    const errorName = errorRecord.name ?? "ResendError";
+    const errorMessage = errorRecord.message ?? JSON.stringify(result.error);
+    const statusCode = errorRecord.statusCode;
 
-    return NextResponse.json({
-      ok: true,
-      sentAt,
-      from: fromConfig,
-      to: targetEmail,
-      resendId: result.data?.id ?? null,
-      resendError: result.error ?? null,
-      message: result.error
-        ? `Resend returned an error — see resendError below.`
-        : `Test email sent successfully. Check ${targetEmail} inbox (and spam folder).`,
-    });
-  } catch (err) {
-    const errorMessage = safeErrorMessage(err);
     recordEvent({
       type: "admin_email_failed",
-      data: { kind: "test", to: targetEmail },
+      data: { kind: "test", to: targetEmail, errorName, statusCode },
       error: errorMessage,
     });
 
@@ -150,12 +147,35 @@ export async function POST(req: Request) {
         sentAt,
         from: fromConfig,
         to: targetEmail,
-        error: errorMessage,
+        resendError: {
+          name: errorName,
+          message: errorMessage,
+          statusCode: statusCode ?? null,
+          raw: result.error,
+        },
         diagnosis: diagnoseResendError(errorMessage),
       },
-      { status: 500 },
+      { status: 200 }, // 200 so the response is readable; resendError contains the failure
     );
   }
+
+  recordEvent({
+    type: "admin_email_sent",
+    data: {
+      kind: "test",
+      to: targetEmail,
+      resendId: result.data?.id,
+    },
+  });
+
+  return NextResponse.json({
+    ok: true,
+    sentAt,
+    from: fromConfig,
+    to: targetEmail,
+    resendId: result.data?.id ?? null,
+    message: `Test email sent successfully. Check ${targetEmail} inbox (and spam folder). Also verify in Resend dashboard at resend.com/emails — the message ID above will appear in the log.`,
+  });
 }
 
 /**
