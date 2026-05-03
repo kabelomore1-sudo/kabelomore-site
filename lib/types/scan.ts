@@ -14,15 +14,22 @@
 // ─── Enums ──────────────────────────────────────────────────────────
 
 export const INDUSTRIES = [
-  "industrial-supplier",
-  "professional-services",
+  // High-ticket SA verticals first (matching our ICP and likely deal value)
   "medical",
   "legal",
+  "industrial-supplier",
+  "manufacturing",
   "construction",
+  "mining",
+  "agriculture",
+  "finance",
+  "property",
+  "government",
+  "education",
+  "professional-services",
+  "automotive",
   "retail",
   "hospitality",
-  "manufacturing",
-  "automotive",
   "other",
 ] as const;
 export type Industry = (typeof INDUSTRIES)[number];

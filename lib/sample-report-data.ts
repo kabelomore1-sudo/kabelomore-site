@@ -415,12 +415,33 @@ export function generateSampleReport(
 
 /**
  * Map raw industry string to sample sector key.
- * Defaults to 'other' if no match.
+ *
+ * The preview dashboard only renders 4 distinct sample patterns
+ * (medical / legal / industrial / other) — but the form now accepts
+ * many more industries. We collapse adjacent industries onto the
+ * closest sample pattern so the preview stays meaningful:
+ *   - medical → medical
+ *   - legal / finance → legal (procurement-driven, professional-services
+ *     pattern)
+ *   - industrial / manufacturing / construction / mining / agriculture /
+ *     automotive / property → industrial (procurement-driven,
+ *     trade-association heavy)
+ *   - government / education / professional-services / retail /
+ *     hospitality / other → other (generic baseline)
  */
 export function mapIndustryToSector(industry: Industry | string): SampleSector {
   if (industry === "medical") return "medical";
-  if (industry === "legal") return "legal";
-  if (industry === "industrial-supplier" || industry === "manufacturing" || industry === "construction" || industry === "automotive")
+  if (industry === "legal" || industry === "finance") return "legal";
+  if (
+    industry === "industrial-supplier" ||
+    industry === "manufacturing" ||
+    industry === "construction" ||
+    industry === "automotive" ||
+    industry === "mining" ||
+    industry === "agriculture" ||
+    industry === "property"
+  ) {
     return "industrial";
+  }
   return "other";
 }

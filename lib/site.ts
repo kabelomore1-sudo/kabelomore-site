@@ -160,7 +160,7 @@ export const tiers: Tier[] = [
       "Top 3 fixes that would move the needle most",
       "Delivered as a PDF to your email",
     ],
-    cta: { label: "Request a scan", href: "/scan" },
+    cta: { label: "Get my free scan", href: "/scan" },
     highlight: false,
   },
   {
@@ -186,7 +186,7 @@ export const tiers: Tier[] = [
       "PDF documenting everything we did + all login details",
       "60-day support window for small fixes",
     ],
-    cta: { label: "See Foundation Pack", href: "/foundation" },
+    cta: { label: "Start Foundation Pack", href: "/foundation" },
     highlight: false,
   },
   {
@@ -473,7 +473,7 @@ export const tiers: Tier[] = [
     },
     cancelTerms:
       "3-month minimum (covers the implementation-heavy first month + payback). After that, cancel via email with 30 days notice. No phone calls, no retention pitch, no fine print.",
-    cta: { label: "Apply for AI Authority", href: "/brief/premium" },
+    cta: { label: "Start AI Authority retainer", href: "/brief/premium" },
     highlight: false,
   },
   {
@@ -537,7 +537,7 @@ export const tiers: Tier[] = [
       qualifier:
         "Eligibility: B2B + R250k+ average deal + CRM that tags AI-source leads. Discussed in the fit-check call.",
     },
-    cta: { label: "Apply for Fractional Role", href: "/brief/strategy-partner" },
+    cta: { label: "Apply for Fractional Head of AI Visibility", href: "/brief/strategy-partner" },
     highlight: false,
   },
 ];

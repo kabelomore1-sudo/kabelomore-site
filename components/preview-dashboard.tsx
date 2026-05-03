@@ -27,6 +27,7 @@ import {
 import { ConversionBlock } from "@/components/conversion-block";
 import { AiConversationGrid } from "@/components/ai-conversation-grid";
 import { MethodologyDisclosure } from "@/components/methodology-disclosure";
+import { DashboardSectionToc } from "@/components/dashboard-section-toc";
 
 interface PreviewDashboardProps {
   /** Industry from form submission, used to tailor the sample data */
@@ -101,8 +102,16 @@ export function PreviewDashboard({
         </div>
       )}
 
+      {/* Sticky section TOC — sits below the sample warning, above
+          the score. Helps prospects jump between sections without
+          having to scroll past content they've already seen. */}
+      <DashboardSectionToc />
+
       {/* HEADLINE — Score + Diagnosis */}
-      <section className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10">
+      <section
+        id="score"
+        className="scroll-mt-20 rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10"
+      >
         <div className="grid gap-8 md:grid-cols-2 md:items-center md:gap-10">
           {/* Score Gauge */}
           <div className="flex flex-col items-center">
@@ -187,6 +196,8 @@ export function PreviewDashboard({
         </div>
       </section>
 
+      {/* PROOF LAYER — what an AI proxy returns. ANCHOR: #responses */}
+      <div id="responses" className="scroll-mt-20" />
       {/* PROOF LAYER — what an AI proxy returns.
           Sits between headline (score) and explanatory charts. The
           score creates the 'ouch' moment. The conversations make it
@@ -234,8 +245,8 @@ export function PreviewDashboard({
         </p>
       </section>
 
-      {/* TWO-COL — Layer Radar + Engine Heatmap */}
-      <section className="grid gap-6 md:grid-cols-2">
+      {/* TWO-COL — Layer Radar + Engine Heatmap. ANCHOR: #layers */}
+      <section id="layers" className="scroll-mt-20 grid gap-6 md:grid-cols-2">
         <div className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-8">
           <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
             7-property breakdown
@@ -270,8 +281,11 @@ export function PreviewDashboard({
         </div>
       </section>
 
-      {/* CITATION BENCHMARK */}
-      <section className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10">
+      {/* CITATION BENCHMARK. ANCHOR: #citations */}
+      <section
+        id="citations"
+        className="scroll-mt-20 rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10"
+      >
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
           Citation benchmark
         </div>
@@ -289,8 +303,8 @@ export function PreviewDashboard({
         </div>
       </section>
 
-      {/* ISSUE DISTRIBUTION + TOP RECOMMENDATIONS */}
-      <section className="grid gap-6 md:grid-cols-5">
+      {/* ISSUE DISTRIBUTION + TOP RECOMMENDATIONS. ANCHOR: #issues */}
+      <section id="issues" className="scroll-mt-20 grid gap-6 md:grid-cols-5">
         <div className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:col-span-2 md:p-8">
           <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
             Issues by severity
@@ -346,39 +360,48 @@ export function PreviewDashboard({
         </div>
       </section>
 
-      {/* COMPETITOR MENTIONS — text list.
-          Honest framing: these are names that surfaced in our
-          search-grounded test queries — NOT a definitive competitor
-          set. The prospect knows their actual market; we always
-          invite them to verify / challenge the list. */}
-      <section className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-8">
-        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
-          Names that surfaced in our test queries
-        </div>
-        <h3 className="mt-2 text-lg font-semibold text-ink-900 md:text-xl">
-          Sample competitor mentions
-        </h3>
-        <p className="mt-2 text-xs text-ink-500">
-          Names that came up when we ran customer-style queries via Claude+web_search.{" "}
-          <strong className="text-ink-700">Verify these are your actual competitors</strong>{" "}
-          — search may surface adjacent firms you don&apos;t consider direct competition.
-        </p>
-        <ul className="mt-5 space-y-3">
-          {sampleReport.competitors.map((c) => (
-            <li
-              key={c.name}
-              className="flex items-start gap-3 rounded-xl border border-rule bg-ink-50/40 p-4"
-            >
-              <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-rose-500" />
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-ink-900">{c.name}</div>
-                <div className="mt-1 text-xs text-ink-600">
-                  Surfaced in {c.appearsInEngines.length} of 4 test queries · ~{c.citationCount} citation domains we identified
-                </div>
+      {/* COMPETITOR MENTIONS — collapsed by default to shorten scroll.
+          The same names already appear in the AI conversation cards
+          and the citation benchmark above — this section is reference,
+          not first-read content. <details> open-on-click is the
+          simplest UX pattern: zero JS state, prints fine, screen-reader
+          friendly. */}
+      <section className="rounded-3xl border border-rule bg-white shadow-soft">
+        <details className="group p-6 md:p-8">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
+                Names that surfaced in our test queries
               </div>
-            </li>
-          ))}
-        </ul>
+              <h3 className="mt-1 text-base font-semibold text-ink-900 md:text-lg">
+                Sample competitor mentions ({sampleReport.competitors.length})
+              </h3>
+              <p className="mt-1 text-xs text-ink-500">
+                Click to expand · verify these match your actual competitive set
+              </p>
+            </div>
+            <span className="flex-shrink-0 rounded-full bg-ink-100 px-3 py-1 text-sm font-medium text-ink-700 transition-transform group-open:rotate-45">
+              +
+            </span>
+          </summary>
+
+          <ul className="mt-5 space-y-3">
+            {sampleReport.competitors.map((c) => (
+              <li
+                key={c.name}
+                className="flex items-start gap-3 rounded-xl border border-rule bg-ink-50/40 p-4"
+              >
+                <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-rose-500" />
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-ink-900">{c.name}</div>
+                  <div className="mt-1 text-xs text-ink-600">
+                    Surfaced in {c.appearsInEngines.length} of 4 test queries · ~{c.citationCount} citation domains we identified
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </details>
       </section>
 
       {/* METHODOLOGY DISCLOSURE — full version, end of dashboard so
@@ -398,6 +421,7 @@ export function PreviewDashboard({
           Replaces the previous generic 'Want this for your business?'
           CTA which was too soft — this drives buying decisions.
           ───────────────────────────────────────────────────────── */}
+      <div id="decide" className="scroll-mt-20" />
       <ConversionBlock industry={industry} businessName={businessName} />
 
       {/* If on the standalone /scan/preview page, also show a final

@@ -137,19 +137,34 @@ async function runIndustrySearch(
   profile: BusinessProfile,
   countryName: string,
 ): Promise<SingleSearchResult> {
-  // Industry-specific guidance
+  // Industry-specific guidance — sector-aware citation discovery so the
+  // search query targets the registers and directories AI engines actually
+  // weight for that industry. Adding a sector here is the single highest-
+  // leverage way to improve scan accuracy for prospects in that vertical.
   const industryHint =
     profile.industry === "industrial-supplier" || profile.industry === "manufacturing"
       ? "LME register (Department of Labour for ZA), ECSA, LEEASA, SAIMM, mining industry directories"
       : profile.industry === "legal"
-        ? "Law Society register, professional body directories"
+        ? "Law Society register (LSSA), General Council of the Bar, professional body directories"
         : profile.industry === "medical"
           ? "HPCSA register, medpages, medical association directories"
           : profile.industry === "construction"
-            ? "NHBRC, Master Builders Association, construction industry directories"
+            ? "NHBRC, Master Builders Association, CIDB grading, construction industry directories"
             : profile.industry === "automotive"
               ? "RMI register, automotive industry directories"
-              : "professional body and industry-specific registers";
+              : profile.industry === "mining"
+                ? "SAMI (SA Mining Industry), DMRE registrations, Mining Weekly, Engineering News, Junior Mining Council, SAIMM, Minerals Council"
+                : profile.industry === "agriculture"
+                  ? "Agbiz, AgriSA, Grain SA, commodity body directories, Farmer's Weekly, agri-processing associations"
+                  : profile.industry === "finance"
+                    ? "FSCA register, SAICA / SAIPA / SAIBA membership directories, JSE-listed pages, financial advisory directories"
+                    : profile.industry === "property"
+                      ? "Property24, Private Property, EAAB register, REIM Africa, Property Wheel, Sectional Title Owners Forum"
+                      : profile.industry === "government"
+                        ? "Central Supplier Database (CSD), DTIC business registrations, government tender portals (eTender, IPS), SOE supplier lists"
+                        : profile.industry === "education"
+                          ? "DHET / SETA registrations, Umalusi, training accreditation bodies, education association directories"
+                          : "professional body and industry-specific registers";
 
   const prompt = `You are searching for industry-specific mentions of a business. Use web_search.
 

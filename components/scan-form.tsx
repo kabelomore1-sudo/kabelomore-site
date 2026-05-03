@@ -666,15 +666,21 @@ function ScanningProgress({ stageIndex }: { stageIndex: number }) {
 
 function industryLabel(ind: (typeof INDUSTRIES)[number]): string {
   switch (ind) {
-    case "industrial-supplier": return "Industrial supplier";
-    case "professional-services": return "Professional services";
     case "medical": return "Medical practice";
     case "legal": return "Legal practice";
+    case "industrial-supplier": return "Industrial supplier";
+    case "manufacturing": return "Manufacturing";
     case "construction": return "Construction";
+    case "mining": return "Mining";
+    case "agriculture": return "Agriculture";
+    case "finance": return "Finance / Accounting";
+    case "property": return "Property / Real Estate";
+    case "government": return "Government / SOE";
+    case "education": return "Education / Training";
+    case "professional-services": return "Professional services";
+    case "automotive": return "Automotive";
     case "retail": return "Retail";
     case "hospitality": return "Hospitality";
-    case "manufacturing": return "Manufacturing";
-    case "automotive": return "Automotive";
     case "other": return "Other";
   }
 }

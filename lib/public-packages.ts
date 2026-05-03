@@ -125,7 +125,7 @@ export const publicPackages: PublicPackage[] = [
     ],
     internalTierIds: ["premium", "strategy-partner", "digital-pr"],
     highlight: false,
-    cta: { label: "Apply via Discovery", href: "/discover" },
+    cta: { label: "Start with Discovery", href: "/discover" },
   },
 ];
 
