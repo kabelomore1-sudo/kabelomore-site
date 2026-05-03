@@ -12,7 +12,7 @@ import { ScanResultsClient } from "@/components/scan-results-client";
 export const metadata = {
   title: "Your AI Visibility Scan Results",
   description:
-    "Your custom AI Visibility scan results across ChatGPT, Claude, Gemini, and Perplexity. Score, classification, ranked issues, and recommended next steps.",
+    "Your custom AI Visibility scan results — customer-style queries run via Claude with live web search as a proxy for ChatGPT, Gemini, and Perplexity. Score, classification, ranked issues, and recommended next steps.",
   // Results pages contain personal business data — keep out of search index
   robots: { index: false, follow: false },
 };

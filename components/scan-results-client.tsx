@@ -11,6 +11,7 @@ import { LayerRadar } from "./scan-charts/layer-radar";
 import { EngineHeatmap } from "./scan-charts/engine-heatmap";
 import { CitationBenchmark } from "./scan-charts/citation-benchmark";
 import { IssueDistribution } from "./scan-charts/issue-distribution";
+import { MethodologyDisclosure } from "./methodology-disclosure";
 import type { ScanResult } from "@/lib/types/scan";
 import {
   ArrowRight,
@@ -173,12 +174,21 @@ function ResultsView({ result }: { result: ScanResult }) {
         </div>
       </Section>
 
-      {/* AI ENGINES VISIBILITY — heatmap */}
+      {/* AI ENGINES VISIBILITY — heatmap.
+          Honest framing: we run via Claude+web_search as a proxy.
+          The heatmap component carries its own methodology badge,
+          but the section headline + eyebrow now match reality. */}
       <Section variant="tinted" padding="lg" containerSize="narrow">
-        <Eyebrow>Visibility across AI engines</Eyebrow>
+        <Eyebrow>Visibility in our test queries</Eyebrow>
         <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
-          Where AI is recommending you — and where it isn&apos;t.
+          Where you&apos;re likely recommended — and where you&apos;re not.
         </h2>
+        <p className="mt-3 max-w-2xl text-sm text-ink-500 leading-relaxed">
+          Each cell shows the same aggregate result across our 4 conceptual
+          engines. We currently test via Claude with live web search as a
+          proxy; native ChatGPT, Gemini, and Perplexity adapters land in
+          Phase 1.5.
+        </p>
         <div className="mt-8">
           <EngineHeatmap
             visibilityChecks={result.visibilityChecks}
@@ -195,8 +205,10 @@ function ResultsView({ result }: { result: ScanResult }) {
         </h2>
         <p className="mt-4 text-base text-ink-700 leading-relaxed">
           AI engines verify businesses by counting third-party mentions on
-          trusted sites. Below the AI confidence threshold, recommendations
-          rarely happen — no matter how good your website is.
+          trusted sites. Below the AI confidence threshold, consistent
+          recommendation is rare — no matter how good your website is. The
+          domains below are what our directory + industry searches surfaced;
+          if you have listings we missed, share them and we&apos;ll re-check.
         </p>
         <div className="mt-8">
           <CitationBenchmark
@@ -209,7 +221,7 @@ function ResultsView({ result }: { result: ScanResult }) {
         {result.detected.citationSources.length > 0 && (
           <div className="mt-8 rounded-2xl border border-rule bg-white p-6">
             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
-              Where you&apos;re currently mentioned ({result.detected.citationSources.length})
+              Domains where we surfaced you ({result.detected.citationSources.length})
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {result.detected.citationSources.slice(0, 12).map((source) => (
@@ -285,13 +297,26 @@ function ResultsView({ result }: { result: ScanResult }) {
         </div>
       </Section>
 
-      {/* What AI says (the gut punch) */}
+      {/* What AI says (the gut punch).
+          Honest framing: ran live via Claude+web_search proxy. The
+          per-card "AI recommended these instead" wording softened to
+          "Names that surfaced instead" so we don't claim AI authoritatively
+          ranked anyone — we just observed names in proxy responses. */}
       {result.visibilityChecks.length > 0 && (
         <Section variant="tinted" padding="lg" containerSize="narrow">
-          <Eyebrow>What AI actually says about your category</Eyebrow>
+          <Eyebrow>What an AI proxy returned for your category</Eyebrow>
           <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
-            We tested live. Here&apos;s what AI is saying.
+            We tested live. Here&apos;s what surfaced.
           </h2>
+          <p className="mt-3 max-w-2xl text-sm text-ink-500 leading-relaxed">
+            Each query was run via Claude with live{" "}
+            <code className="rounded bg-ink-50 px-1 py-0.5 text-[11px]">
+              web_search
+            </code>{" "}
+            — a proxy for ChatGPT, Gemini, and Perplexity. Verbatim text
+            below is what the proxy returned, not text quoted from a specific
+            AI engine&apos;s native output.
+          </p>
 
           <div className="mt-10 space-y-5">
             {result.visibilityChecks.map((check, idx) => (
@@ -322,7 +347,7 @@ function ResultsView({ result }: { result: ScanResult }) {
                     {check.competitorsCited.length > 0 && (
                       <div className="mt-3">
                         <div className="text-xs uppercase tracking-wider text-ink-500">
-                          AI recommended these instead:
+                          Names that surfaced instead:
                         </div>
                         <ul className="mt-2 space-y-1 text-sm text-ink-700">
                           {check.competitorsCited.slice(0, 5).map((c, i) => (
@@ -332,6 +357,9 @@ function ResultsView({ result }: { result: ScanResult }) {
                             </li>
                           ))}
                         </ul>
+                        <div className="mt-2 text-[10px] italic text-ink-500">
+                          Verify these are your actual competitors — search may surface adjacent firms.
+                        </div>
                       </div>
                     )}
                   </div>
@@ -401,6 +429,24 @@ function ResultsView({ result }: { result: ScanResult }) {
               </div>
             </article>
           ))}
+        </div>
+      </Section>
+
+      {/* METHODOLOGY DISCLOSURE — full version, anchored just before the
+          CTA so the prospect has the complete honest picture before deciding
+          whether to engage. Single source of truth for what we measure,
+          what's a proxy, and what's directional. */}
+      <Section variant="default" padding="default" containerSize="narrow">
+        <Eyebrow>Methodology</Eyebrow>
+        <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
+          What this scan measured (and what it didn&apos;t).
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm text-ink-500 leading-relaxed">
+          Honest disclosure of what we verified directly versus what we
+          inferred via proxy. Trust before performance.
+        </p>
+        <div className="mt-6">
+          <MethodologyDisclosure variant="full" />
         </div>
       </Section>
 

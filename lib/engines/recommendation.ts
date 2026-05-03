@@ -135,7 +135,7 @@ function recommendForTypeC(d: DetectedSignals): Omit<Recommendation, "rank">[] {
     recs.push({
       title: "Expand citation breadth (low → high)",
       explanation:
-        "You have some citations but not enough density to be the default AI recommendation in your category. Building 25-50 industry-specific citations is what tips the scale.",
+        "You have some citations but not enough density to be the default AI recommendation in your category. We typically see 25-50 active industry-specific citations on businesses that AI engines cite consistently — not an industry standard, but a pattern in our work.",
       estimatedImpact: "high",
       estimatedEffort: "medium",
     });

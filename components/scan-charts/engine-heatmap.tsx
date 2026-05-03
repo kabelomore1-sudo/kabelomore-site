@@ -1,22 +1,32 @@
 /**
- * EngineHeatmap — 4-cell grid showing visibility across each AI engine.
+ * EngineHeatmap — visualises visibility across the 4 AI engines we
+ * track conceptually (ChatGPT, Claude, Gemini, Perplexity).
+ *
+ * HONESTY NOTE:
+ *   We currently run all queries via Claude + live `web_search` as a
+ *   proxy for ChatGPT / Gemini / Perplexity (their public answers all
+ *   blend a model with web retrieval, so a single search-grounded
+ *   call is a directionally reliable stand-in until we ship native
+ *   per-engine adapters in Phase 1.5).
+ *
+ *   The chart shows the same aggregate state across the 4 engine
+ *   cells with an explicit "Proxy" label and Phase 1.5 note. Naval
+ *   shape: never let the visual imply we did 4 separate engine
+ *   calls when we did 1 web-search-grounded call.
  *
  * Visual gut-punch: a buyer sees 4 cells, color-coded by whether they
- * appeared in that engine's response. All red = "AI doesn't recommend
- * me anywhere." That's the moment the conversion happens.
+ * appeared in our test answers. All red = "AI doesn't recommend me
+ * anywhere." Real per-engine differentiation lands Phase 1.5.
  */
 
 import type { VisibilityCheck } from "@/lib/types/scan";
-import { CheckCircle2, XCircle, Sparkles } from "lucide-react";
+import { CheckCircle2, XCircle, Sparkles, Info } from "lucide-react";
 
 type Props = {
   visibilityChecks: VisibilityCheck[];
   businessName: string;
 };
 
-// We currently only run claude-search, but UI shows the 4 conceptual engines
-// (since the messaging is "we test 4 AI engines"). Future Phase will add real
-// per-engine adapters for ChatGPT, Gemini, Perplexity.
 const ENGINES = [
   { id: "chatgpt", name: "ChatGPT", color: "emerald", brand: "OpenAI" },
   { id: "claude", name: "Claude", color: "orange", brand: "Anthropic" },
@@ -29,45 +39,54 @@ export function EngineHeatmap({ visibilityChecks, businessName }: Props) {
   const totalChecks = visibilityChecks.length;
   const appeared = visibilityChecks.filter((c) => c.businessAppears).length;
 
-  // Per-engine status. v1: claude-search powers all checks. v1.5 will split.
-  // For now we report the same aggregate across all 4 engine cards (honest
-  // degradation since we run via Claude+search as a proxy for "what AI says").
+  // v1: claude-search powers all checks. v1.5 will split per-engine.
   const overallCited = appeared > 0;
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-end justify-between">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
-            Tested across
+            Tested via
           </div>
           <div className="mt-0.5 text-base font-semibold text-ink-900">
-            4 AI engines
+            Claude + web search proxy
+          </div>
+          <div className="mt-0.5 text-[10px] text-ink-500">
+            Stands in for the 4 engines below
           </div>
         </div>
         <div className="text-right">
           <div className="text-xs uppercase tracking-wider text-ink-500">
-            Cited
+            Queries returning you
           </div>
           <div className="text-2xl font-semibold text-ink-900">
             {appeared}
-            <span className="text-sm text-ink-400">/{totalChecks * 4}</span>
+            <span className="text-sm text-ink-400">/{totalChecks}</span>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {ENGINES.map((engine) => {
-          const wasCited = overallCited; // v1 simplification
+          const wasCited = overallCited; // v1 simplification — same state across the 4 cards
           return (
             <div
               key={engine.id}
-              className={`overflow-hidden rounded-2xl border p-4 transition-shadow ${
+              className={`relative overflow-hidden rounded-2xl border p-4 transition-shadow ${
                 wasCited
                   ? "border-emerald-200 bg-emerald-50/40"
                   : "border-rose-200 bg-rose-50/40"
               }`}
             >
+              {/* Proxy badge — top-right of every card so prospects
+                  always see we're stand-in testing, not native testing. */}
+              <span
+                className="absolute right-2 top-2 rounded-full bg-white/90 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-ink-500 ring-1 ring-ink-100"
+                title="Result inferred from a Claude + web_search proxy run"
+              >
+                Proxy
+              </span>
               <div
                 className={`flex h-9 w-9 items-center justify-center rounded-xl text-white ${colorBg(engine.color)}`}
               >
@@ -84,14 +103,14 @@ export function EngineHeatmap({ visibilityChecks, businessName }: Props) {
                   <>
                     <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                     <span className="text-xs font-medium text-emerald-700">
-                      Cited
+                      Likely cited
                     </span>
                   </>
                 ) : (
                   <>
                     <XCircle className="h-4 w-4 text-rose-600" />
                     <span className="text-xs font-medium text-rose-700">
-                      Not cited
+                      Likely not cited
                     </span>
                   </>
                 )}
@@ -105,19 +124,28 @@ export function EngineHeatmap({ visibilityChecks, businessName }: Props) {
         <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/50 p-4">
           <div className="text-sm text-ink-700">
             <span className="font-semibold text-ink-900">{businessName}</span>{" "}
-            doesn&apos;t appear in any of the {totalChecks} customer-style queries
-            we tested. AI engines are recommending your competitors instead.
+            didn&apos;t appear in any of the {totalChecks} customer-style
+            queries we tested via Claude + live web search. Names that came up
+            instead are listed in the citation benchmark and conversation
+            cards below.
           </div>
         </div>
       )}
 
-      {/* Honest caveat — Phase 1.5 plan to add native per-engine adapters */}
-      <div className="mt-4 rounded-xl bg-ink-50/40 px-4 py-2.5 text-[10px] text-ink-500">
-        <span className="font-semibold">Phase 1 note:</span> we currently run
-        web-search-based testing as a proxy for what AI engines see. Per-engine
-        native adapters (direct ChatGPT, Gemini, Perplexity API calls) ship in
-        Phase 1.5. The signal is reliable; the per-engine breakdown gets more
-        precise next iteration.
+      {/* Methodology disclosure — anchored honestly to current state */}
+      <div className="mt-4 flex items-start gap-2 rounded-xl bg-ink-50/40 px-4 py-2.5 text-[10px] leading-relaxed text-ink-500">
+        <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
+        <div>
+          <span className="font-semibold text-ink-700">Phase 1 method:</span>{" "}
+          we run customer-style queries via Claude with live{" "}
+          <code className="rounded bg-white px-1 py-0.5 text-[10px]">
+            web_search
+          </code>{" "}
+          as a proxy for ChatGPT, Gemini, and Perplexity (all of which blend a
+          model with web retrieval in their answers). Native per-engine
+          adapters land Phase 1.5. Use the &quot;Likely cited&quot; signal as
+          directional, not deterministic.
+        </div>
       </div>
     </div>
   );

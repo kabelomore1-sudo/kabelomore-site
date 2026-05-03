@@ -406,8 +406,8 @@ export function generateSampleReport(
     recommendations,
     competitors,
     visibilityChecks,
-    diagnosisOneLiner: `For a typical SA ${sector} firm, AI engine visibility usually starts in the bottom quartile — even when Google rankings are reasonable. Three high-impact fixes typically move firms to the top quartile within 60 days.`,
-    diagnosisFull: `Across the 4 major AI engines (ChatGPT, Claude, Gemini, Perplexity), the typical baseline shows the business appearing in ${visibilityChecks.filter((v) => v.businessAppears).length} of ${visibilityChecks.length} buyer-intent queries. Note: this is independent of Google search performance — many businesses ranking well on Google Maps are still invisible to AI engines because the systems use different signals. The good news: the highest-impact fixes for AI visibility are quick wins — schema deployment, key directory listings, and a few specific changes to your Google Business Profile that AI engines weight heavily.`,
+    diagnosisOneLiner: `For a typical SA ${sector} firm, AI engine visibility usually starts in the bottom quartile — even when Google rankings are reasonable. Three high-impact fixes typically move firms to the top quartile within 60 days. (Score is directional, not deterministic.)`,
+    diagnosisFull: `Across customer-style queries we run via Claude + live web search (a proxy for ChatGPT, Gemini, Perplexity until native adapters ship in Phase 1.5), the typical baseline shows the business appearing in ${visibilityChecks.filter((v) => v.businessAppears).length} of ${visibilityChecks.length} buyer-intent queries. This is independent of Google search performance — businesses ranking well on Google Maps can still be invisible to AI engines because the systems weight signals differently. The good news: the highest-impact fixes for AI visibility are quick wins — schema deployment, key directory listings, and a few specific changes to your Google Business Profile that AI engines weight heavily.`,
     scannedAt: new Date().toISOString(),
     durationMs: 28_400,
   };

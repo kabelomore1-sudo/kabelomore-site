@@ -1,13 +1,27 @@
 /**
- * Visibility simulator — runs 2-3 customer-style queries via Claude +
+ * Visibility simulator — runs customer-style queries via Claude +
  * web_search to see what AI engines would actually recommend.
  *
  * This is the "gut punch" engine. The results page shows the buyer:
  *   "Here's exactly what AI says when your customers search.
  *    Notice who's listed. Notice who isn't."
  *
- * Each query: ~10-12 seconds. We run 2 queries to stay under 60s
- * Vercel function timeout. Both run sequentially (web_search rate limits).
+ * QUERY DIVERSITY (post-honesty-audit):
+ *   We run 4 queries across distinct buyer-intent shapes — not 4
+ *   reskins of the same query. The shapes:
+ *     1. SUPERLATIVE   "Best [service] in [city]"
+ *     2. CATEGORY      "Top [industry] companies in [city]"
+ *     3. PROBLEM       "Who can help with [service]?"
+ *     4. BRAND         "Reviews for [business name]"
+ *   Each shape exercises a different retrieval pattern (general
+ *   recommendation, category list, intent match, brand awareness).
+ *   2 queries weren't enough — they were too similar to differentiate
+ *   between "no AI footprint at all" and "no footprint for THIS query
+ *   shape."
+ *
+ * Each query: ~10-12 seconds. 4 queries × 12s = ~48s sequential.
+ * Hard cap at the orchestrator level keeps us inside the 60s Vercel
+ * function timeout.
  */
 
 import { anthropic, SCAN_MODEL, WEB_SEARCH_TOOL } from "@/lib/anthropic-client";
@@ -44,12 +58,16 @@ export async function simulateAIQueries(
 }
 
 // ─── Query generation ─────────────────────────────────────────────
+// 4 distinct intent shapes — each exercises a different AI retrieval
+// pattern. We run all 4 sequentially because Anthropic's web_search
+// has tighter rate limits than its base model.
 function generateCustomerQueries(profile: BusinessProfile): string[] {
   const services = profile.servicesText
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
   const primary = services[0] || profile.industry.replace(/-/g, " ");
+  const industryWords = profile.industry.replace(/-/g, " ");
   const country =
     profile.country === "ZA"
       ? "South Africa"
@@ -60,9 +78,15 @@ function generateCustomerQueries(profile: BusinessProfile): string[] {
           : profile.country;
 
   return [
+    // 1. SUPERLATIVE — recommendation framing
     `Best ${primary} in ${profile.city}, ${country}`,
-    `Top ${profile.industry.replace(/-/g, " ")} companies in ${profile.city}`,
-  ]; // 2 queries × ~12s = ~24s — fits comfortably under 60s timeout
+    // 2. CATEGORY — list framing
+    `Top ${industryWords} companies in ${profile.city}`,
+    // 3. PROBLEM / INTENT — buyer-need framing
+    `Who can help me with ${primary} in ${profile.city}?`,
+    // 4. BRAND — direct awareness check
+    `Reviews and reputation of ${profile.businessName}`,
+  ]; // 4 queries × ~12s ≈ 48s — orchestrator timeout protects against overrun
 }
 
 // ─── Single query execution ──────────────────────────────────────

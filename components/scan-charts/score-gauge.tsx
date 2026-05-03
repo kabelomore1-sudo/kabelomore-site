@@ -82,6 +82,14 @@ export function ScoreGauge({ score, classification }: Props) {
       <div className="mt-3 text-sm text-ink-500">
         {classificationLabel(classification)}
       </div>
+      {/* Directional-readiness disclosure — keeps the prospect from
+          treating the score as a precise measurement. Live web_search
+          is non-deterministic, so re-runs vary 5-10 pts. We prefer to
+          say this once, clearly, here than to bury it in the small
+          print elsewhere. */}
+      <div className="mt-2 text-[10px] text-ink-400">
+        Directional readiness score · re-runs may vary 5-10 pts
+      </div>
     </div>
   );
 }

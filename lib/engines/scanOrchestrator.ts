@@ -88,6 +88,8 @@ export async function runFullScan(
     presenceData = {
       websiteReachable: false,
       websiteHasSchema: false,
+      websiteHasLocalBusinessSchema: false,
+      websiteHasFAQSchema: false,
       gbpFound: Boolean(resolvedGbpUrl),
       gbpCompleteness: undefined,
     };
@@ -134,8 +136,8 @@ export async function runFullScan(
   const detected: DetectedSignals = {
     websiteReachable: presenceData.websiteReachable,
     websiteHasSchema: presenceData.websiteHasSchema,
-    websiteHasFAQSchema: false,
-    websiteHasLocalBusinessSchema: false,
+    websiteHasFAQSchema: presenceData.websiteHasFAQSchema,
+    websiteHasLocalBusinessSchema: presenceData.websiteHasLocalBusinessSchema,
     gbpFound: presenceData.gbpFound,
     gbpCompleteness: presenceData.gbpCompleteness,
     citationCount: citationData.count,
@@ -195,29 +197,53 @@ export async function runFullScan(
 }
 
 // ─── Lightweight presence check using resolved URLs ──────────────
+//
+// Phase 1 honest measurement:
+//  - Website reachable: HEAD request, follow redirects, accept any
+//    non-5xx status (some sites return 403/406 to crawlers but are
+//    obviously up; we don't want false negatives).
+//  - Schema check: parse <script type="application/ld+json"> blocks
+//    properly and inspect the @type field. A bare substring match was
+//    catching false positives (the literal text "FAQPage" in JS
+//    comments) and missing real schemas split across multiple blocks.
+//
+// What this still doesn't catch:
+//  - Schema injected at runtime via tag manager (won't be in static
+//    HTML response). We surface this caveat in the issues copy so
+//    prospects know to confirm manually.
 async function checkPresence(
   websiteUrl: string | undefined,
   gbpUrl: string | undefined,
 ): Promise<{
   websiteReachable: boolean;
   websiteHasSchema: boolean;
+  websiteHasLocalBusinessSchema: boolean;
+  websiteHasFAQSchema: boolean;
   gbpFound: boolean;
   gbpCompleteness?: number;
 }> {
   let websiteReachable = false;
   let websiteHasSchema = false;
+  let websiteHasLocalBusinessSchema = false;
+  let websiteHasFAQSchema = false;
+
   if (websiteUrl) {
     websiteReachable = await isUrlReachable(websiteUrl);
     if (websiteReachable) {
-      websiteHasSchema = await checkForSchema(websiteUrl);
+      const schemaInfo = await detectSchemaTypes(websiteUrl);
+      websiteHasSchema = schemaInfo.hasAnyJsonLd;
+      websiteHasLocalBusinessSchema = schemaInfo.hasLocalBusiness;
+      websiteHasFAQSchema = schemaInfo.hasFAQ;
     }
   }
 
   return {
     websiteReachable,
     websiteHasSchema,
+    websiteHasLocalBusinessSchema,
+    websiteHasFAQSchema,
     gbpFound: Boolean(gbpUrl),
-    // gbpCompleteness deferred to Phase 2 (requires Google Maps API or deeper scrape)
+    // gbpCompleteness deferred to Phase 1.5 (requires Google Places / GBP API)
   };
 }
 
@@ -238,7 +264,33 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
-async function checkForSchema(url: string): Promise<boolean> {
+/**
+ * Parse JSON-LD blocks from a page and detect specific schema types.
+ *
+ * Stronger than a `html.includes("application/ld+json")` substring
+ * match — that approach was returning false positives (literal text
+ * "LocalBusiness" inside JS comments / inline scripts) and false
+ * negatives (multi-block schemas where one block was malformed).
+ *
+ * We accept three @type shapes:
+ *   - String:    "@type": "LocalBusiness"
+ *   - Array:     "@type": ["LocalBusiness", "Plumber"]
+ *   - @graph:    {"@graph": [{"@type": "LocalBusiness"}, ...]}
+ *
+ * Failure modes:
+ *   - JSON.parse failure on a block → that block contributes nothing
+ *     (but we don't fail the whole detection).
+ *   - Network failure → return all-false (logged upstream).
+ *
+ * Caveat (returned to user via issue copy):
+ *   - Tag-manager-injected schema won't appear in our static fetch.
+ *     We tell the prospect this so they can confirm manually.
+ */
+async function detectSchemaTypes(url: string): Promise<{
+  hasAnyJsonLd: boolean;
+  hasLocalBusiness: boolean;
+  hasFAQ: boolean;
+}> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
@@ -248,12 +300,98 @@ async function checkForSchema(url: string): Promise<boolean> {
       headers: { "User-Agent": "KabelomoreScan/1.0" },
     });
     clearTimeout(timeout);
-    if (!res.ok) return false;
+    if (!res.ok) return { hasAnyJsonLd: false, hasLocalBusiness: false, hasFAQ: false };
     const html = await res.text();
-    return html.includes("application/ld+json");
+
+    // Regex extracts every JSON-LD <script> block. The /s flag lets `.`
+    // span newlines. Non-greedy capture so adjacent blocks don't merge.
+    const blockRegex =
+      /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+
+    let hasAnyJsonLd = false;
+    let hasLocalBusiness = false;
+    let hasFAQ = false;
+
+    // LocalBusiness has many subtypes (LegalService, MedicalBusiness,
+    // Plumber, etc.) — checking against the canonical schema.org
+    // hierarchy entries that actually represent local businesses.
+    const localBusinessTypes = new Set([
+      "LocalBusiness",
+      "LegalService",
+      "MedicalBusiness",
+      "MedicalClinic",
+      "Physician",
+      "Dentist",
+      "AutomotiveBusiness",
+      "FinancialService",
+      "FoodEstablishment",
+      "HealthAndBeautyBusiness",
+      "HomeAndConstructionBusiness",
+      "Plumber",
+      "Electrician",
+      "ProfessionalService",
+      "Store",
+      "Restaurant",
+      "Hotel",
+    ]);
+
+    let match: RegExpExecArray | null;
+    while ((match = blockRegex.exec(html)) !== null) {
+      hasAnyJsonLd = true;
+      const raw = match[1].trim();
+      if (!raw) continue;
+
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        continue; // malformed block — skip but keep scanning others
+      }
+
+      // Walk the parsed structure. Schema can be a single object,
+      // an array of objects, or an @graph wrapping an array.
+      const nodes = collectSchemaNodes(parsed);
+      for (const node of nodes) {
+        const types = extractTypes(node);
+        if (types.some((t) => localBusinessTypes.has(t))) {
+          hasLocalBusiness = true;
+        }
+        if (types.includes("FAQPage")) {
+          hasFAQ = true;
+        }
+      }
+    }
+
+    return { hasAnyJsonLd, hasLocalBusiness, hasFAQ };
   } catch {
-    return false;
+    return { hasAnyJsonLd: false, hasLocalBusiness: false, hasFAQ: false };
   }
+}
+
+// Flatten schema.org JSON-LD into a list of typed nodes.
+// Handles single objects, arrays, and @graph containers.
+function collectSchemaNodes(parsed: unknown): Record<string, unknown>[] {
+  if (Array.isArray(parsed)) {
+    return parsed.flatMap((item) => collectSchemaNodes(item));
+  }
+  if (parsed && typeof parsed === "object") {
+    const obj = parsed as Record<string, unknown>;
+    if (Array.isArray(obj["@graph"])) {
+      return collectSchemaNodes(obj["@graph"]);
+    }
+    return [obj];
+  }
+  return [];
+}
+
+// Read @type — accept string, string[], or undefined.
+function extractTypes(node: Record<string, unknown>): string[] {
+  const t = node["@type"];
+  if (typeof t === "string") return [t];
+  if (Array.isArray(t)) {
+    return t.filter((x): x is string => typeof x === "string");
+  }
+  return [];
 }
 
 function countSocialProfiles(profile: BusinessProfile): number {

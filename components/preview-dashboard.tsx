@@ -26,6 +26,7 @@ import {
 } from "@/lib/sample-report-data";
 import { ConversionBlock } from "@/components/conversion-block";
 import { AiConversationGrid } from "@/components/ai-conversation-grid";
+import { MethodologyDisclosure } from "@/components/methodology-disclosure";
 
 interface PreviewDashboardProps {
   /** Industry from form submission, used to tailor the sample data */
@@ -93,8 +94,9 @@ export function PreviewDashboard({
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-ink-500 md:text-lg">
             Every prospect who submits gets a personalised version of this
-            dashboard. 5 charts. Real AI-engine responses. Sector-specific
-            recommendations. Delivered within 24 hours.
+            dashboard. 5 charts. Customer-style queries run via Claude + live
+            web search (a proxy for ChatGPT, Gemini, Perplexity).
+            Sector-specific recommendations. Delivered within 24 hours.
           </p>
         </div>
       )}
@@ -185,24 +187,28 @@ export function PreviewDashboard({
         </div>
       </section>
 
-      {/* PROOF LAYER — what AI actually says.
+      {/* PROOF LAYER — what an AI proxy returns.
           Sits between headline (score) and explanatory charts. The
           score creates the 'ouch' moment. The conversations make it
-          felt — 'every engine is recommending my competitor and I'm
+          felt — 'every query I tested returned my competitor and I'm
           not in the answer.' Then charts explain WHY.
           STRATEGIC ROLE: mockups = proof. Charts = explanation.
-          Recommendations = action. */}
+          Recommendations = action.
+          HONESTY NOTE: previous copy said "4 AI engines say this" —
+          we don't natively query ChatGPT/Gemini/Perplexity. Updated
+          to reflect the Claude+web_search proxy reality. */}
       <section className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10">
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
-          What AI actually says
+          What an AI proxy actually returns
         </div>
         <h3 className="mt-2 text-2xl font-semibold tracking-tight text-ink-900 md:text-3xl">
           See for yourself.
         </h3>
         <p className="mt-3 text-base text-ink-700 leading-relaxed">
-          Here&apos;s what each of the 4 AI engines says when your customers
-          search for businesses like yours. Notice who&apos;s in the answer
-          — and who isn&apos;t.
+          Below are real customer-style queries we run via Claude with live
+          web search — a proxy for what ChatGPT, Gemini, and Perplexity
+          surface from public web data. Notice who&apos;s in the answer —
+          and who isn&apos;t.
         </p>
 
         <div className="mt-8">
@@ -213,7 +219,7 @@ export function PreviewDashboard({
         </div>
 
         <p className="mt-6 text-xs italic text-ink-500">
-          These responses are from our latest scan of typical SA{" "}
+          These responses are illustrative — drawn from typical SA{" "}
           {sector === "medical"
             ? "medical practice"
             : sector === "legal"
@@ -221,9 +227,10 @@ export function PreviewDashboard({
               : sector === "industrial"
                 ? "industrial"
                 : "business"}{" "}
-          queries. Your real report shows the actual verbatim responses for{" "}
+          patterns. Your real report shows the actual verbatim responses for{" "}
           <strong className="not-italic text-ink-700">YOUR specific queries</strong>{" "}
-          across all 4 engines.
+          using the same Claude+web_search proxy. Native ChatGPT, Gemini,
+          and Perplexity adapters land in Phase 1.5.
         </p>
       </section>
 
@@ -249,10 +256,10 @@ export function PreviewDashboard({
             AI engine visibility
           </div>
           <h3 className="mt-2 text-lg font-semibold text-ink-900">
-            Which engines cite you
+            Likely cited / not cited
           </h3>
           <p className="mt-2 text-xs text-ink-500">
-            ChatGPT · Claude · Gemini · Perplexity
+            Claude+web_search proxy · stand-in for ChatGPT, Gemini, Perplexity
           </p>
           <div className="mt-6">
             <EngineHeatmap
@@ -339,16 +346,22 @@ export function PreviewDashboard({
         </div>
       </section>
 
-      {/* COMPETITOR MENTIONS — text list */}
+      {/* COMPETITOR MENTIONS — text list.
+          Honest framing: these are names that surfaced in our
+          search-grounded test queries — NOT a definitive competitor
+          set. The prospect knows their actual market; we always
+          invite them to verify / challenge the list. */}
       <section className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-8">
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
-          Who AI is recommending instead of you
+          Names that surfaced in our test queries
         </div>
         <h3 className="mt-2 text-lg font-semibold text-ink-900 md:text-xl">
           Sample competitor mentions
         </h3>
         <p className="mt-2 text-xs text-ink-500">
-          Your real report names the actual competitors AI engines surface for your specific queries.
+          Names that came up when we ran customer-style queries via Claude+web_search.{" "}
+          <strong className="text-ink-700">Verify these are your actual competitors</strong>{" "}
+          — search may surface adjacent firms you don&apos;t consider direct competition.
         </p>
         <ul className="mt-5 space-y-3">
           {sampleReport.competitors.map((c) => (
@@ -360,13 +373,17 @@ export function PreviewDashboard({
               <div className="flex-1">
                 <div className="text-sm font-semibold text-ink-900">{c.name}</div>
                 <div className="mt-1 text-xs text-ink-600">
-                  Cited by {c.appearsInEngines.length} of 4 AI engines · {c.citationCount} verified citations
+                  Surfaced in {c.appearsInEngines.length} of 4 test queries · ~{c.citationCount} citation domains we identified
                 </div>
               </div>
             </li>
           ))}
         </ul>
       </section>
+
+      {/* METHODOLOGY DISCLOSURE — full version, end of dashboard so
+          the prospect has the complete honest picture before deciding. */}
+      <MethodologyDisclosure variant="full" />
 
       {/* ─────────────────────────────────────────────────────────
           CONVERSION BLOCK — turns 'interesting insight' into 'clear

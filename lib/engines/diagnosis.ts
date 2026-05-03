@@ -9,8 +9,17 @@
  * + detected signals + top issue, what's the cleanest plain-English
  * explanation of what's happening?"
  *
+ * HONEST PHRASING (post-trust-audit):
+ *   We never say "your business has no citations" or "AI engines have
+ *   no record of you" — both overclaim. The scan didn't survey every
+ *   directory ever and didn't query ChatGPT/Gemini/Perplexity natively.
+ *   We say "our test queries didn't surface…" / "we couldn't find a
+ *   GBP via search…" so the prospect understands the bound on what
+ *   was actually checked.
+ *
  * This is THE most important text in the system. Buyers' decisions rest on
- * how clearly they understand what's wrong. Don't bury the lead.
+ * how clearly they understand what's wrong. Don't bury the lead, but never
+ * claim more than the scan actually established.
  */
 
 import type {
@@ -43,26 +52,26 @@ function buildOneLiner(
   classification: Classification,
   detected: DetectedSignals,
 ): string {
-  // The pattern: STATE → CAUSE → FIX
-  // "[Business] scores X/100. [Reason]. [Implication]."
+  // Pattern: STATE → CAUSE → IMPLICATION
+  // Hedged so we don't overclaim what the scan tested.
 
   if (classification === "type-a-no-presence") {
-    return `${businessName} scored ${score}/100. AI engines have no record of your business — when customers ask AI for businesses like yours, your name doesn't come up at all.`;
+    return `${businessName} scored ${score}/100 (directional). In our test queries, AI engines didn't surface your business — meaning customers asking AI for businesses like yours are unlikely to see your name.`;
   }
 
   if (classification === "type-b-partial-presence") {
     if (detected.citationLevel === "none") {
-      return `${businessName} scored ${score}/100. Your business exists online but has zero third-party citations — which is why AI engines aren't recommending you, even though your site exists.`;
+      return `${businessName} scored ${score}/100 (directional). Your business exists online, but our directory + industry searches didn't surface third-party citations — which is why AI engines aren't yet recommending you with confidence.`;
     }
-    return `${businessName} scored ${score}/100. AI engines have partial knowledge of your business but not enough authority signals to recommend you when customers ask.`;
+    return `${businessName} scored ${score}/100 (directional). AI engines have partial knowledge of your business but our test answers showed insufficient authority signals to recommend you consistently.`;
   }
 
   if (classification === "type-c-active-presence") {
-    return `${businessName} scored ${score}/100. AI engines know your business but you're occasionally cited rather than consistently recommended. The gap to dominance is closeable.`;
+    return `${businessName} scored ${score}/100 (directional). AI engines know your business but in our test queries you were occasionally cited rather than consistently recommended. The gap to dominance is closeable.`;
   }
 
   // Type D
-  return `${businessName} scored ${score}/100. AI engines actively recommend your business — the next move is dominance through compounding monthly work.`;
+  return `${businessName} scored ${score}/100 (directional). In our test queries, AI engines actively recommended your business — the next move is dominance through compounding monthly work.`;
 }
 
 // ─── Full diagnosis (3-4 sentences, for results hero) ────────────
@@ -101,32 +110,33 @@ function buildHeadlineSentence(
 ): string {
   switch (c) {
     case "type-a-no-presence":
-      return `${businessName} is currently invisible to AI search.`;
+      return `${businessName} appears largely invisible to AI search in our test queries.`;
     case "type-b-partial-presence":
-      return `${businessName} has a partial digital footprint, but AI engines aren't recommending you when customers ask.`;
+      return `${businessName} has a partial digital footprint — but in our test queries, AI engines weren't recommending you when customers ask.`;
     case "type-c-active-presence":
-      return `${businessName} has a working digital presence — AI engines know about you, but you're not the default recommendation.`;
+      return `${businessName} has a working digital presence — AI engines know about you, but you're not the default recommendation in our test queries.`;
     case "type-d-strong-presence":
-      return `${businessName} is well-positioned for AI search — you're showing up where it matters.`;
+      return `${businessName} is well-positioned for AI search — you're showing up where it matters in our test queries.`;
   }
 }
 
 function buildCauseSentence(d: DetectedSignals): string {
-  // Pick the dominant cause based on what's missing
+  // Pick the dominant cause based on what's missing — phrased so it
+  // describes what we observed, not what definitively is.
   if (d.citationLevel === "none") {
-    return "The biggest reason: zero third-party citations. AI engines verify businesses by mentions on trusted directories and industry sites — without those, you have no authority signal.";
+    return "The biggest reason: our directory + industry searches didn't surface any third-party citations. AI engines verify businesses by mentions on trusted directories and industry sites — without those signals visible to a search-grounded AI, you have weak authority footing.";
   }
   if (!d.websiteReachable && !d.gbpFound) {
-    return "The biggest reason: no website AND no Google Business Profile. AI engines need at least one verified entity record to consider recommending you.";
+    return "The biggest reason: we couldn't reach a website AND couldn't detect a Google Business Profile in search results. AI engines need at least one verified entity record to consider recommending you.";
   }
   if (d.websiteReachable && !d.websiteHasSchema) {
-    return "The biggest reason: your website has no schema markup. AI engines see a wall of text instead of structured business data.";
+    return "The biggest reason: your website has no JSON-LD schema markup we could parse. AI engines see a wall of text instead of structured business data — much harder to quote reliably.";
   }
   if (!d.gbpFound) {
-    return "The biggest reason: no Google Business Profile. GBP is the single biggest local AI visibility signal in 2026.";
+    return "The biggest reason: we couldn't detect a Google Business Profile via search. GBP is the single biggest local AI visibility signal in 2026 — please confirm it exists so we can rule this out.";
   }
   if (!d.napConsistent) {
-    return "The biggest reason: inconsistent business details (name, address, phone) across the platforms where you appear. AI engines downgrade trust when signals don't match.";
+    return "The biggest reason: business details (name, address, phone) appeared inconsistent across the platforms our search surfaced. AI engines downgrade trust when signals don't match.";
   }
   return "The biggest reason: insufficient depth across the layers AI engines weight most heavily.";
 }
@@ -137,11 +147,11 @@ function buildImplicationSentence(
 ): string {
   switch (c) {
     case "type-a-no-presence":
-      return "Right now, every customer who asks ChatGPT, Claude, Gemini, or Perplexity for businesses like yours is sent to your competitors instead.";
+      return "Right now, customers who ask ChatGPT, Claude, Gemini, or Perplexity for businesses like yours are likely sent to your competitors instead.";
     case "type-b-partial-presence":
-      return "Your competitors with stronger AEO infrastructure are getting the AI recommendations — even when their underlying business or service quality isn't actually better than yours.";
+      return "Competitors with stronger AEO infrastructure are likely getting the AI recommendations — even when their underlying business or service quality isn't actually better than yours.";
     case "type-c-active-presence":
-      return "You're in the running but not the default. AI engines give you partial credit, but the consistent recommendations are going to firms that have invested in citation density and content authority.";
+      return "You're in the running but not the default. AI engines give you partial credit, but the consistent recommendations tend to go to firms that have invested in citation density and content authority.";
     case "type-d-strong-presence":
       return "The compounding window is open: clients who maintain AEO discipline through months 6-24 dominate their categories long-term.";
   }
@@ -164,6 +174,9 @@ function buildPathSentence(c: Classification): string {
 /**
  * Generate a ranked list of issues from detected signals.
  * Lives in this file because issues + diagnosis read off the same data.
+ *
+ * Phrasing is deliberately bounded — we describe what the scan tested
+ * and what it didn't surface, rather than asserting absolute absence.
  */
 export function buildIssues(detected: DetectedSignals): Issue[] {
   const issues: Issue[] = [];
@@ -172,9 +185,9 @@ export function buildIssues(detected: DetectedSignals): Issue[] {
     issues.push({
       id: "no-citations",
       severity: "critical",
-      title: "Zero third-party citations",
+      title: "No third-party citations surfaced",
       explanation:
-        "Your business is not mentioned on any trusted directory or industry site we can find. Citations are how AI engines verify businesses exist and are real.",
+        "Our directory + industry searches didn't find your business mentioned on any trusted third-party site. Citations are how AI engines verify businesses exist and are real. (If you have listings we missed, share them — we'll re-check.)",
       fixCategory: "citations",
     });
   } else if (detected.citationLevel === "low") {
@@ -183,7 +196,7 @@ export function buildIssues(detected: DetectedSignals): Issue[] {
       severity: "high",
       title: "Insufficient citation breadth",
       explanation:
-        "You have some citations but not enough density to be the default AI recommendation. Industry standard is 25-50 consistent citations across trusted directories.",
+        "We surfaced some citations but not the density that typically pushes a business to default AI recommendations. We typically see 25-50 active citations on businesses that get cited consistently across AI engines.",
       fixCategory: "citations",
     });
   }
@@ -192,9 +205,9 @@ export function buildIssues(detected: DetectedSignals): Issue[] {
     issues.push({
       id: "no-schema",
       severity: "critical",
-      title: "No schema markup on your website",
+      title: "No JSON-LD schema markup detected",
       explanation:
-        "Your site has no structured data — meaning AI engines have to guess what your business does instead of having verified entity data they can confidently quote.",
+        "Your site doesn't expose structured data we could parse — meaning AI engines have to guess what your business does instead of reading verified entity data. (Schema injected at runtime via tag manager won't be visible to crawlers either — confirm with us if you think you have it.)",
       fixCategory: "schema",
     });
   }
@@ -203,17 +216,17 @@ export function buildIssues(detected: DetectedSignals): Issue[] {
     issues.push({
       id: "no-gbp",
       severity: "critical",
-      title: "Google Business Profile missing or not findable",
+      title: "Google Business Profile not detected via search",
       explanation:
-        "GBP is the single biggest local AI visibility signal. AI engines (and Google's AI Overviews) check GBP first when answering location-based queries.",
+        "We couldn't surface a Google Business Profile for your business in search results. GBP is the single biggest local AI visibility signal — please confirm it exists so we can rule this out. (We don't yet query the Google Maps API directly; that ships Phase 1.5.)",
       fixCategory: "gbp",
     });
   } else if (detected.gbpCompleteness && detected.gbpCompleteness < 80) {
     issues.push({
       id: "incomplete-gbp",
       severity: "high",
-      title: "Google Business Profile incomplete",
-      explanation: `Your GBP exists but is only ${detected.gbpCompleteness}% complete. Categories, hours, photos, services — every blank field weakens AI engines' trust signal.`,
+      title: "Google Business Profile likely incomplete",
+      explanation: `Based on what surfaced in search, your GBP appears around ${detected.gbpCompleteness}% complete. Categories, hours, photos, services — every blank field weakens AI engines' trust signal.`,
       fixCategory: "gbp",
     });
   }
@@ -222,9 +235,9 @@ export function buildIssues(detected: DetectedSignals): Issue[] {
     issues.push({
       id: "no-website",
       severity: "high",
-      title: "No website detected",
+      title: "Website not reachable",
       explanation:
-        "AI engines can recommend businesses without websites, but the citation density required to do so is much higher. A simple, AEO-ready website is the highest-leverage first investment.",
+        "We couldn't reach a website at the URL we tested. AI engines can recommend businesses without websites, but the citation density required to do so is much higher. A simple, AEO-ready website is the highest-leverage first investment.",
       fixCategory: "presence",
     });
   }
@@ -236,9 +249,9 @@ export function buildIssues(detected: DetectedSignals): Issue[] {
     issues.push({
       id: "nap-inconsistent",
       severity: "medium",
-      title: "Inconsistent NAP across listings",
+      title: "Possible NAP inconsistency across listings",
       explanation:
-        "Your business name, address, or phone varies across the directories where you're mentioned. AI engines downgrade trust when signals don't match.",
+        "Your business name, address, or phone appeared to vary across the directories our search surfaced. AI engines downgrade trust when signals don't match. (We'll verify the exact mismatches in your full audit.)",
       fixCategory: "consistency",
     });
   }
@@ -247,9 +260,9 @@ export function buildIssues(detected: DetectedSignals): Issue[] {
     issues.push({
       id: "no-faq-schema",
       severity: "medium",
-      title: "No FAQ-structured content",
+      title: "No FAQ-structured content detected",
       explanation:
-        "AI engines quote question-answer blocks directly when answering customer queries. Without FAQ schema or answer-shaped content, your site can't be quoted easily.",
+        "AI engines quote question-answer blocks directly when answering customer queries. Without FAQ schema or answer-shaped content visible in your HTML, your site is harder for AI to quote.",
       fixCategory: "content",
     });
   }
