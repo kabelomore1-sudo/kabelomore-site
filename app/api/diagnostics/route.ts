@@ -73,6 +73,21 @@ export async function GET() {
       purpose: "Override the From address (default: scan@kabelomore.com).",
       fix: "Add to Vercel env vars only if you want a different sender.",
     },
+    // Required for the /admin/scans dashboard. We expose the LENGTH but
+    // never the value — length differences are the most common reason
+    // the login route returns 403 (whitespace, partial paste, wrong
+    // copy). Length leak is acceptable: it doesn't materially help an
+    // attacker against a 24+ char random token (search space is still
+    // astronomically large).
+    ADMIN_TOKEN: {
+      set: Boolean(process.env.ADMIN_TOKEN),
+      length: process.env.ADMIN_TOKEN?.length ?? 0,
+      meetsMinLength: (process.env.ADMIN_TOKEN?.length ?? 0) >= 24,
+      required: false,
+      purpose:
+        "Gates the /admin/scans dashboard + /api/admin/* endpoints. Must be 24+ chars random.",
+      fix: "Vercel → Settings → Environment Variables → ADMIN_TOKEN (Production + Preview). Then REDEPLOY — env var changes don't apply to running deploys.",
+    },
   };
 
   const requiredMissing = Object.entries(checks)
