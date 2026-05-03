@@ -28,6 +28,7 @@ import { ConversionBlock } from "@/components/conversion-block";
 import { AiConversationGrid } from "@/components/ai-conversation-grid";
 import { MethodologyDisclosure } from "@/components/methodology-disclosure";
 import { DashboardSectionToc } from "@/components/dashboard-section-toc";
+import { AutoOpenDetails } from "@/components/auto-open-details";
 
 interface PreviewDashboardProps {
   /** Industry from form submission, used to tailor the sample data */
@@ -363,10 +364,15 @@ export function PreviewDashboard({
       {/* COMPETITOR MENTIONS — collapsed by default to shorten scroll.
           The same names already appear in the AI conversation cards
           and the citation benchmark above — this section is reference,
-          not first-read content. <details> open-on-click is the
-          simplest UX pattern: zero JS state, prints fine, screen-reader
-          friendly. */}
-      <section className="rounded-3xl border border-rule bg-white shadow-soft">
+          not first-read content. ANCHOR: #competitors.
+          AutoOpenDetails opens the <details> automatically when the
+          URL hash is #competitors, so clicking the TOC chip jumps to
+          the section AND reveals the content (no double-click). */}
+      <AutoOpenDetails
+        targetId="competitors"
+        className="rounded-3xl border border-rule bg-white shadow-soft"
+      >
+        <section id="competitors" className="scroll-mt-24">
         <details className="group p-6 md:p-8">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
             <div>
@@ -402,7 +408,8 @@ export function PreviewDashboard({
             ))}
           </ul>
         </details>
-      </section>
+        </section>
+      </AutoOpenDetails>
 
       {/* METHODOLOGY DISCLOSURE — full version, end of dashboard so
           the prospect has the complete honest picture before deciding. */}
