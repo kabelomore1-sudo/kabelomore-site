@@ -24,6 +24,7 @@ import {
   generateSampleReport,
   mapIndustryToSector,
 } from "@/lib/sample-report-data";
+import { ConversionBlock } from "@/components/conversion-block";
 
 interface PreviewDashboardProps {
   /** Industry from form submission, used to tailor the sample data */
@@ -256,27 +257,38 @@ export function PreviewDashboard({
         </ul>
       </section>
 
-      {/* CLOSING CTA */}
+      {/* ─────────────────────────────────────────────────────────
+          CONVERSION BLOCK — turns 'interesting insight' into 'clear
+          business decision'.
+          Includes:
+            - Revenue impact (sector-aware ZAR loss math)
+            - Urgency (compounds over time)
+            - Local visibility signals breakdown
+            - What happens next (3-step process)
+            - Risk reduction (high-impact fixes first)
+            - Decision block (1 primary + 2 secondary CTAs)
+          Replaces the previous generic 'Want this for your business?'
+          CTA which was too soft — this drives buying decisions.
+          ───────────────────────────────────────────────────────── */}
+      <ConversionBlock industry={industry} businessName={businessName} />
+
+      {/* If on the standalone /scan/preview page, also show a final
+          'submit a real scan' CTA for visitors who got here via marketing.
+          On the post-submit fallback, this is redundant — the prospect
+          already submitted. */}
       {showMarketingIntro && (
-        <section className="rounded-3xl bg-ink-gradient p-8 text-center text-white shadow-lift md:p-12">
-          <h2 className="text-display-md font-semibold tracking-tight text-white">
-            Want this for your business?
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-ink-300">
-            30-second submission. Personalised report within 24 hours. No card.
+        <section className="rounded-2xl border border-rule bg-ink-50/40 p-6 text-center md:p-8">
+          <p className="text-sm text-ink-600">
+            Haven&apos;t submitted yet? Get your personalised version of this
+            dashboard.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href="/scan"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-7 text-base font-semibold text-ink-900 shadow-md transition-all duration-200 hover:bg-ink-50 hover:shadow-lift"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink-900 px-6 text-sm font-semibold text-white shadow-soft transition-all hover:bg-ink-800"
             >
-              Get my AI Visibility report <ArrowRight className="h-4 w-4" />
-            </a>
-            <a
-              href="/discover"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/40 px-6 text-base font-medium text-white transition-all duration-200 hover:border-white/60 hover:bg-white/15"
-            >
-              Take the 10-min Discovery
+              Get my AI Visibility report
+              <ArrowRight className="h-4 w-4" />
             </a>
           </div>
         </section>
