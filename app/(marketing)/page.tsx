@@ -228,7 +228,7 @@ export default function HomePage() {
               accent: "bg-ink-900 text-white",
               eyebrow: "30 seconds",
               title: "Quick scan",
-              body: "Submit your business + city. We test 4 AI engines on the queries your customers run. PDF report in 24h.",
+              body: "Submit your business + city. We run customer-style queries via Claude + live web search (a proxy for ChatGPT, Gemini, Perplexity) and deliver a personalised report within 24h.",
               cta: "Run the free scan",
               href: "/scan",
             },

@@ -670,14 +670,14 @@ function RecommendationCard({
                 onClick={handleTalkToKabelo}
                 className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-5 py-2.5 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
               >
-                WhatsApp Kabelo
+                Chat on WhatsApp
               </a>
               <a
                 href="mailto:kabelo@kabelomore.com?subject=Discovery%20review%20request"
                 onClick={handleTalkToKabelo}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-rule bg-white px-5 py-2.5 text-sm font-medium text-ink-700 transition-all hover:bg-ink-50"
               >
-                Email Kabelo
+                Send an email
               </a>
             </div>
           </div>

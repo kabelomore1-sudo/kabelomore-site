@@ -461,8 +461,9 @@ function ResultsView({ result }: { result: ScanResult }) {
             {result.diagnosisOneLiner}
           </p>
           <p className="mt-4 text-base text-ink-300">
-            The fastest path: WhatsApp me. We&apos;ll spend 10 minutes
-            walking through your scan together. No pressure, no card.
+            The fastest path: a 10-minute call. We&apos;ll walk through your
+            scan together — what&apos;s real, what&apos;s a quick fix, what
+            actually matters. No pressure, no card.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button
@@ -472,7 +473,7 @@ function ResultsView({ result }: { result: ScanResult }) {
               variant="ink"
               size="lg"
             >
-              <MessageCircle className="h-4 w-4" /> WhatsApp Kabelo now
+              <MessageCircle className="h-4 w-4" /> Talk through your scan
             </Button>
             <Button
               href={`mailto:${site.contact.email}?subject=AI%20Visibility%20Scan%20-%20${encodeURIComponent(result.businessName)}&body=Hi%20Kabelo%2C%0A%0AI%20just%20got%20my%20scan%20for%20${encodeURIComponent(result.businessName)}.%20Score%3A%20${result.score}%2F100.%0A%0AI%27d%20like%20to%20talk%20about%20%5Bnext%20step%5D.%0A%0AThanks%2C%0A${encodeURIComponent(result.contactName)}`}
@@ -672,7 +673,7 @@ function FailedView({ error }: { error: string }) {
                 variant="secondary"
                 size="md"
               >
-                Email Kabelo
+                Email support
               </Button>
             </div>
           </div>
