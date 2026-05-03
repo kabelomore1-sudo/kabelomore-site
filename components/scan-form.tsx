@@ -50,9 +50,12 @@ type FormState =
       // Submission accepted but scan didn't complete inline. Render a
       // banner whose tone (green / amber / rose) reflects which emails
       // actually succeeded. Never lie.
+      // 'mode' lets the banner render different copy for manual mode
+      // (where scanCompleted=false is expected, not a failure).
       status: "fallback";
       message: string;
       flags: OutcomeFlags;
+      mode?: string;
     }
   | { status: "error"; message: string; field?: string; values: FormValues };
 
@@ -208,13 +211,18 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
       // ok:false but with flags = the API processed the submission but
       // the scan didn't complete inline. The UI message reflects WHICH
       // operations actually succeeded — flags drive the banner tone.
+      // 'mode' tells the banner whether to frame scanCompleted=false as
+      // intentional (manual mode) or as a failure (automated mode).
       if (data.flags) {
+        // mode is on the response when the API includes it; cast safely
+        const responseMode = (data as { mode?: string }).mode;
         setState({
           status: "fallback",
           message:
             data.message ??
             "Request received. Please check your inbox for confirmation.",
           flags: data.flags,
+          mode: responseMode,
         });
         return;
       }
@@ -249,7 +257,13 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
   // Critical: this is the bug fix. The previous banner said "we emailed
   // you" regardless of actual outcome. Now we render based on flags.
   if (state.status === "fallback") {
-    return <FallbackBanner message={state.message} flags={state.flags} />;
+    return (
+      <FallbackBanner
+        message={state.message}
+        flags={state.flags}
+        mode={state.mode}
+      />
+    );
   }
 
   // Form is rendered for both "idle" and "error" states. Field defaults
@@ -671,16 +685,23 @@ function industryLabel(ind: (typeof INDUSTRIES)[number]): string {
 function FallbackBanner({
   message,
   flags,
+  mode,
 }: {
   message: string;
   flags: OutcomeFlags;
+  /** SCAN_MODE returned by the API. In 'manual' mode, scanCompleted=false
+   *  is the EXPECTED outcome (no Anthropic call by design), not a failure.
+   *  The banner tone + scan-row labels render accordingly. */
+  mode?: string;
 }) {
+  const isManualMode = mode === "manual";
   const allEmailsSent = flags.userEmailSent && flags.adminEmailSent;
   const anyEmailSent = flags.userEmailSent || flags.adminEmailSent;
   const submissionGood = flags.submissionSaved;
 
-  // Determine banner tone + icon
-  const tone = allEmailsSent
+  // In manual mode, scanCompleted is intentionally false — don't let it
+  // bring down the banner tone. Only emails + submission save matter.
+  const tone = allEmailsSent && submissionGood
     ? "success"
     : anyEmailSent || submissionGood
       ? "warning"
@@ -745,11 +766,23 @@ function FallbackBanner({
               labelOk="Kabelo has been notified"
               labelFail="Kabelo could NOT be notified automatically"
             />
-            <FlagRow
-              ok={flags.scanCompleted}
-              labelOk="Automated scan completed"
-              labelFail="Automated scan did not complete (manual run within 24h)"
-            />
+            {/* Scan row — mode-aware. In manual mode, scanCompleted=false
+                is BY DESIGN (we don't run paid Anthropic calls), so render
+                it as a positive 'manual delivery scheduled' state. In
+                automated mode, treat it as a real status check. */}
+            {isManualMode ? (
+              <FlagRow
+                ok={true}
+                labelOk="Manual delivery — Kabelo runs your scan within 24h"
+                labelFail=""
+              />
+            ) : (
+              <FlagRow
+                ok={flags.scanCompleted}
+                labelOk="Automated scan completed"
+                labelFail="Automated scan did not complete (manual run within 24h)"
+              />
+            )}
           </div>
 
           {/* If anything failed, surface the contact path explicitly */}
