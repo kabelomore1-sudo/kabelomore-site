@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/cn";
 import { INDUSTRIES, COUNTRIES } from "@/lib/types/scan";
 import type { ScanResult } from "@/lib/types/scan";
+import { PreviewDashboard } from "@/components/preview-dashboard";
 
 type FormValues = {
   businessName?: string;
@@ -52,10 +53,13 @@ type FormState =
       // actually succeeded. Never lie.
       // 'mode' lets the banner render different copy for manual mode
       // (where scanCompleted=false is expected, not a failure).
+      // submittedValues = capture the form data so we can show a
+      // sector-personalised preview dashboard below the banner.
       status: "fallback";
       message: string;
       flags: OutcomeFlags;
       mode?: string;
+      submittedValues?: FormValues;
     }
   | { status: "error"; message: string; field?: string; values: FormValues };
 
@@ -213,6 +217,8 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
       // operations actually succeeded — flags drive the banner tone.
       // 'mode' tells the banner whether to frame scanCompleted=false as
       // intentional (manual mode) or as a failure (automated mode).
+      // submittedValues are passed to the preview dashboard so it can
+      // personalise the sample report (name + sector).
       if (data.flags) {
         // mode is on the response when the API includes it; cast safely
         const responseMode = (data as { mode?: string }).mode;
@@ -223,6 +229,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
             "Request received. Please check your inbox for confirmation.",
           flags: data.flags,
           mode: responseMode,
+          submittedValues: values,
         });
         return;
       }
@@ -262,6 +269,7 @@ export function ScanForm({ defaultTier }: { defaultTier?: string }) {
         message={state.message}
         flags={state.flags}
         mode={state.mode}
+        submittedValues={state.submittedValues}
       />
     );
   }
@@ -686,6 +694,7 @@ function FallbackBanner({
   message,
   flags,
   mode,
+  submittedValues,
 }: {
   message: string;
   flags: OutcomeFlags;
@@ -693,6 +702,9 @@ function FallbackBanner({
    *  is the EXPECTED outcome (no Anthropic call by design), not a failure.
    *  The banner tone + scan-row labels render accordingly. */
   mode?: string;
+  /** Form values from the submission — used to personalise the preview
+   *  dashboard with the prospect's business name + sector. */
+  submittedValues?: FormValues;
 }) {
   const isManualMode = mode === "manual";
   const allEmailsSent = flags.userEmailSent && flags.adminEmailSent;
@@ -734,6 +746,7 @@ function FallbackBanner({
   const Icon = config.Icon;
 
   return (
+    <div className="space-y-10">
     <div
       className={`rounded-3xl border-2 ${config.borderClass} ${config.bgClass} p-7 md:p-9`}
     >
@@ -810,6 +823,22 @@ function FallbackBanner({
           )}
         </div>
       </div>
+    </div>
+
+      {/* PREVIEW DASHBOARD — show the prospect what their personalised
+          report will look like. This is the 'wow' moment: same charts
+          they'd get if scan ran inline, populated with sector-typical
+          sample data. Clearly framed as 'sample' so we never imply
+          this is their actual data.
+          Only shown when submission was saved + at least one email got out
+          — i.e. when there's a meaningful follow-up promise to back the
+          preview. */}
+      {flags.submissionSaved && (flags.userEmailSent || flags.adminEmailSent) && (
+        <PreviewDashboard
+          industry={submittedValues?.industry ?? "other"}
+          businessName={submittedValues?.businessName ?? "Your Business"}
+        />
+      )}
     </div>
   );
 }
