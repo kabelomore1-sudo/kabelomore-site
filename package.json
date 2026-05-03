@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "scans:list": "bash scripts/admin-scans.sh",
+    "scan:run": "bash scripts/run-scan.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

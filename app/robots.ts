@@ -7,7 +7,11 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/"],
+        // Admin routes are gated by ADMIN_TOKEN, but we add a robots
+        // disallow as defense-in-depth so well-behaved crawlers don't
+        // even attempt the auth-rejected paths (which would still leak
+        // a 401/403 in their logs).
+        disallow: ["/api/", "/admin/"],
       },
       // Explicitly welcome AI engine crawlers — we sell AEO, we want them
       { userAgent: "GPTBot", allow: "/" },

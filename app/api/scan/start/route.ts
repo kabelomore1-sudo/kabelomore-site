@@ -9,6 +9,7 @@ import {
   saveResult,
   setError,
   isStorageConfigured,
+  addToIndex,
 } from "@/lib/storage/scanStore";
 import { runFullScan } from "@/lib/engines/scanOrchestrator";
 import { INDUSTRIES, COUNTRIES } from "@/lib/types/scan";
@@ -218,7 +219,7 @@ export async function POST(req: Request) {
       },
     });
 
-    // ─── Save profile ───────────────────────────────────────────────
+    // ─── Save profile (index push happens AFTER emails ─ see below) ──
     let submissionSaved = true;
     try {
       await saveProfile(scanId, profile);
@@ -344,6 +345,34 @@ export async function POST(req: Request) {
       flags,
       errors,
     });
+
+    // ─── Push to admin index AFTER outcomes are known ───────────────
+    // Index push is best-effort — if it fails we still have the profile
+    // saved + admin notification email. The admin dashboard's failover
+    // is to read profiles directly by scanId.
+    if (submissionSaved) {
+      try {
+        await addToIndex({
+          scanId,
+          businessName: profile.businessName,
+          contactName: profile.contactName,
+          email: profile.email,
+          industry: profile.industry,
+          city: profile.city,
+          country: profile.country,
+          submittedAt: profile.submittedAt,
+          userEmailSent: flags.userEmailSent,
+          adminEmailSent: flags.adminEmailSent,
+          manualFallback: flags.manualFallback,
+        });
+      } catch (indexErr) {
+        recordEvent({
+          type: "scan_failed",
+          scanId,
+          error: `index push: ${safeErrorMessage(indexErr)}`,
+        });
+      }
+    }
 
     if (scanCompleted && result) {
       // Save result + send completion email
@@ -539,16 +568,21 @@ async function sendUserAcknowledgment(profile: BusinessProfile): Promise<void> {
       "",
       "WHAT HAPPENS NEXT:",
       "",
-      "  Within 24 hours: a personalised PDF report covering",
-      "    · How ChatGPT, Claude, Gemini, and Perplexity respond when",
-      "      your customers search for your services",
+      "  Within 24 hours: a personalised written report delivered via",
+      "  a secure web link (and a summary email). It covers:",
+      "    · How an AI proxy (Claude + live web search, standing in for",
+      "      ChatGPT, Gemini, and Perplexity) responds when your customers",
+      "      search for your services",
       "    · The 3 highest-leverage fixes to improve your AI visibility",
       "    · A no-pressure recommendation on what to do next",
       "",
-      "  Sometimes our automated scan completes immediately — if so,",
-      "  you'll receive a more detailed second email with the full report.",
-      "  If it doesn't, Kabelo runs it manually and the report arrives",
-      "  within 24 hours either way.",
+      "  Methodology note: native ChatGPT, Gemini, and Perplexity adapters",
+      "  ship in Phase 1.5 — for now we use a Claude+web_search proxy.",
+      "  The score is directional (re-runs may vary 5-10 points), not a",
+      "  precise measurement.",
+      "",
+      "  Need it as a PDF? Reply to this email and we'll export the",
+      "  report as a PDF for you within the same 24-hour window.",
       "",
       "WHILE YOU WAIT:",
       "",

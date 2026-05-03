@@ -30,6 +30,57 @@ const memProfile = new Map<string, BusinessProfile>();
 const memStatus = new Map<string, ScanStatus>();
 const memResult = new Map<string, ScanResult>();
 const memError = new Map<string, string>();
+const memIndex: IndexEntry[] = [];
+
+// ─── Submission index (for the admin dashboard) ─────────────────
+//
+// KV doesn't expose a fast `list keys by prefix` for free — instead
+// we maintain an explicit list at `scan:index`, lpush'd recent-first.
+// Each entry is the minimum metadata the admin dashboard needs to
+// render a row without fetching every profile separately.
+//
+// Capped at 500 entries (ltrim'd on each push) so the list stays
+// O(1) to read. Older scans still exist under their per-key entries
+// — they just don't appear in the "recent" admin list.
+
+export type IndexEntry = {
+  scanId: string;
+  businessName: string;
+  contactName: string;
+  email: string;
+  industry: string;
+  city: string;
+  country: string;
+  submittedAt: string;
+  // Captured at submission time so the admin dashboard can show whether
+  // the user got their confirmation email and Kabelo got his admin
+  // notification — without an extra fetch per row.
+  userEmailSent?: boolean;
+  adminEmailSent?: boolean;
+  manualFallback?: boolean;
+};
+
+const INDEX_KEY = "scan:index";
+const INDEX_MAX = 500;
+
+// ─── Admin-set per-scan metadata ──────────────────────────────────
+// Tracks Kabelo's manual workflow state. Separate from the scan
+// engine's own status (scanning/complete/failed) so admin actions
+// don't collide with scan execution. Keyed under scan:{id}:meta.
+export type ScanMeta = {
+  /** True once Kabelo has reviewed the scan output */
+  handled?: boolean;
+  /** True once Kabelo has emailed the prospect their report */
+  emailed?: boolean;
+  /** True once the prospect has been moved out of "active leads" */
+  archived?: boolean;
+  /** Free-form note Kabelo can write against this scan */
+  note?: string;
+  /** ISO timestamp of the most recent meta update */
+  updatedAt?: string;
+};
+
+const memMeta = new Map<string, ScanMeta>();
 
 function isKvConfigured(): boolean {
   return Boolean(
@@ -114,6 +165,96 @@ export async function getError(scanId: string): Promise<string | null> {
     return await kv.get<string>(`scan:${scanId}:error`);
   }
   return memError.get(scanId) ?? null;
+}
+
+// ─── Submission index (push + list) ──────────────────────────────
+/**
+ * Push an index entry to the recent-first list.
+ *
+ * Idempotent enough for our needs: if called twice with the same
+ * scanId, the entry shows up twice (mild duplication). We accept
+ * this because deduping requires an O(n) scan on every write, and
+ * scan submissions are 1-per-IP-per-5-min anyway.
+ */
+export async function addToIndex(entry: IndexEntry): Promise<void> {
+  if (isKvConfigured()) {
+    await kv.lpush(INDEX_KEY, JSON.stringify(entry));
+    await kv.ltrim(INDEX_KEY, 0, INDEX_MAX - 1);
+  } else {
+    memIndex.unshift(entry);
+    if (memIndex.length > INDEX_MAX) memIndex.length = INDEX_MAX;
+  }
+}
+
+/**
+ * List the most recent N submissions, recent-first.
+ *
+ * Defensive parsing: @vercel/kv has historically returned raw strings
+ * for list entries, but newer versions auto-parse JSON. We handle both
+ * shapes so an SDK upgrade can't quietly break the admin dashboard.
+ */
+export async function listIndex(limit = 100): Promise<IndexEntry[]> {
+  if (isKvConfigured()) {
+    const raw = await kv.lrange(INDEX_KEY, 0, limit - 1);
+    return raw
+      .map((item: unknown): IndexEntry | null => {
+        if (typeof item === "string") {
+          try {
+            return JSON.parse(item) as IndexEntry;
+          } catch {
+            return null;
+          }
+        }
+        if (item && typeof item === "object") {
+          return item as IndexEntry;
+        }
+        return null;
+      })
+      .filter((e): e is IndexEntry => e !== null);
+  }
+  return memIndex.slice(0, limit);
+}
+
+// ─── Admin metadata (handled / emailed / notes) ──────────────────
+/**
+ * Read the admin-set metadata for a scan. Returns an empty object
+ * if no metadata exists yet — never null — so callers can spread
+ * safely without conditionals.
+ */
+export async function getScanMeta(scanId: string): Promise<ScanMeta> {
+  if (isKvConfigured()) {
+    try {
+      const data = await kv.get<ScanMeta>(`scan:${scanId}:meta`);
+      return data ?? {};
+    } catch (err) {
+      console.error(`[scanStore] getScanMeta failed for ${scanId}:`, err);
+      return {};
+    }
+  }
+  return memMeta.get(scanId) ?? {};
+}
+
+/**
+ * Merge a partial meta update onto the existing record. We use merge
+ * (not replace) so admin actions are independent — toggling `emailed`
+ * doesn't blow away `handled` or notes.
+ */
+export async function updateScanMeta(
+  scanId: string,
+  patch: Partial<ScanMeta>,
+): Promise<ScanMeta> {
+  const current = await getScanMeta(scanId);
+  const next: ScanMeta = {
+    ...current,
+    ...patch,
+    updatedAt: new Date().toISOString(),
+  };
+  if (isKvConfigured()) {
+    await kv.set(`scan:${scanId}:meta`, next, { ex: TTL_SECONDS });
+  } else {
+    memMeta.set(scanId, next);
+  }
+  return next;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────

@@ -8,14 +8,14 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Free AI Visibility Scan",
   description:
-    "Find out exactly what ChatGPT, Claude, Gemini, and Perplexity say about your business when your customers search. Free, no obligation, 24-hour turnaround.",
+    "Find out what an AI proxy (Claude + live web search, standing in for ChatGPT, Gemini, and Perplexity) returns when your customers search for businesses like yours. Free, no obligation, 24-hour turnaround.",
   alternates: { canonical: `${site.url}/scan` },
 };
 
 const scanFaqs = [
   {
     q: "What do I get from the free scan?",
-    a: "A 2-page PDF showing exactly what each of ChatGPT, Claude, Gemini, and Perplexity say about your business when potential customers search. Includes verbatim AI responses, screenshots, and the names of any competitors mentioned in your place.",
+    a: "A personalised written report — delivered as a hosted web link plus summary email (PDF available on request) — showing what an AI proxy returns when customers search for businesses like yours. Includes verbatim responses, names that surfaced instead of you, and the 3 highest-leverage fixes. Methodology: we currently use Claude with live web search as a proxy for ChatGPT, Gemini, and Perplexity (native engine adapters land Phase 1.5).",
   },
   {
     q: "What does it cost?",
