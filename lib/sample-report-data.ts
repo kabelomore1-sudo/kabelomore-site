@@ -279,7 +279,15 @@ export function generateSampleReport(
             },
           ];
 
-  // Realistic competitor names (anonymised — they're sector typicals)
+  // Realistic competitor names per sector — REAL local SA mid-market
+  // firms that actually compete in each vertical. NOT multinational
+  // enterprise brands (Bell / Barloworld / Babcock are too big to be a
+  // competitor for a mid-market industrial supplier — using them in the
+  // sample broke trust because prospects know their real competitive set).
+  //
+  // For industrial: Pretoria/Gauteng lifting equipment competitors that
+  // actually appear in Google Maps for queries like 'hoist equipment
+  // pretoria' / 'lifting equipment supplier gauteng'.
   const competitors = [
     {
       name:
@@ -287,10 +295,10 @@ export function generateSampleReport(
           ? "Sandton Specialist Group"
           : sector === "legal"
             ? "Werksmans Attorneys"
-            : "Bell Equipment",
+            : "Integrate Lifting SA",
       appearsInEngines: ["chatgpt", "perplexity", "gemini"] as Engine[],
       hasCitations: true,
-      citationCount: 47,
+      citationCount: 32,
     },
     {
       name:
@@ -298,10 +306,10 @@ export function generateSampleReport(
           ? "Linksfield Medical Centre"
           : sector === "legal"
             ? "Webber Wentzel"
-            : "Barloworld Equipment",
+            : "Elephant Lifting Equipment",
       appearsInEngines: ["chatgpt", "claude", "perplexity"] as Engine[],
       hasCitations: true,
-      citationCount: 38,
+      citationCount: 28,
     },
     {
       name:
@@ -309,14 +317,16 @@ export function generateSampleReport(
           ? "Cape Town Cardiology"
           : sector === "legal"
             ? "ENS Africa"
-            : "Babcock International",
+            : "RGM Cranes",
       appearsInEngines: ["chatgpt", "gemini"] as Engine[],
       hasCitations: true,
-      citationCount: 29,
+      citationCount: 21,
     },
   ];
 
-  // Visibility checks across the 4 engines
+  // Visibility checks — realistic queries customers actually run.
+  // For industrial: queries align with what procurement officers and
+  // operations managers Google for lifting/hoist equipment in Gauteng.
   const visibilityChecks = [
     {
       query:
@@ -324,17 +334,17 @@ export function generateSampleReport(
           ? `Best ${sector} specialist near me`
           : sector === "legal"
             ? "Best commercial attorney in Johannesburg"
-            : "BBBEE Level 1 industrial supplier in Gauteng",
+            : "Hoist equipment supplier in Pretoria",
       businessAppears: false,
       competitorsCited: [competitors[0].name, competitors[1].name],
-      verbatimExcerpt: `Based on available information, the top recommended firms include ${competitors[0].name} and ${competitors[1].name}, both with strong track records...`,
+      verbatimExcerpt: `For ${sector === "industrial" ? "hoist and lifting equipment in Pretoria" : "the top firms in this category"}, here are some recommended suppliers: ${competitors[0].name} and ${competitors[1].name}, both with strong local presence and customer reviews...`,
       source: "chatgpt" as Engine,
     },
     {
       query: `Reviews for ${businessName}`,
       businessAppears: true,
       competitorsCited: [],
-      verbatimExcerpt: `I have limited information about ${businessName}. They appear to operate in [sector] but I cannot confirm specific reviews or ratings.`,
+      verbatimExcerpt: `I have limited information about ${businessName}. They appear to operate in this sector but I cannot confirm specific reviews, recent customer feedback, or detailed services without more context.`,
       source: "claude" as Engine,
     },
     {
@@ -343,17 +353,20 @@ export function generateSampleReport(
           ? "Medical practitioner accepting Discovery in Pretoria"
           : sector === "legal"
             ? "Top SA law firm for SaaS startups"
-            : "Mining equipment fabricator BBBEE supplier",
+            : "BBBEE Level 1 lifting equipment supplier Gauteng",
       businessAppears: false,
       competitorsCited: [competitors[0].name, competitors[2].name],
-      verbatimExcerpt: `Based on industry sources, the leading providers in this category are ${competitors[0].name} and ${competitors[2].name}...`,
+      verbatimExcerpt: `Based on industry sources, the leading providers I can identify are ${competitors[0].name} and ${competitors[2].name}, both verified with strong reputations in the South African market...`,
       source: "perplexity" as Engine,
     },
     {
-      query: `Top ${sector} services in South Africa`,
+      query:
+        sector === "industrial"
+          ? "Lifting equipment supplier mining contracts SA"
+          : `Top ${sector} services in South Africa`,
       businessAppears: false,
       competitorsCited: [competitors[1].name],
-      verbatimExcerpt: `For ${sector} services in South Africa, ${competitors[1].name} is widely cited as a leading provider...`,
+      verbatimExcerpt: `For ${sector === "industrial" ? "lifting equipment serving the mining sector in South Africa" : `${sector} services in South Africa`}, ${competitors[1].name} is one of the more established providers I can recommend based on available information...`,
       source: "gemini" as Engine,
     },
   ];
@@ -393,8 +406,8 @@ export function generateSampleReport(
     recommendations,
     competitors,
     visibilityChecks,
-    diagnosisOneLiner: `Your AI visibility is in the bottom quartile for SA ${sector} firms. Three high-impact fixes would move you to the top quartile within 60 days.`,
-    diagnosisFull: `Across the 4 major AI engines (ChatGPT, Claude, Gemini, Perplexity), your business appears in ${visibilityChecks.filter((v) => v.businessAppears).length} of ${visibilityChecks.length} buyer-intent queries we tested. Your competitors are being recommended where you're not. The good news: the highest-impact fixes are quick wins — schema deployment, key directory listings, and a few specific changes to your Google Business Profile.`,
+    diagnosisOneLiner: `For a typical SA ${sector} firm, AI engine visibility usually starts in the bottom quartile — even when Google rankings are reasonable. Three high-impact fixes typically move firms to the top quartile within 60 days.`,
+    diagnosisFull: `Across the 4 major AI engines (ChatGPT, Claude, Gemini, Perplexity), the typical baseline shows the business appearing in ${visibilityChecks.filter((v) => v.businessAppears).length} of ${visibilityChecks.length} buyer-intent queries. Note: this is independent of Google search performance — many businesses ranking well on Google Maps are still invisible to AI engines because the systems use different signals. The good news: the highest-impact fixes for AI visibility are quick wins — schema deployment, key directory listings, and a few specific changes to your Google Business Profile that AI engines weight heavily.`,
     scannedAt: new Date().toISOString(),
     durationMs: 28_400,
   };

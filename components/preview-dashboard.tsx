@@ -49,20 +49,32 @@ export function PreviewDashboard({
 
   return (
     <div className="space-y-8">
-      {/* SAMPLE LABEL — clear framing so we never imply real data */}
+      {/* SAMPLE LABEL — strengthened framing so prospects never confuse
+          the sample with their real data. CRITICAL: if their actual
+          Google rankings are good, the sample (which shows them invisible)
+          could break trust before we start. New copy explicitly distinguishes
+          Google ranking from AI engine ranking. */}
       {!hideSampleLabel && (
         <div className="rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/50 p-5">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700" />
             <div>
               <h3 className="text-sm font-bold text-ink-900 md:text-base">
-                Below: a sample of what your personalised report will look like.
+                Sample data — not your actual results.
               </h3>
-              <p className="mt-1 text-xs text-ink-700 md:text-sm">
-                These are <strong>illustrative numbers</strong> showing a
-                typical day-0 baseline for SA {sector} firms. Your actual
-                report — with YOUR data, YOUR competitors, YOUR specific
-                AI-engine responses — arrives within 24 hours.
+              <p className="mt-2 text-xs text-ink-700 md:text-sm">
+                Below shows what a personalised report LOOKS like, using
+                illustrative numbers from a typical day-0 baseline for SA{" "}
+                {sector} firms. Your actual report — based on your real
+                website, GBP, and AI-engine responses to YOUR queries —
+                arrives within 24 hours.
+              </p>
+              <p className="mt-2 text-xs text-ink-700 md:text-sm">
+                <strong className="text-ink-900">Important:</strong>{" "}
+                if you already rank well on Google or Google Maps, that
+                doesn&apos;t automatically mean you rank in AI engines.
+                They&apos;re different systems with different signals — see
+                the explainer below.
               </p>
             </div>
           </div>
@@ -101,17 +113,73 @@ export function PreviewDashboard({
           {/* Diagnosis */}
           <div>
             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
-              Headline diagnosis
+              Headline diagnosis (sample)
             </div>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 md:text-3xl">
-              You&apos;re in the bottom quartile of SA {sector} firms.
+              Sample SA {sector} firm — bottom quartile on AI visibility.
             </h2>
             <p className="mt-4 text-sm text-ink-700 leading-relaxed md:text-base">
               {sampleReport.diagnosisOneLiner}
             </p>
             <p className="mt-3 text-xs italic text-ink-500">
-              Your real report includes a longer diagnosis covering the
-              specific competitors AI engines recommend instead of you.
+              The score above represents AI engine visibility specifically —
+              NOT Google rankings. A sample firm can rank well on Google
+              Maps and still score low here. Your real report covers both
+              systems with YOUR actual data.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* GOOGLE vs AI ENGINES — critical clarification.
+          A business can rank #1 on Google Maps AND be invisible to ChatGPT.
+          They're different systems with different signals. This callout
+          prevents prospects from dismissing the methodology because they
+          know they 'rank well on Google.' */}
+      <section className="rounded-2xl border border-accent-200 bg-accent-50/40 p-6 md:p-8">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-accent-100 text-accent-700">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-ink-900 md:text-lg">
+              Google rankings ≠ AI engine rankings — they&apos;re different games.
+            </h3>
+            <p className="mt-2 text-sm text-ink-700 leading-relaxed">
+              You might rank well on Google Maps for &quot;[your service] near me&quot;
+              and STILL be invisible when someone asks ChatGPT or Claude the same
+              question. Different systems, different signals, different weightings.
+            </p>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="rounded-xl border border-rule bg-white p-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-ink-500">
+                  Google ranks based on
+                </div>
+                <ul className="mt-2 space-y-1 text-xs text-ink-700">
+                  <li>· GBP completeness + reviews</li>
+                  <li>· NAP consistency (proximity matters)</li>
+                  <li>· On-page SEO + backlinks</li>
+                  <li>· Site speed + mobile responsiveness</li>
+                </ul>
+              </div>
+              <div className="rounded-xl border border-rule bg-white p-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-accent-700">
+                  AI engines rank based on
+                </div>
+                <ul className="mt-2 space-y-1 text-xs text-ink-700">
+                  <li>· Trusted citations (Wikipedia, news, industry pubs)</li>
+                  <li>· Schema markup AI can parse</li>
+                  <li>· LinkedIn presence (especially Perplexity)</li>
+                  <li>· Verbatim quotability (FAQ-style content)</li>
+                </ul>
+              </div>
+            </div>
+
+            <p className="mt-4 text-xs italic text-ink-600">
+              The signals overlap (citations, NAP, schema all matter for both)
+              — but the WEIGHTING is different. AI visibility is the next
+              layer on top of solid local SEO, not a replacement.
             </p>
           </div>
         </div>
