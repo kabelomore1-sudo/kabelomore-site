@@ -25,6 +25,7 @@ import {
   mapIndustryToSector,
 } from "@/lib/sample-report-data";
 import { ConversionBlock } from "@/components/conversion-block";
+import { AiConversationGrid } from "@/components/ai-conversation-grid";
 
 interface PreviewDashboardProps {
   /** Industry from form submission, used to tailor the sample data */
@@ -114,6 +115,48 @@ export function PreviewDashboard({
             </p>
           </div>
         </div>
+      </section>
+
+      {/* PROOF LAYER — what AI actually says.
+          Sits between headline (score) and explanatory charts. The
+          score creates the 'ouch' moment. The conversations make it
+          felt — 'every engine is recommending my competitor and I'm
+          not in the answer.' Then charts explain WHY.
+          STRATEGIC ROLE: mockups = proof. Charts = explanation.
+          Recommendations = action. */}
+      <section className="rounded-3xl border border-rule bg-white p-6 shadow-soft md:p-10">
+        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-600">
+          What AI actually says
+        </div>
+        <h3 className="mt-2 text-2xl font-semibold tracking-tight text-ink-900 md:text-3xl">
+          See for yourself.
+        </h3>
+        <p className="mt-3 text-base text-ink-700 leading-relaxed">
+          Here&apos;s what each of the 4 AI engines says when your customers
+          search for businesses like yours. Notice who&apos;s in the answer
+          — and who isn&apos;t.
+        </p>
+
+        <div className="mt-8">
+          <AiConversationGrid
+            visibilityChecks={sampleReport.visibilityChecks}
+            businessName={businessName}
+          />
+        </div>
+
+        <p className="mt-6 text-xs italic text-ink-500">
+          These responses are from our latest scan of typical SA{" "}
+          {sector === "medical"
+            ? "medical practice"
+            : sector === "legal"
+              ? "law firm"
+              : sector === "industrial"
+                ? "industrial"
+                : "business"}{" "}
+          queries. Your real report shows the actual verbatim responses for{" "}
+          <strong className="not-italic text-ink-700">YOUR specific queries</strong>{" "}
+          across all 4 engines.
+        </p>
       </section>
 
       {/* TWO-COL — Layer Radar + Engine Heatmap */}
