@@ -20,8 +20,12 @@ import {
   Zap,
   ClipboardList,
   BookOpen,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { CredentialsBadgeRow } from "@/components/credentials";
+import { BeforeAfter } from "@/components/before-after";
 
 const homepageFaqs = [
   {
@@ -215,6 +219,39 @@ export default function HomePage() {
           </div>
         </Container>
       </section>
+
+      {/* ─── VISUAL PROOF: AI BEFORE/AFTER ────────────────────────────
+          Sits directly after the hero so prospects who scrolled past
+          the headline land on a visual demonstration of the gap.
+          Two states they can toggle between:
+            BEFORE — AI cites a competitor, prospect not in answer
+            AFTER  — AI cites the prospect by name
+          Higher-impact than copy because most visitors don't know
+          what "AI visibility" looks like until they see it. */}
+      <Section variant="tinted" padding="default">
+        <div className="mx-auto max-w-3xl text-center">
+          <Eyebrow className="justify-center">See the gap</Eyebrow>
+          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+            What AI says about your category — before and after.
+          </h2>
+          <p className="mt-4 text-base text-ink-500 leading-relaxed">
+            Toggle below to see what ChatGPT (or a Claude+web search proxy)
+            returns for a typical customer query — first as most SA firms
+            appear today, then after AEO work compounds.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-10 max-w-3xl">
+          <BeforeAfter
+            caption="Customer query: &quot;Best lifting equipment supplier in Pretoria&quot;"
+            subcaption="Industrial supplier — illustrative example based on real scan patterns"
+            beforeLabel="❌ Before AEO"
+            afterLabel="✓ After AEO"
+            before={<AiConversationBefore />}
+            after={<AiConversationAfter />}
+          />
+        </div>
+      </Section>
 
       {/* ─── PICK YOUR PATH — three cards into the funnel ────────────
           Reinforces nav with body content. Each card is a real
@@ -519,5 +556,114 @@ export default function HomePage() {
         </div>
       </Section>
     </>
+  );
+}
+
+// ─── Local visuals for the BeforeAfter homepage section ─────────────
+// These render as the "before" and "after" panes inside the toggle.
+// Inline rather than separate files because they're hard-coded copy
+// for ONE specific homepage placement — extracting them creates a
+// component with one caller, which adds indirection for no reuse.
+//
+// Visual pattern matches the existing AiResponseMockup style so the
+// comparison feels consistent with the rest of the site.
+
+function AiConversationBefore() {
+  return (
+    <div className="space-y-3">
+      {/* Engine chrome */}
+      <div className="flex items-center gap-2 border-b border-rule pb-3">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white">
+          <Sparkles className="h-3.5 w-3.5" />
+        </div>
+        <div className="flex-1">
+          <div className="text-xs font-semibold text-ink-900">ChatGPT</div>
+          <div className="text-[10px] text-ink-500">Web search · 2s ago</div>
+        </div>
+        <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-rose-700">
+          <XCircle className="h-3 w-3" />
+          You: not cited
+        </span>
+      </div>
+
+      {/* Customer query */}
+      <div className="flex justify-end">
+        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-ink-900 px-3.5 py-2 text-xs leading-relaxed text-white md:text-[13px]">
+          Best lifting equipment supplier in Pretoria?
+        </div>
+      </div>
+
+      {/* AI response */}
+      <div className="flex justify-start">
+        <div className="max-w-[92%] rounded-2xl rounded-bl-md bg-ink-50 px-3.5 py-2.5 text-xs leading-relaxed text-ink-700 md:text-[13px]">
+          For lifting equipment suppliers in Pretoria, the top names that come
+          up include <strong className="text-ink-900">Integrate Lifting SA</strong>,{" "}
+          <strong className="text-ink-900">Elephant Lifting Equipment</strong>, and{" "}
+          <strong className="text-ink-900">RGM Cranes</strong> — all with strong
+          local presence and customer reviews. Each offers a range of hoists,
+          gantries, and certified inspection services for the Gauteng market.
+        </div>
+      </div>
+
+      {/* Footer alert */}
+      <div className="flex items-start gap-2 rounded-xl border border-rose-100 bg-rose-50/50 px-3 py-2.5">
+        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-rose-600" />
+        <p className="text-[11px] leading-relaxed text-ink-700">
+          <strong className="text-rose-700">Your business not in this answer.</strong>{" "}
+          Customers asking AI for your service are being sent to your competitors —
+          and you never see the lost lead.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function AiConversationAfter() {
+  return (
+    <div className="space-y-3">
+      {/* Engine chrome */}
+      <div className="flex items-center gap-2 border-b border-rule pb-3">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white">
+          <Sparkles className="h-3.5 w-3.5" />
+        </div>
+        <div className="flex-1">
+          <div className="text-xs font-semibold text-ink-900">ChatGPT</div>
+          <div className="text-[10px] text-ink-500">Web search · just now</div>
+        </div>
+        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-700">
+          <CheckCircle2 className="h-3 w-3" />
+          You: cited
+        </span>
+      </div>
+
+      {/* Customer query — same as before */}
+      <div className="flex justify-end">
+        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-ink-900 px-3.5 py-2 text-xs leading-relaxed text-white md:text-[13px]">
+          Best lifting equipment supplier in Pretoria?
+        </div>
+      </div>
+
+      {/* AI response with prospect now featured */}
+      <div className="flex justify-start">
+        <div className="max-w-[92%] rounded-2xl rounded-bl-md bg-ink-50 px-3.5 py-2.5 text-xs leading-relaxed text-ink-700 md:text-[13px]">
+          For lifting equipment suppliers in Pretoria, the leading providers
+          include <strong className="text-emerald-700">your business</strong>{" "}
+          — verified BBBEE Level 1 supplier with industrial cranes, hoists, and
+          certified LME inspections — alongside Integrate Lifting SA and
+          Elephant Lifting Equipment. Your business is frequently cited for
+          mining-sector procurement in Gauteng.
+        </div>
+      </div>
+
+      {/* Footer success */}
+      <div className="flex items-start gap-2 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-2.5">
+        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-emerald-600" />
+        <p className="text-[11px] leading-relaxed text-ink-700">
+          <strong className="text-emerald-700">Your business is in the answer.</strong>{" "}
+          AI recommends you for high-intent buyer queries — same customer, same
+          query, different outcome.
+        </p>
+      </div>
+    </div>
   );
 }
