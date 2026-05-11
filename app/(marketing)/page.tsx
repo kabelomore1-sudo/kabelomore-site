@@ -21,6 +21,7 @@ import {
   ClipboardList,
   BookOpen,
 } from "lucide-react";
+import { CredentialsBadgeRow } from "@/components/credentials";
 
 const homepageFaqs = [
   {
@@ -202,6 +203,9 @@ export default function HomePage() {
                   To find out where you stand. No card, no obligation.
                 </div>
               </div>
+            </div>
+            <div className="mt-6 border-t border-rule pt-5">
+              <CredentialsBadgeRow />
             </div>
           </div>
         </Container>
