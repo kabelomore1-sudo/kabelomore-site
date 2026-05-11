@@ -10,6 +10,7 @@ import { PublicPackagesGrid } from "@/components/public-packages-grid";
 import { SerpRealEstateMap } from "@/components/serp-real-estate-map";
 import { TierComparisonTable } from "@/components/tier-comparison-table";
 import { TrackPageView } from "@/components/track-page-view";
+import { TrustStrip } from "@/components/trust-strip";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -142,12 +143,41 @@ export default function ServicesPage() {
           <p className="mt-5 text-sm text-ink-400">
             10-min Discovery · Personalised recommendation in 24 hours · No card
           </p>
+
+          {/* Above-the-fold pricing summary — visitors who came to see
+              prices shouldn't have to scroll past two hero sections to
+              find them. One-line preview with anchor link to the cards. */}
+          <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-rule bg-white px-5 py-4 shadow-soft md:px-6">
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-sm">
+              <span className="font-semibold text-ink-900">
+                Starter <span className="font-normal text-ink-500">from R5,000</span>
+              </span>
+              <span className="hidden h-3 w-px bg-rule sm:inline-block" aria-hidden="true" />
+              <span className="font-semibold text-ink-900">
+                Growth <span className="font-normal text-ink-500">R5,500/mo</span>
+              </span>
+              <span className="hidden h-3 w-px bg-rule sm:inline-block" aria-hidden="true" />
+              <span className="font-semibold text-ink-900">
+                Premium <span className="font-normal text-ink-500">from R10,500/mo</span>
+              </span>
+            </div>
+            <div className="mt-2 text-center text-[11px] text-ink-400">
+              All 50/50 payment terms · Cancel monthly retainers after month 3 ·{" "}
+              <a href="#packages" className="text-accent-600 hover:text-accent-700">
+                See what each includes ↓
+              </a>
+            </div>
+          </div>
         </div>
       </Section>
 
       {/* ─────────────────────────────────────────────────────────────
           PUBLIC PACKAGES — 3 cards.
           Growth is highlighted as 'Recommended' with visual amplification.
+          TrustStrip sits directly above the cards because this is the
+          page's first commercial-commitment moment — visitors deciding
+          between R5k once-off and R5.5k+/mo retainers need proof at
+          the decision point, not buried in the footer.
           ───────────────────────────────────────────────────────────── */}
       <Section variant="default" padding="lg" id="packages">
         <div className="mx-auto max-w-3xl text-center">
@@ -162,7 +192,11 @@ export default function ServicesPage() {
           </p>
         </div>
 
-        <div className="mx-auto mt-12 max-w-6xl">
+        <div className="mx-auto mt-10 max-w-4xl">
+          <TrustStrip />
+        </div>
+
+        <div className="mx-auto mt-10 max-w-6xl">
           <PublicPackagesGrid />
         </div>
 

@@ -113,28 +113,33 @@ export default function HomePage() {
               Serving SA · UK · US · Built in Pretoria
             </Eyebrow>
 
+            {/* Hero headline — promise-first, not question-first.
+                Previous copy asked "does your business come up?" which
+                forced the visitor into a thinking pose before they could
+                act. Replaced with a declarative promise that names the
+                ICP (SA medical / legal / industrial) and the outcome
+                (get cited by AI engines). */}
             <h1 className="mt-6 text-display-xl font-semibold tracking-tight text-ink-900">
-              When your customer asks Google or AI for{" "}
+              Get your business cited by{" "}
               <span className="relative inline-block whitespace-nowrap">
-                <span className="relative z-10">your service</span>
+                <span className="relative z-10">ChatGPT, Claude, Gemini, Perplexity</span>
                 <span className="absolute inset-x-0 bottom-1 h-3 -z-0 bg-accent-100" />
               </span>
-              ,
               <br className="hidden md:block" />
-              <span className="text-ink-500">does your business come up?</span>
+              <span className="text-ink-500">— where your customers ask first.</span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-500 md:text-xl">
-              For most South African medical, legal, and industrial firms, the
-              answer is no. We fix that with{" "}
+              For SA medical, legal, and industrial firms. We run a free
+              60-second scan, deliver a personalised report in 24 hours, and
+              fix what&apos;s broken with{" "}
               <Link
                 href="/about"
                 className="font-semibold text-ink-700 underline decoration-accent-300 underline-offset-4 hover:text-accent-700 hover:decoration-accent-500"
               >
                 The Real Estate Method
               </Link>{" "}
-              — covering all 7 places customers actually search to find businesses
-              like yours.
+              — covering all 7 places your customers actually search.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">

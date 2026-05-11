@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Section, Eyebrow } from "@/components/ui/section";
 import { ScanForm } from "@/components/scan-form";
+import { TrustStrip } from "@/components/trust-strip";
 import { JsonLd } from "@/components/ui/jsonld";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -59,11 +60,20 @@ export default async function ScanPage({
             <span className="text-ink-500">recommend your business.</span>
           </h1>
           <p className="mt-5 text-lg text-ink-500">
-            Submit your business details. We'll test you across ChatGPT, Claude,
-            Gemini, and Perplexity — then send you a 2-page report with exactly what
-            each AI said. Free. No follow-up unless you want one.
+            Submit your business details. We run customer-style queries via
+            Claude with live web search (a proxy for ChatGPT, Gemini, and
+            Perplexity) and deliver a personalised report in 24 hours. Free.
+            No follow-up unless you want one.
           </p>
         </div>
+      </Section>
+
+      {/* Trust strip — placed between the hero promise and the form so
+          social proof lands at the decision point (where the visitor
+          is about to hand over data). Adds named first case (OMS),
+          method coverage, delivery promise, and the "no card" reassurance. */}
+      <Section variant="default" padding="default" containerSize="narrow">
+        <TrustStrip />
       </Section>
 
       {/* Form */}
@@ -106,20 +116,20 @@ export default async function ScanPage({
           <div className="mt-10 grid gap-4">
             {[
               {
-                h: "What ChatGPT says",
-                p: "Verbatim screenshots of ChatGPT's response when prompted with the queries your customers run.",
+                h: "What an AI proxy returns",
+                p: "Verbatim text from Claude with live web search — a stand-in for what ChatGPT, Gemini, and Perplexity blend from public web data. Native per-engine adapters land Phase 1.5.",
               },
               {
-                h: "What Claude, Gemini, and Perplexity say",
-                p: "Same prompts, three other AI engines. Often three different answers — that itself is useful data.",
+                h: "Across 4 buyer-intent queries",
+                p: "We run 4 distinct query shapes (best, top, problem-form, brand) so the result distinguishes 'no AI footprint at all' from 'no footprint for this query'.",
               },
               {
-                h: "Who AI recommends instead",
-                p: "Names of the businesses AI engines cite when they don't cite you. Your real digital competitors, not the ones you assume.",
+                h: "Who surfaced instead of you",
+                p: "Names of the businesses our test answers cited when yours wasn't there. Verify they're your actual competitors — search sometimes surfaces adjacent firms.",
               },
               {
                 h: "Top 3 fixes",
-                p: "Three concrete, prioritised recommendations. The ones that move the needle most for least effort.",
+                p: "Three concrete, prioritised recommendations. The ones that move the needle most for least effort — based on what we observed.",
               },
             ].map((item) => (
               <div
