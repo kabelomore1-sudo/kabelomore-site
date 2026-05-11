@@ -6,6 +6,7 @@ import { breadcrumbJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
 import { FounderAvatarLandscape } from "@/components/founder-avatar";
 import { ArrowRight } from "lucide-react";
+import { Credentials } from "@/components/credentials";
 
 export const metadata: Metadata = {
   title: "About Kabelo More — AI Visibility Consultant, Pretoria",
@@ -110,6 +111,23 @@ export default function AboutPage() {
               Pretoria-built, internationally served
             </div>
           </div>
+        </div>
+      </Section>
+
+      {/* Certifications & credentials */}
+      <Section variant="default" padding="default">
+        <div className="mx-auto max-w-4xl text-center">
+          <Eyebrow className="justify-center">Certifications</Eyebrow>
+          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+            Trained and certified by the platforms I optimise for.
+          </h2>
+          <p className="mt-4 text-base text-ink-500 leading-relaxed">
+            Continuous investment in AI, search, and marketing education —
+            because the landscape changes quarterly.
+          </p>
+        </div>
+        <div className="mt-10">
+          <Credentials />
         </div>
       </Section>
 
