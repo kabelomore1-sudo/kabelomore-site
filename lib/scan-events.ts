@@ -32,6 +32,8 @@ export type ScanEventType =
   | "admin_email_failed"
   | "completion_email_sent"
   | "completion_email_failed"
+  | "client_completion_email_sent"
+  | "client_completion_email_failed"
   | "response_returned";
 
 export interface ScanEvent {

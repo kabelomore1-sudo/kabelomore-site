@@ -26,6 +26,10 @@ import {
 } from "@/lib/scan-events";
 import { sendEmailOrThrow } from "@/lib/resend-helper";
 import {
+  buildAdminCompletionEmail,
+  buildClientCompletionEmail,
+} from "@/lib/email-templates";
+import {
   getScanMode,
   isPaidApiAllowed,
   acceptsSubmissions,
@@ -375,7 +379,7 @@ export async function POST(req: Request) {
     }
 
     if (scanCompleted && result) {
-      // Save result + send completion email
+      // Save result + send completion emails
       try {
         await saveResult(scanId, result);
         await setStatus(scanId, "complete");
@@ -383,12 +387,28 @@ export async function POST(req: Request) {
         /* storage non-fatal */
       }
 
+      // Admin notification (Kabelo) — comprehensive operational email
       try {
         await notifyKabeloOnCompletion(result, profile);
         recordEvent({ type: "completion_email_sent", scanId });
       } catch (err) {
         recordEvent({
           type: "completion_email_failed",
+          scanId,
+          error: safeErrorMessage(err),
+        });
+      }
+
+      // Client completion email — conversion-focused HTML email with
+      // score, diagnosis, top issues, top fixes, big CTA to hosted
+      // report. Failure is non-fatal — admin still has the result and
+      // can manually trigger the email from /admin/scans (Send email).
+      try {
+        await sendClientCompletionEmail(result, profile);
+        recordEvent({ type: "client_completion_email_sent", scanId });
+      } catch (err) {
+        recordEvent({
+          type: "client_completion_email_failed",
           scanId,
           error: safeErrorMessage(err),
         });
@@ -601,11 +621,21 @@ async function sendUserAcknowledgment(profile: BusinessProfile): Promise<void> {
   });
 }
 
+/**
+ * Admin completion email — operational, comprehensive.
+ * Uses the template helper for consistency between this path and the
+ * admin-dashboard "Run scan" path (which now also sends this email).
+ *
+ * `clientEmailWillBeSent` reflects whether we ALSO sent the client a
+ * results email. In the /api/scan/start automated path that's always
+ * true. In the admin-dashboard path it's a flag the admin can toggle.
+ */
 async function notifyKabeloOnCompletion(
   result: ScanResult & {
     stageReport?: import("@/lib/engines/scanOrchestrator").ScanStageReport;
   },
   profile: BusinessProfile,
+  clientEmailWillBeSent = true,
 ): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -616,79 +646,51 @@ async function notifyKabeloOnCompletion(
   const inboxEmail = process.env.SCAN_INBOX_EMAIL ?? site.contact.email;
   const fromEmail = process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
 
-  const stages = result.stageReport;
-  const stageEmoji = (s: string | undefined) =>
-    s === "ok" ? "✅" : s === "partial" ? "⚠️" : s === "failed" ? "❌" : "—";
-  const hasFailures = stages
-    ? Object.values(stages).some((s) => s === "failed" || s === "partial")
-    : false;
-  const confidenceTag = hasFailures
-    ? `[LOW CONFIDENCE — manual verification recommended]`
-    : `[high confidence]`;
+  const email = buildAdminCompletionEmail({
+    result,
+    profile,
+    stageReport: result.stageReport,
+    clientEmailWillBeSent,
+  });
 
   await sendEmailOrThrow(resend, {
     from: `Kabelomore Scans <${fromEmail}>`,
     to: [inboxEmail],
     replyTo: profile.email,
-    subject: `Scan complete — ${profile.businessName} — ${result.score}/100 ${hasFailures ? "⚠️" : ""}`,
-    text: [
-      `Scan complete for ${profile.businessName} ${confidenceTag}`,
-      "─".repeat(60),
-      ``,
-      `Score:           ${result.score}/100`,
-      `Classification:  ${result.classification}`,
-      ``,
-      `Stage report (what ran successfully):`,
-      stages
-        ? [
-            `  ${stageEmoji(stages.discovery)}  Discovery (find website + GBP):       ${stages.discovery}`,
-            `  ${stageEmoji(stages.presenceCheck)}  Presence check (HEAD + schema):       ${stages.presenceCheck}`,
-            `  ${stageEmoji(stages.citationAnalysis)}  Citation analysis (multi-search):     ${stages.citationAnalysis}`,
-            `  ${stageEmoji(stages.visibilitySimulation)}  Visibility simulation (AI queries):   ${stages.visibilitySimulation}`,
-          ].join("\n")
-        : `  (stage tracking unavailable)`,
-      ``,
-      `Layers:`,
-      `  Presence:    ${result.layers.presence}/25`,
-      `  Authority:   ${result.layers.authority}/40`,
-      `  Consistency: ${result.layers.consistency}/20`,
-      `  Content:     ${result.layers.content}/15`,
-      ``,
-      `Top issues:`,
-      ...result.issues
-        .slice(0, 3)
-        .map((i, idx) => `  ${idx + 1}. [${i.severity.toUpperCase()}] ${i.title}`),
-      ``,
-      `Top recommendations:`,
-      ...result.recommendations.slice(0, 3).map((r) => `  ${r.rank}. ${r.title}`),
-      ``,
-      `Diagnosis: ${result.diagnosisOneLiner}`,
-      ``,
-      `View full results page: ${site.url}/scan/${result.id}/results`,
-      ``,
-      `─── Detected signals ───`,
-      `Website reachable: ${result.detected.websiteReachable ? "yes" : "no"}`,
-      `Website has schema: ${result.detected.websiteHasSchema ? "yes" : "no"}`,
-      `GBP found: ${result.detected.gbpFound ? "yes" : "no"}`,
-      `Citation count: ${result.detected.citationCount}`,
-      `Citation level: ${result.detected.citationLevel}`,
-      `Citation sources: ${result.detected.citationSources.slice(0, 8).join(", ") || "—"}`,
-      `NAP consistent: ${result.detected.napConsistent ? "yes" : "no"}`,
-      ``,
-      `─── Visibility queries ───`,
-      ...result.visibilityChecks.map(
-        (v) =>
-          `  • "${v.query}" → ${v.businessAppears ? "✓ business cited" : "✗ business NOT cited"}`,
-      ),
-      ``,
-      `Competitors AI is recommending:`,
-      ...result.competitors.slice(0, 5).map((c) => `  • ${c.name}`),
-      ``,
-      `Scan duration: ${(result.durationMs / 1000).toFixed(1)}s`,
-      ``,
-      hasFailures
-        ? `⚠️  This scan had partial/failed stages — review the detected signals above and run audit-agent CLI manually for verification before sending the report to the prospect.`
-        : `✅  All scan stages ran successfully.`,
-    ].join("\n"),
+    subject: email.subject,
+    text: email.text,
+  });
+}
+
+/**
+ * Client completion email — conversion-focused HTML email with score,
+ * diagnosis, top 3 issues, top 3 fixes, big CTA to the hosted report.
+ *
+ * Sent from Kabelo's personal address (replyTo set so client replies
+ * route back to the same inbox). Failure is non-fatal — admin still
+ * has the result in /admin/scans and can re-send manually via the
+ * "Send email" button.
+ */
+async function sendClientCompletionEmail(
+  result: ScanResult,
+  profile: BusinessProfile,
+): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY not configured");
+  }
+
+  const resend = new Resend(apiKey);
+  const fromEmail = process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
+
+  const email = buildClientCompletionEmail({ result, profile });
+
+  await sendEmailOrThrow(resend, {
+    from: `Kabelo More <${fromEmail}>`,
+    to: [profile.email],
+    replyTo: site.contact.email,
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
   });
 }

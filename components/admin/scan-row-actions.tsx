@@ -32,6 +32,7 @@ export function ScanRowActions({ scanId, status, meta }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [running, setRunning] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [savingMeta, setSavingMeta] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,6 +80,47 @@ export function ScanRowActions({ scanId, status, meta }: Props) {
     }
   }
 
+  async function sendEmail() {
+    if (sendingEmail) return;
+
+    const proceed = window.confirm(
+      "Send completion emails?\n\n" +
+        "Will dispatch:\n" +
+        "  · Client report email (HTML, with score + top fixes + report link)\n" +
+        "  · Admin notification (operational detail to your inbox)\n\n" +
+        "Free — uses existing scan data, no new API spend.\n" +
+        "Click OK to send.",
+    );
+    if (!proceed) return;
+
+    setSendingEmail(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/scans/${scanId}/send-email`, {
+        method: "POST",
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        message?: string;
+        clientEmailSent?: boolean;
+        adminEmailSent?: boolean;
+      };
+      if (!res.ok || !data.ok) {
+        setError(data.message ?? `HTTP ${res.status}`);
+        return;
+      }
+      // Optimistically reflect Emailed badge if client email landed
+      if (data.clientEmailSent) {
+        setLocalMeta((m) => ({ ...m, emailed: true }));
+      }
+      startTransition(() => router.refresh());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSendingEmail(false);
+    }
+  }
+
   async function patchMeta(patch: Partial<ScanMeta>) {
     if (savingMeta) return;
     const previous = localMeta;
@@ -116,7 +158,7 @@ export function ScanRowActions({ scanId, status, meta }: Props) {
 
   return (
     <div className="flex flex-col items-end gap-2">
-      {/* Primary: run / view */}
+      {/* Primary: run / view / send-email */}
       <div className="flex flex-wrap justify-end gap-1.5">
         {status === "complete" ? (
           <a
@@ -127,6 +169,17 @@ export function ScanRowActions({ scanId, status, meta }: Props) {
           >
             View result
           </a>
+        ) : null}
+
+        {status === "complete" ? (
+          <button
+            onClick={sendEmail}
+            disabled={sendingEmail}
+            className="rounded-full bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
+            title="Send the client + admin completion emails. Uses existing scan data, no new API spend."
+          >
+            {sendingEmail ? "Sending…" : "Send email"}
+          </button>
         ) : null}
 
         <button

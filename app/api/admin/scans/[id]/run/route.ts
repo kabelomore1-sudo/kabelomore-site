@@ -1,13 +1,26 @@
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 import {
   getProfile,
   saveResult,
   setStatus,
   setError,
+  updateScanMeta,
 } from "@/lib/storage/scanStore";
 import { runFullScan } from "@/lib/engines/scanOrchestrator";
+import type { ScanResult } from "@/lib/types/scan";
+import type { ScanStageReport } from "@/lib/engines/scanOrchestrator";
 import { verifyAdminRequest } from "@/lib/admin-auth";
+
+// Helper type for the result returned by runFullScan — includes stageReport
+type ScanResultWithStages = ScanResult & { stageReport?: ScanStageReport };
 import { recordEvent, safeErrorMessage } from "@/lib/scan-events";
+import { sendEmailOrThrow } from "@/lib/resend-helper";
+import {
+  buildAdminCompletionEmail,
+  buildClientCompletionEmail,
+} from "@/lib/email-templates";
+import { site } from "@/lib/site";
 
 export const runtime = "nodejs";
 // 60s is the Vercel Hobby ceiling. The orchestrator has its own internal
@@ -100,6 +113,13 @@ export async function POST(
     data: { trigger: "admin_manual" },
   });
 
+  // Default behaviour: when admin clicks Run scan from the dashboard,
+  // we also automatically fire BOTH completion emails (client + admin
+  // notification) so the workflow completes in one action. To override
+  // (e.g. you want to review before sending), pass ?skipEmail=1.
+  const url = new URL(req.url);
+  const skipEmail = url.searchParams.get("skipEmail") === "1";
+
   try {
     await setStatus(id, "scanning");
     const result = await runFullScan(profile);
@@ -110,6 +130,77 @@ export async function POST(
       scanId: id,
       data: { score: result.score, trigger: "admin_manual" },
     });
+
+    // Email dispatch — non-fatal failures. Track per-email outcome
+    // so the response tells the admin what actually went out.
+    let clientEmailSent = false;
+    let adminEmailSent = false;
+    const emailErrors: string[] = [];
+
+    if (!skipEmail) {
+      const resend = new Resend(process.env.RESEND_API_KEY!);
+      const inboxEmail = process.env.SCAN_INBOX_EMAIL ?? site.contact.email;
+      const fromEmail = process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
+
+      // Client completion email — conversion-focused
+      try {
+        const email = buildClientCompletionEmail({ result, profile });
+        await sendEmailOrThrow(resend, {
+          from: `Kabelo More <${fromEmail}>`,
+          to: [profile.email],
+          replyTo: site.contact.email,
+          subject: email.subject,
+          text: email.text,
+          html: email.html,
+        });
+        clientEmailSent = true;
+        recordEvent({ type: "client_completion_email_sent", scanId: id });
+      } catch (e) {
+        emailErrors.push(`client: ${safeErrorMessage(e)}`);
+        recordEvent({
+          type: "client_completion_email_failed",
+          scanId: id,
+          error: safeErrorMessage(e),
+        });
+      }
+
+      // Admin notification — operational, comprehensive
+      try {
+        const email = buildAdminCompletionEmail({
+          result,
+          profile,
+          stageReport: (result as ScanResultWithStages).stageReport,
+          clientEmailWillBeSent: clientEmailSent,
+        });
+        await sendEmailOrThrow(resend, {
+          from: `Kabelomore Scans <${fromEmail}>`,
+          to: [inboxEmail],
+          replyTo: profile.email,
+          subject: email.subject,
+          text: email.text,
+        });
+        adminEmailSent = true;
+        recordEvent({ type: "completion_email_sent", scanId: id });
+      } catch (e) {
+        emailErrors.push(`admin: ${safeErrorMessage(e)}`);
+        recordEvent({
+          type: "completion_email_failed",
+          scanId: id,
+          error: safeErrorMessage(e),
+        });
+      }
+
+      // If the client email landed, mark the scan as Emailed in admin
+      // workflow state. Same flag the Mark Emailed button toggles.
+      if (clientEmailSent) {
+        try {
+          await updateScanMeta(id, { emailed: true });
+        } catch {
+          /* meta update non-fatal */
+        }
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       scanId: id,
@@ -117,6 +208,9 @@ export async function POST(
       classification: result.classification,
       durationMs: result.durationMs,
       resultUrl: `/scan/${id}/results`,
+      clientEmailSent,
+      adminEmailSent,
+      emailErrors: emailErrors.length > 0 ? emailErrors : undefined,
     });
   } catch (err) {
     const msg = safeErrorMessage(err);
