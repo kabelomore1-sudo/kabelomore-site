@@ -42,6 +42,19 @@ export function ScanRowActions({ scanId, status, meta }: Props) {
 
   async function runScan() {
     if (running) return;
+
+    // Cost confirmation — every scan spends ~$0.30 on Anthropic API.
+    // The button is a single tap with no visual cost cue, so misclicks
+    // are easy. window.confirm() is intentionally low-tech: it works,
+    // blocks the UI, and the message is the only thing the user has to
+    // read. Single-admin tool, so a polished dialog is over-engineering.
+    const proceed = window.confirm(
+      "Trigger a paid scan?\n\n" +
+        "This calls the Anthropic API (~$0.30) and takes 30-50 seconds.\n" +
+        "Click OK to fire, Cancel to abort.",
+    );
+    if (!proceed) return;
+
     setRunning(true);
     setError(null);
     try {
@@ -118,7 +131,16 @@ export function ScanRowActions({ scanId, status, meta }: Props) {
 
         <button
           onClick={runScan}
-          disabled={running || status === "scanning"}
+          // Only disable while THIS browser tab is actively firing.
+          // We used to also disable when `status === "scanning"` to
+          // prevent double-firing during a real scan, but the side
+          // effect was that submissions made in manual mode (which
+          // sets status="scanning" without ever running Anthropic)
+          // stayed permanently locked. Status pill in the next column
+          // already shows the "Scanning" state visually — re-stating
+          // it on the button helped no one and blocked admins from
+          // running stuck submissions.
+          disabled={running}
           className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors ${
             status === "complete"
               ? "border border-rule bg-white text-ink-700 hover:bg-ink-50"
@@ -127,13 +149,11 @@ export function ScanRowActions({ scanId, status, meta }: Props) {
         >
           {running
             ? "Running…"
-            : status === "scanning"
-              ? "In progress…"
-              : status === "complete"
-                ? "Re-run"
-                : status === "failed"
-                  ? "Re-run scan"
-                  : "Run scan"}
+            : status === "complete"
+              ? "Re-run"
+              : status === "failed"
+                ? "Re-run scan"
+                : "Run scan"}
         </button>
       </div>
 
