@@ -82,38 +82,49 @@ export function buildClientCompletionEmail(input: {
   const top3Issues = result.issues.slice(0, 3);
   const top3Recs = result.recommendations.slice(0, 3);
 
-  const subject = `Your AI Visibility Score: ${result.score}/100 — ${profile.businessName}`;
+  // Subject line tuned to read as TRANSACTIONAL, not marketing.
+  // Gmail's Promotions filter weights subjects with $/%/score/marketing
+  // keywords. We deliberately:
+  //   - Use "Your scan results" framing (matches user expectation of
+  //     receiving a thing they requested)
+  //   - Include business name as second clause for personalisation signal
+  //   - Avoid emoji, numbers in brackets, "FREE", marketing exclamation
+  //   - Don't lead with "Your AI Visibility Score: X/100" which reads as
+  //     a marketing teaser (the number-in-subject pattern is a Promotions
+  //     flag in Gmail's classifier).
+  const subject = `Your scan results — ${profile.businessName}`;
 
-  // ─── Plain-text version (fallback for HTML-blocked clients) ───
+  // ─── Plain-text version ───
+  // Tone: conversational, transactional. No "headlines", no exclamation,
+  // no marketing-coded phrasing ("here's what we found!" etc). Reads
+  // like a personal email from one person to another.
   const text = [
     `Hi ${firstName},`,
     "",
-    `Your AI Visibility report for ${profile.businessName} is ready.`,
+    `Your scan finished for ${profile.businessName}. Quick summary below — the full breakdown (with charts and AI response examples) is at the link.`,
     "",
-    `Score: ${result.score}/100 — ${colour.label}`,
-    `Classification: ${classificationLabel(result.classification)}`,
+    `Headline: ${result.score}/100 — ${colour.label}`,
     "",
-    `View your full report (with charts, AI conversation examples, and full breakdown):`,
-    reportUrl,
-    "",
-    "Plain-English diagnosis:",
+    "Plain-English read:",
     result.diagnosisFull,
     "",
-    top3Issues.length > 0 ? "Top issues we found:" : "",
+    "Full report (web link):",
+    reportUrl,
+    "",
+    top3Issues.length > 0 ? "The three things to look at first:" : "",
     ...top3Issues.map(
-      (issue, idx) => `  ${idx + 1}. [${issue.severity.toUpperCase()}] ${issue.title}`,
+      (issue, idx) => `${idx + 1}. ${issue.title}`,
     ),
     "",
-    top3Recs.length > 0 ? "Top fixes ranked by impact:" : "",
-    ...top3Recs.map((rec, idx) => `  ${idx + 1}. ${rec.title}`),
+    top3Recs.length > 0 ? "The three highest-leverage fixes:" : "",
+    ...top3Recs.map((rec, idx) => `${idx + 1}. ${rec.title}`),
     "",
-    "Want to talk through this? Reply to this email or WhatsApp +27 76 035 1084 — typical reply within 1 business hour.",
+    "Most clients book a 15-min call once they've read the report — we go through it together, you ask whatever, no pressure or pitch. If that's useful, reply to this email or WhatsApp 076 035 1084.",
     "",
-    "— Kabelo More",
-    `  AI Visibility Consultant · Pretoria`,
-    `  ${site.url}`,
+    "Kabelo",
+    `${site.url}`,
     "",
-    "How this scan works: we run customer-style queries via Claude with live web search — a proxy for ChatGPT, Gemini, and Perplexity. Score is directional (re-runs may vary 5-10 pts). Native per-engine adapters land in Phase 1.5.",
+    "Notes on methodology: scan runs customer-style queries via Claude with live web search (proxy for ChatGPT, Gemini, Perplexity). Score is a directional readiness indicator — re-runs may vary 5-10 points.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -136,16 +147,20 @@ export function buildClientCompletionEmail(input: {
       <!-- Container -->
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;">
 
-        <!-- Header -->
+        <!-- Header — minimal, no caps, no marketing eyebrow.
+             Gmail Promotions filter is sensitive to all-caps eyebrows
+             ("AI VISIBILITY REPORT") so we drop the marketing chrome
+             and lead with the business name. Reads as a transactional
+             notification, not a marketing send. -->
         <tr><td style="padding:24px 28px 8px;border-bottom:1px solid #e4e4e7;">
-          <div style="font-size:13px;color:#71717a;letter-spacing:0.14em;text-transform:uppercase;font-weight:600;">AI Visibility Report</div>
-          <div style="font-size:20px;font-weight:600;color:#18181b;margin-top:4px;">${escapeHtml(profile.businessName)}</div>
+          <div style="font-size:16px;font-weight:600;color:#18181b;">Scan results for ${escapeHtml(profile.businessName)}</div>
+          <div style="font-size:12px;color:#71717a;margin-top:4px;">From Kabelo More · kabelomore.com</div>
         </td></tr>
 
-        <!-- Greeting -->
+        <!-- Greeting — conversational, no exclamation, no "Here's what we found!" -->
         <tr><td style="padding:20px 28px 12px;">
-          <p style="margin:0 0 12px;font-size:16px;line-height:1.5;color:#27272a;">Hi ${escapeHtml(firstName)},</p>
-          <p style="margin:0;font-size:15px;line-height:1.6;color:#52525b;">Your free AI Visibility scan is complete. Here's the headline — the full report (with charts, AI conversation examples, and recommendations) is at the link below.</p>
+          <p style="margin:0 0 10px;font-size:16px;line-height:1.5;color:#27272a;">Hi ${escapeHtml(firstName)},</p>
+          <p style="margin:0;font-size:15px;line-height:1.6;color:#52525b;">Quick summary below — the full breakdown is at the link.</p>
         </td></tr>
 
         <!-- Score block -->
@@ -219,23 +234,43 @@ export function buildClientCompletionEmail(input: {
             : ""
         }
 
-        <!-- CTA — bulletproof button technique -->
-        <tr><td style="padding:0 28px 28px;" align="center">
+        <!-- Primary CTA — bulletproof button technique.
+             Drives to the hosted report, which itself drives to a call.
+             Two-step flow (email → report → call) outperforms email →
+             direct purchase for B2B services at this price point. -->
+        <tr><td style="padding:0 28px 20px;" align="center">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0">
             <tr><td align="center" style="background:#18181b;border-radius:999px;">
               <a href="${escapeAttr(reportUrl)}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px;">
-                View your full report →
+                Open the full report
               </a>
             </td></tr>
           </table>
-          <div style="margin-top:12px;font-size:12px;color:#a1a1aa;">Charts, AI conversation examples, citation gaps, full recommendations</div>
+          <div style="margin-top:10px;font-size:12px;color:#a1a1aa;">Charts, verbatim AI responses, citation breakdown, ranked fixes</div>
         </td></tr>
 
-        <!-- Soft CTA — talk to Kabelo -->
+        <!-- Secondary CTA — book a call. This is where most B2B
+             service conversions happen at this price point — the
+             conversation, not a self-serve purchase. -->
         <tr><td style="padding:0 28px 24px;border-top:1px solid #e4e4e7;">
-          <p style="margin:20px 0 0;font-size:14px;line-height:1.6;color:#52525b;">
-            Want to walk through this? Reply to this email or WhatsApp <a href="https://wa.me/27760351084" style="color:#d97706;text-decoration:none;font-weight:600;">+27 76 035 1084</a> — typical reply within 1 business hour. No pressure, no card, no follow-up unless you want one.
+          <p style="margin:20px 0 12px;font-size:14px;line-height:1.6;color:#27272a;font-weight:600;">After you've read it — should we talk?</p>
+          <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#52525b;">
+            Most clients book a 15-minute call to walk through the report and pick the right next step. No pitch, no card. If that's useful, reply to this email or send a WhatsApp.
           </p>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="padding-right:8px;">
+                <a href="mailto:${escapeAttr(site.contact.email)}?subject=${encodeURIComponent("Re: scan results for " + profile.businessName)}" style="display:inline-block;padding:10px 18px;font-size:13px;font-weight:600;color:#27272a;text-decoration:none;border:1px solid #d4d4d8;border-radius:999px;">
+                  Reply to this email
+                </a>
+              </td>
+              <td>
+                <a href="https://wa.me/27760351084" style="display:inline-block;padding:10px 18px;font-size:13px;font-weight:600;color:#27272a;text-decoration:none;border:1px solid #d4d4d8;border-radius:999px;">
+                  WhatsApp
+                </a>
+              </td>
+            </tr>
+          </table>
         </td></tr>
 
         <!-- Footer -->

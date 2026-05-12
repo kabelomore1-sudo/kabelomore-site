@@ -111,7 +111,14 @@ function ResultsView({ result }: { result: ScanResult }) {
       {/* HERO — Score gauge + classification + diagnosis */}
       <Section variant="tinted" padding="lg">
         <div className="mx-auto max-w-5xl">
-          <Eyebrow>AI Visibility Scan · {result.businessName}</Eyebrow>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Eyebrow>AI Visibility Scan · {result.businessName}</Eyebrow>
+            {/* Save-as-PDF hint — uses the existing @media print
+                stylesheet in globals.css. Browser's native "Save as
+                PDF" appears in the print dialog. No PDF generation
+                dependency needed; everything works offline. */}
+            <PrintButton />
+          </div>
 
           <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-14 md:items-center">
             {/* Left: Score gauge (the hero number) */}
@@ -450,33 +457,41 @@ function ResultsView({ result }: { result: ScanResult }) {
         </div>
       </Section>
 
-      {/* Conversion CTA */}
-      <Section variant="ink" padding="lg">
+      {/* Conversion CTA — drives toward a CALL, not a self-serve purchase.
+          For B2B services at R5.5k-R10.5k/mo retainer pricing, the call
+          is where pricing flexibility happens, scope gets defined, and
+          trust is built. Per Neil Patel: skipping the call costs ~10×
+          conversion at this price point. Per Naval: the conversation is
+          your specific knowledge — the moat. Don't automate it away
+          before you've proven the manual model converts. */}
+      <Section variant="ink" padding="lg" id="next-step">
         <div className="mx-auto max-w-3xl text-center text-white">
           <Eyebrow className="text-accent-400 justify-center">Next step</Eyebrow>
           <h2 className="mt-4 text-display-lg font-semibold tracking-tight">
-            Want me to fix this?
+            Book a 15-minute call. No pitch.
           </h2>
           <p className="mt-5 text-lg text-ink-300 leading-relaxed">
             {result.diagnosisOneLiner}
           </p>
           <p className="mt-4 text-base text-ink-300">
-            The fastest path: a 10-minute call. We&apos;ll walk through your
-            scan together — what&apos;s real, what&apos;s a quick fix, what
-            actually matters. No pressure, no card.
+            On the call we go through your scan together — what&apos;s real,
+            what&apos;s a quick fix, what actually moves the needle for
+            your business. You ask whatever. I tell you honestly which
+            package (if any) fits, or whether you can DIY this. No card,
+            no pressure, typical reply within one business hour.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row print:hidden">
             <Button
               href={whatsappLink(
-                `Hi Kabelo — I just got my AI Visibility scan for ${result.businessName}. My score is ${result.score}/100. Want to talk about fixing it?`,
+                `Hi Kabelo — I just read my AI Visibility scan for ${result.businessName}. Can we book a 15-min call?`,
               )}
               variant="ink"
               size="lg"
             >
-              <MessageCircle className="h-4 w-4" /> Talk through your scan
+              <MessageCircle className="h-4 w-4" /> WhatsApp to book a call
             </Button>
             <Button
-              href={`mailto:${site.contact.email}?subject=AI%20Visibility%20Scan%20-%20${encodeURIComponent(result.businessName)}&body=Hi%20Kabelo%2C%0A%0AI%20just%20got%20my%20scan%20for%20${encodeURIComponent(result.businessName)}.%20Score%3A%20${result.score}%2F100.%0A%0AI%27d%20like%20to%20talk%20about%20%5Bnext%20step%5D.%0A%0AThanks%2C%0A${encodeURIComponent(result.contactName)}`}
+              href={`mailto:${site.contact.email}?subject=${encodeURIComponent("15-min call request — " + result.businessName)}&body=${encodeURIComponent("Hi Kabelo,\n\nI've read my AI Visibility scan for " + result.businessName + " (score: " + result.score + "/100). Can we book a 15-minute call to talk through it?\n\nMy availability:\n[a few options]\n\nThanks,\n" + result.contactName)}`}
               variant="ghost"
               size="lg"
               className="text-white hover:bg-white/10"
@@ -484,9 +499,42 @@ function ResultsView({ result }: { result: ScanResult }) {
               <Mail className="h-4 w-4" /> Reply by email
             </Button>
           </div>
-          <p className="mt-8 text-xs text-ink-400">
-            Scan ID: {result.id} · Completed in {(result.durationMs / 1000).toFixed(1)}s ·{" "}
-            <span>You&apos;ll receive a copy via email shortly</span>
+          {/* Package menu — visible but secondary. Lets self-serve
+              buyers see prices without forcing them to a call. Naval
+              shape: surface the option, don't push it. */}
+          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 text-left">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-accent-400">
+              Or browse packages first
+            </div>
+            <div className="mt-3 grid gap-3 text-sm md:grid-cols-3">
+              <a
+                href="/services#packages"
+                className="rounded-xl bg-white/10 p-3 hover:bg-white/15"
+              >
+                <div className="font-semibold text-white">Starter</div>
+                <div className="mt-0.5 text-xs text-ink-300">From R5,000 once-off</div>
+                <div className="mt-1 text-[11px] text-ink-400">Foundations: schema, GBP, 10 directory listings</div>
+              </a>
+              <a
+                href="/services#packages"
+                className="rounded-xl border border-accent-500/40 bg-accent-500/10 p-3 hover:bg-accent-500/15"
+              >
+                <div className="font-semibold text-white">Growth <span className="text-[9px] uppercase tracking-wider text-accent-400">· Most fit here</span></div>
+                <div className="mt-0.5 text-xs text-ink-300">R5,500/month</div>
+                <div className="mt-1 text-[11px] text-ink-400">Compounding monthly AEO + citations + LinkedIn</div>
+              </a>
+              <a
+                href="/services#packages"
+                className="rounded-xl bg-white/10 p-3 hover:bg-white/15"
+              >
+                <div className="font-semibold text-white">Premium</div>
+                <div className="mt-0.5 text-xs text-ink-300">From R10,500/month</div>
+                <div className="mt-1 text-[11px] text-ink-400">Visibility + workflow automation + PR</div>
+              </a>
+            </div>
+          </div>
+          <p className="mt-8 text-xs text-ink-400 print:hidden">
+            Scan ID: {result.id} · Completed in {(result.durationMs / 1000).toFixed(1)}s
           </p>
         </div>
       </Section>
@@ -529,6 +577,40 @@ function ResultsView({ result }: { result: ScanResult }) {
         </div>
       </Section>
     </>
+  );
+}
+
+// ─── Print / Save-as-PDF button ───────────────────────────────────
+// Triggers the browser's native print dialog. The @media print
+// stylesheet in globals.css already strips nav/footer/CTAs and
+// reformats for paper. Most browsers offer "Save as PDF" as a
+// destination in the print dialog — works offline, no server-side
+// PDF generation needed.
+function PrintButton() {
+  return (
+    <button
+      type="button"
+      onClick={() => window.print()}
+      className="print:hidden inline-flex items-center gap-1.5 rounded-full border border-rule bg-white px-3 py-1.5 text-xs font-semibold text-ink-700 hover:bg-ink-50"
+      title="Open the print dialog — most browsers offer 'Save as PDF' as a destination"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-3.5 w-3.5"
+        aria-hidden="true"
+      >
+        <polyline points="6 9 6 2 18 2 18 9" />
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+        <rect width="12" height="8" x="6" y="14" />
+      </svg>
+      Save as PDF
+    </button>
   );
 }
 
