@@ -37,3 +37,24 @@ export const WEB_SEARCH_TOOL = {
   type: "web_search_20260209" as const,
   name: "web_search" as const,
 };
+
+/**
+ * Shared system prompt used by every scan-engine call to Claude.
+ *
+ * Why: by default, generative models hedge on naming specific businesses
+ * ("you can find many providers in your area..."). For an AI Visibility
+ * scan we NEED named entities — the whole product is "did your business
+ * surface, and if not, who did?". This system prompt biases Claude toward
+ * naming companies explicitly.
+ *
+ * Used by:
+ *   - visibilitySimulator.runQuery      (customer-style queries)
+ *   - citationAnalyzer.runSearchCall    (directory + industry searches)
+ *   - presenceDiscovery.discoverPresence (website + GBP lookup)
+ *
+ * Without this, our scans frequently returned empty competitorsCited
+ * arrays even when the web_search results clearly named competitors —
+ * the model just didn't think it should repeat the names.
+ */
+export const SCAN_SYSTEM_PROMPT =
+  "You are a helpful assistant analysing live web search results for an AI Visibility scan. Provide detailed, specific findings with company names, locations, and context. ALWAYS mention specific businesses by name when the web search results name them. Do not hedge or anonymise — if the search results say 'Integrate Lifting SA', say 'Integrate Lifting SA'. Preserve original casing and spelling of business names. Your output is consumed by downstream code that needs exact names to compare against the prospect's business.";

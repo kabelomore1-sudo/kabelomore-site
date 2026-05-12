@@ -15,7 +15,12 @@
  * Cost: ~$0.10 per call. Adds ~10-12s to scan duration.
  */
 
-import { anthropic, SCAN_MODEL, WEB_SEARCH_TOOL } from "@/lib/anthropic-client";
+import {
+  anthropic,
+  SCAN_MODEL,
+  WEB_SEARCH_TOOL,
+  SCAN_SYSTEM_PROMPT,
+} from "@/lib/anthropic-client";
 import type { BusinessProfile } from "@/lib/types/scan";
 
 export type DiscoveredPresence = {
@@ -74,6 +79,7 @@ Respond with ONLY a JSON object (no other text, no code blocks):
     const response = await anthropic.messages.create({
       model: SCAN_MODEL,
       max_tokens: 1500,
+      system: SCAN_SYSTEM_PROMPT,
       tools: [{ ...WEB_SEARCH_TOOL, max_uses: 2 }],
       messages: [{ role: "user", content: prompt }],
     });

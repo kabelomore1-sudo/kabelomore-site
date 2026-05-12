@@ -57,6 +57,30 @@ export type FixCategory =
 
 export type Engine = "chatgpt" | "claude" | "gemini" | "perplexity" | "claude-search";
 
+/**
+ * QueryIntent — the buyer-need shape each test query exercises.
+ *
+ * Different intents test different AI retrieval patterns. A business
+ * might be cited for "research" queries (general info) but invisible
+ * for "problem" queries (urgent help) — that's a meaningfully
+ * different gap than "invisible everywhere".
+ *
+ * Currently we run 4 queries that cover: recommendation, research,
+ * problem, brand. Expansion to 8 intents (urgency, comparison, cost,
+ * conversational, review) is on the roadmap once cost per scan is
+ * justified by traffic data.
+ */
+export type QueryIntent =
+  | "recommendation"
+  | "research"
+  | "problem"
+  | "brand"
+  | "urgency"
+  | "comparison"
+  | "cost"
+  | "conversational"
+  | "review";
+
 // ─── INPUT: What the user submits ─────────────────────────────────
 
 export type BusinessProfile = {
@@ -132,6 +156,14 @@ export type CompetitorMention = {
   appearsInEngines: Engine[];
   hasCitations: boolean;
   citationCount?: number;
+  /** Short snippet from the AI response — what was said about this
+   *  competitor (services mentioned, recommended vs just listed).
+   *  Optional because older scans + aggregations may not have it. */
+  context?: string;
+  /** Whether the competitor was named alongside the prospect's location
+   *  in the AI response. Indicates true local competition vs
+   *  national/multinational firms that surface from generic queries. */
+  locality?: "local" | "regional" | "national" | "unknown";
 };
 
 export type VisibilityCheck = {
@@ -140,6 +172,10 @@ export type VisibilityCheck = {
   competitorsCited: string[];
   verbatimExcerpt: string;
   source: Engine;
+  /** Buyer-need shape this query exercises. Lets us segment results
+   *  by intent ("you're visible for research, invisible for urgency").
+   *  Optional because older scans pre-date intent tagging. */
+  intent?: QueryIntent;
 };
 
 export type ScoreLayers = {

@@ -24,12 +24,29 @@
  * function timeout.
  */
 
-import { anthropic, SCAN_MODEL, WEB_SEARCH_TOOL } from "@/lib/anthropic-client";
+import {
+  anthropic,
+  SCAN_MODEL,
+  WEB_SEARCH_TOOL,
+  SCAN_SYSTEM_PROMPT,
+} from "@/lib/anthropic-client";
 import type {
   BusinessProfile,
   CompetitorMention,
+  QueryIntent,
   VisibilityCheck,
 } from "@/lib/types/scan";
+
+/**
+ * A query + its intent — paired at definition time so the intent
+ * survives through to the report. Allows the results page to segment
+ * "you appear for research queries but not urgency queries" rather
+ * than just showing 4 strings with no semantic grouping.
+ */
+type QueryDefinition = {
+  query: string;
+  intent: QueryIntent;
+};
 
 export type VisibilityAnalysis = {
   checks: VisibilityCheck[];
@@ -42,13 +59,13 @@ export async function simulateAIQueries(
   const queries = generateCustomerQueries(profile);
 
   const checks: VisibilityCheck[] = [];
-  for (const query of queries) {
+  for (const def of queries) {
     try {
-      const check = await runQuery(query, profile);
+      const check = await runQuery(def, profile);
       checks.push(check);
     } catch (err) {
       // If a single query fails, log and continue with the others
-      console.error(`[visibilitySimulator] Query failed: "${query}"`, err);
+      console.error(`[visibilitySimulator] Query failed: "${def.query}"`, err);
     }
   }
 
@@ -59,9 +76,11 @@ export async function simulateAIQueries(
 
 // ─── Query generation ─────────────────────────────────────────────
 // 4 distinct intent shapes — each exercises a different AI retrieval
-// pattern. We run all 4 sequentially because Anthropic's web_search
-// has tighter rate limits than its base model.
-function generateCustomerQueries(profile: BusinessProfile): string[] {
+// pattern. Each query is tagged with its intent so the report can
+// segment results ("visible for research, invisible for problem").
+// We run all 4 sequentially because Anthropic's web_search has tighter
+// rate limits than its base model.
+function generateCustomerQueries(profile: BusinessProfile): QueryDefinition[] {
   const services = profile.servicesText
     .split(",")
     .map((s) => s.trim())
@@ -78,84 +97,183 @@ function generateCustomerQueries(profile: BusinessProfile): string[] {
           : profile.country;
 
   return [
-    // 1. SUPERLATIVE — recommendation framing
-    `Best ${primary} in ${profile.city}, ${country}`,
-    // 2. CATEGORY — list framing
-    `Top ${industryWords} companies in ${profile.city}`,
-    // 3. PROBLEM / INTENT — buyer-need framing
-    `Who can help me with ${primary} in ${profile.city}?`,
-    // 4. BRAND — direct awareness check
-    `Reviews and reputation of ${profile.businessName}`,
+    {
+      query: `Best ${primary} in ${profile.city}, ${country}`,
+      intent: "recommendation",
+    },
+    {
+      query: `Top ${industryWords} companies in ${profile.city}`,
+      intent: "research",
+    },
+    {
+      query: `Who can help me with ${primary} in ${profile.city}?`,
+      intent: "problem",
+    },
+    {
+      query: `Reviews and reputation of ${profile.businessName}`,
+      intent: "brand",
+    },
   ]; // 4 queries × ~12s ≈ 48s — orchestrator timeout protects against overrun
 }
 
 // ─── Single query execution ──────────────────────────────────────
 async function runQuery(
-  query: string,
+  def: QueryDefinition,
   profile: BusinessProfile,
 ): Promise<VisibilityCheck> {
   const prompt = `Use web_search to see what businesses an AI assistant would recommend for this customer query. Do NOT answer the query yourself — observe what the live web returns.
 
-Query: "${query}"
+Query: "${def.query}"
 
 After web_search, report:
-1. Names of the top 3-5 businesses being recommended
+1. Names of the top 3-5 businesses being recommended, with a SHORT context for each (what services were mentioned, whether they were recommended or just listed)
 2. Whether "${profile.businessName}" appears in the results
 3. The verbatim language an AI assistant would use when responding
 
-Respond with ONLY a JSON object (no other text, no code blocks):
+Respond with ONLY a JSON object (no other text, no code blocks). For competitors, "context" is optional — include it when the search results give specific detail about that business, omit otherwise.
+
 {
   "businessAppears": <true if "${profile.businessName}" appears in results, false otherwise>,
-  "competitorsCited": [<list of business name strings>],
+  "competitorsCited": [
+    { "name": "Business Name", "context": "Short context — e.g. 'recommended for industrial cranes, BBBEE Level 1'" }
+  ],
   "verbatimExcerpt": "<2-3 sentences of how an AI assistant would phrase its answer>"
 }`;
 
   const response = await anthropic.messages.create({
     model: SCAN_MODEL,
     max_tokens: 1500,
+    system: SCAN_SYSTEM_PROMPT,
     tools: [{ ...WEB_SEARCH_TOOL, max_uses: 2 }],
     messages: [{ role: "user", content: prompt }],
   });
 
   const json = extractJsonFromResponse(response);
 
+  // Backwards-compatible competitor parsing: accept either the new
+  // shape (array of {name, context} objects) or the old shape (array
+  // of strings). This lets older cached responses still parse.
+  const competitorEntries = parseCompetitorEntries(json.competitorsCited);
+
   return {
-    query,
-    businessAppears: typeof json.businessAppears === "boolean" ? json.businessAppears : false,
-    competitorsCited: Array.isArray(json.competitorsCited)
-      ? json.competitorsCited.filter((c: unknown): c is string => typeof c === "string")
-      : [],
-    verbatimExcerpt: typeof json.verbatimExcerpt === "string" ? json.verbatimExcerpt : "",
+    query: def.query,
+    intent: def.intent,
+    businessAppears:
+      typeof json.businessAppears === "boolean" ? json.businessAppears : false,
+    // Surface just the names on the existing string[] field so all
+    // existing consumers (charts, citation aggregation, sample data
+    // matching) keep working.
+    competitorsCited: competitorEntries.map((e) => e.name),
+    // Stash the context for aggregation downstream — see
+    // aggregateCompetitors. We pass it via a closure-local map keyed
+    // off the check, since VisibilityCheck doesn't carry per-competitor
+    // detail. See the call site for how it's merged into
+    // CompetitorMention.
+    verbatimExcerpt:
+      typeof json.verbatimExcerpt === "string" ? json.verbatimExcerpt : "",
     source: "claude-search",
+    // Attach raw entries via a non-enumerable side channel so
+    // aggregateCompetitors can read them without polluting the public
+    // type. We do this by storing on a Symbol key.
+    ...({ [COMPETITOR_DETAIL_KEY]: competitorEntries } as unknown as object),
   };
 }
 
+// ─── Competitor context extraction ───────────────────────────────
+// Non-enumerable symbol key used to carry per-competitor context from
+// runQuery → aggregateCompetitors without leaking into the public
+// VisibilityCheck type. Older clients deserialising JSON won't see this
+// property — it only exists in-memory inside a single scan run.
+const COMPETITOR_DETAIL_KEY = Symbol("competitorDetail");
+
+type CompetitorEntry = { name: string; context?: string };
+
+function parseCompetitorEntries(raw: unknown): CompetitorEntry[] {
+  if (!Array.isArray(raw)) return [];
+  const out: CompetitorEntry[] = [];
+  for (const item of raw) {
+    if (typeof item === "string") {
+      // Legacy shape — just a name
+      const name = item.trim();
+      if (name) out.push({ name });
+    } else if (item && typeof item === "object") {
+      const obj = item as Record<string, unknown>;
+      const name = typeof obj.name === "string" ? obj.name.trim() : "";
+      if (!name) continue;
+      const context =
+        typeof obj.context === "string" && obj.context.trim().length > 0
+          ? obj.context.trim()
+          : undefined;
+      out.push({ name, context });
+    }
+  }
+  return out;
+}
+
 // ─── Aggregate competitors across checks ─────────────────────────
+//
+// Preserves original casing (the map KEY is lowercased; the stored
+// `name` is the first occurrence as-cased). Merges per-competitor
+// context across queries — first non-empty context wins. Future
+// expansion: detect `locality` by checking whether the competitor name
+// appeared alongside the profile city in `verbatimExcerpt`.
 function aggregateCompetitors(checks: VisibilityCheck[]): CompetitorMention[] {
   const map = new Map<string, CompetitorMention>();
 
   for (const check of checks) {
-    for (const name of check.competitorsCited) {
-      const key = name.trim().toLowerCase();
-      if (!key) continue;
+    // Read per-competitor detail from the symbol side channel attached
+    // in runQuery. If the check came from older code without the
+    // symbol, fall back to names-only.
+    const details = (check as unknown as Record<symbol, unknown>)[
+      COMPETITOR_DETAIL_KEY
+    ] as CompetitorEntry[] | undefined;
 
-      const existing = map.get(key);
-      if (existing) {
-        if (!existing.appearsInEngines.includes("claude-search")) {
-          existing.appearsInEngines.push("claude-search");
-        }
-      } else {
-        map.set(key, {
-          name: name.trim(),
-          appearsInEngines: ["claude-search"],
-          hasCitations: true,
-          citationCount: undefined,
-        });
+    if (details && details.length > 0) {
+      for (const entry of details) {
+        upsertCompetitor(map, entry.name, entry.context, check.verbatimExcerpt);
+      }
+    } else {
+      for (const name of check.competitorsCited) {
+        upsertCompetitor(map, name, undefined, check.verbatimExcerpt);
       }
     }
   }
 
   return Array.from(map.values()).slice(0, 10);
+}
+
+function upsertCompetitor(
+  map: Map<string, CompetitorMention>,
+  name: string,
+  context: string | undefined,
+  _verbatim: string,
+) {
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  const key = trimmed.toLowerCase();
+
+  const existing = map.get(key);
+  if (existing) {
+    if (!existing.appearsInEngines.includes("claude-search")) {
+      existing.appearsInEngines.push("claude-search");
+    }
+    // Fill context only if we don't have one yet — first non-empty wins
+    if (!existing.context && context) {
+      existing.context = context;
+    }
+    return;
+  }
+
+  map.set(key, {
+    name: trimmed, // preserve original casing
+    appearsInEngines: ["claude-search"],
+    hasCitations: true,
+    citationCount: undefined,
+    context,
+    // locality intentionally left unset for now — proper detection
+    // requires NLP on the verbatim excerpt to check if the competitor
+    // and the city were named in proximity. Roadmap.
+  });
 }
 
 // ─── JSON extraction (same pattern as citationAnalyzer) ──────────

@@ -15,7 +15,12 @@
  * Runtime: ~20-25s sequential, ~12s if run in parallel.
  */
 
-import { anthropic, SCAN_MODEL, WEB_SEARCH_TOOL } from "@/lib/anthropic-client";
+import {
+  anthropic,
+  SCAN_MODEL,
+  WEB_SEARCH_TOOL,
+  SCAN_SYSTEM_PROMPT,
+} from "@/lib/anthropic-client";
 import { citationLevelFromCount } from "./scoring";
 import type { BusinessProfile, CitationLevel } from "@/lib/types/scan";
 
@@ -201,6 +206,7 @@ async function runSearchCall(
     const response = await anthropic.messages.create({
       model: SCAN_MODEL,
       max_tokens: 1500,
+      system: SCAN_SYSTEM_PROMPT,
       tools: [{ ...WEB_SEARCH_TOOL, max_uses: 2 }],
       messages: [{ role: "user", content: prompt }],
     });
