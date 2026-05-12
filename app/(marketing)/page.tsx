@@ -123,19 +123,31 @@ export default function HomePage() {
                 act. Replaced with a declarative promise that names the
                 ICP (SA medical / legal / industrial) and the outcome
                 (get cited by AI engines). */}
+            {/* Hero headline — promise-first, fully visible at all
+                breakpoints. `whitespace-nowrap` was previously applied
+                to the highlighted engine list which caused horizontal
+                overflow on narrow viewports (375-640px). Now the engine
+                names wrap naturally; the accent underline still works
+                because `inline` allows multi-line span backgrounds via
+                box-decoration-break. */}
             <h1 className="mt-6 text-display-xl font-semibold tracking-tight text-ink-900">
               Get your business cited by{" "}
-              <span className="relative inline-block whitespace-nowrap">
-                <span className="relative z-10">ChatGPT, Claude, Gemini, Perplexity</span>
-                <span className="absolute inset-x-0 bottom-1 h-3 -z-0 bg-accent-100" />
-              </span>
+              <span className="relative inline-block">
+                <span className="relative z-10">
+                  ChatGPT, Claude, Gemini, Perplexity
+                </span>
+                <span
+                  className="absolute inset-x-0 bottom-1 h-3 -z-0 bg-accent-100"
+                  aria-hidden="true"
+                />
+              </span>{" "}
               <br className="hidden md:block" />
               <span className="text-ink-500">— where your customers ask first.</span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-500 md:text-xl">
               For SA medical, legal, and industrial firms. We run a free
-              60-second scan, deliver a personalised report in 24 hours, and
+              30-second scan, deliver a personalised report in 24 hours, and
               fix what&apos;s broken with{" "}
               <Link
                 href="/about"

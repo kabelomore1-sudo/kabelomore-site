@@ -107,24 +107,41 @@ export function BeforeAfter({
       </div>
 
       {/* Content panes — fade between states via CSS opacity transition.
-          Both stay in the DOM so the height doesn't jump on toggle. */}
+          Both stay in the DOM so the height doesn't jump on toggle.
+          Each pane has a tinted background (rose for BEFORE, emerald for
+          AFTER) so the state change is unmistakable at a glance. The
+          tint is subtle (50/30 opacity) so it doesn't fight the content. */}
       <div className="relative">
         <div
           role="tabpanel"
+          aria-label="Before state"
           aria-hidden={showing !== "before"}
-          className={`p-5 transition-opacity duration-300 md:p-6 ${
-            showing === "before" ? "opacity-100" : "pointer-events-none absolute inset-0 opacity-0"
+          className={`bg-rose-50/40 p-5 transition-opacity duration-300 md:p-6 ${
+            showing === "before"
+              ? "opacity-100"
+              : "pointer-events-none absolute inset-0 opacity-0"
           }`}
         >
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-rose-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-rose-600" aria-hidden="true" />
+            Before AEO
+          </div>
           {before}
         </div>
         <div
           role="tabpanel"
+          aria-label="After state"
           aria-hidden={showing !== "after"}
-          className={`p-5 transition-opacity duration-300 md:p-6 ${
-            showing === "after" ? "opacity-100" : "pointer-events-none absolute inset-0 opacity-0"
+          className={`bg-emerald-50/40 p-5 transition-opacity duration-300 md:p-6 ${
+            showing === "after"
+              ? "opacity-100"
+              : "pointer-events-none absolute inset-0 opacity-0"
           }`}
         >
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" aria-hidden="true" />
+            After AEO
+          </div>
           {after}
         </div>
       </div>

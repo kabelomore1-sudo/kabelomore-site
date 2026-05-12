@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Section, Eyebrow } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/ui/jsonld";
@@ -78,6 +79,26 @@ export default function AboutPage() {
                 changed. I now apply the same first-principles work to AI
                 engines — on whatever website my clients have, for a flat fee,
                 without forcing anyone into packages they don&apos;t need.
+              </p>
+
+              {/* First-viewport CTA — previously /about had no actionable
+                  next-step in the hero, forcing visitors to scroll through
+                  ~3 sections before reaching any CTA. Now there's an
+                  immediate path to action with trust signals adjacent. */}
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Button href="/scan" variant="primary" size="md">
+                  See what AI says about your business
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Link
+                  href="/services"
+                  className="text-sm font-medium text-ink-500 hover:text-ink-900"
+                >
+                  Or browse packages →
+                </Link>
+              </div>
+              <p className="mt-3 text-xs text-ink-400">
+                Free · 24-hour turnaround · No card · No forced packages
               </p>
             </div>
           </div>
