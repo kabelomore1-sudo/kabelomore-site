@@ -216,17 +216,53 @@ export function buildIssues(detected: DetectedSignals): Issue[] {
     issues.push({
       id: "no-gbp",
       severity: "critical",
-      title: "Google Business Profile not detected via search",
+      title: "Google Business Profile not detected",
       explanation:
-        "We couldn't surface a Google Business Profile for your business in search results. GBP is the single biggest local AI visibility signal — please confirm it exists so we can rule this out. (We don't yet query the Google Maps API directly; that ships Phase 1.5.)",
+        "We couldn't find a Google Business Profile for your business. GBP is the single biggest local visibility signal — verified via the Google Places API when this scan ran. If you believe you have one, please share the link so we can re-check.",
       fixCategory: "gbp",
     });
-  } else if (detected.gbpCompleteness && detected.gbpCompleteness < 80) {
+  } else if (
+    typeof detected.gbpCompleteness === "number" &&
+    detected.gbpCompleteness < 80
+  ) {
     issues.push({
       id: "incomplete-gbp",
       severity: "high",
-      title: "Google Business Profile likely incomplete",
-      explanation: `Based on what surfaced in search, your GBP appears around ${detected.gbpCompleteness}% complete. Categories, hours, photos, services — every blank field weakens AI engines' trust signal.`,
+      title: "Google Business Profile incomplete",
+      explanation: `Your GBP is approximately ${detected.gbpCompleteness}% complete based on Google Places data. Missing rating, reviews, hours, or categories weaken your local AI visibility signal. Each blank field is a missed query match.`,
+      fixCategory: "gbp",
+    });
+  }
+
+  // ─── Phase 1.5 GBP-quality issues (Places API data) ─────────────
+  // These only fire when we have real Places data. Older scans (without
+  // the Phase 1.5 fields) skip them entirely.
+  if (
+    detected.gbpFound &&
+    typeof detected.gbpReviewCount === "number" &&
+    detected.gbpReviewCount < 10
+  ) {
+    issues.push({
+      id: "thin-gbp-reviews",
+      severity: "high",
+      title: "Low Google review count",
+      explanation: `Your Google Business Profile has only ${detected.gbpReviewCount} review${
+        detected.gbpReviewCount === 1 ? "" : "s"
+      }. Local AI visibility scales with review density — 25-50 reviews is the threshold where buyers typically stop questioning your legitimacy. Active review-acquisition is the highest-leverage local fix.`,
+      fixCategory: "gbp",
+    });
+  }
+
+  if (
+    detected.gbpFound &&
+    detected.gbpHasHours === false
+  ) {
+    issues.push({
+      id: "no-gbp-hours",
+      severity: "medium",
+      title: "GBP missing operating hours",
+      explanation:
+        "Your Google Business Profile has no opening hours set. Local-intent queries (\"open now\", \"24-hour\", \"same-day service\") never surface profiles without hours. Adding hours is a 2-minute fix that opens an entire query class.",
       fixCategory: "gbp",
     });
   }

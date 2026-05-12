@@ -120,6 +120,23 @@ export type DetectedSignals = {
   gbpFound: boolean;
   gbpCompleteness?: number; // 0-100 if found
 
+  // ─── GBP signals from Places API (Phase 1.5) ────────────────────
+  // Populated by `gbpFetcher.findPlace` in Stage 2.5 of the orchestrator.
+  // All optional — older scans + scans where Places API is unavailable
+  // simply omit them; the rest of the engine doesn't depend on them.
+  /** Rating 0.0-5.0 from Places */
+  gbpRating?: number;
+  /** Review count from Places */
+  gbpReviewCount?: number;
+  /** First category Places returned (e.g. "store", "lawyer") */
+  gbpPrimaryCategory?: string;
+  /** All category strings Places returned */
+  gbpCategories?: string[];
+  /** True if Places returned opening_hours.weekday_text */
+  gbpHasHours?: boolean;
+  /** Heuristic: business_status=OPERATIONAL && reviewCount>0 */
+  gbpVerifiedHeuristic?: boolean;
+
   citationCount: number;
   citationLevel: CitationLevel;
   citationSources: string[]; // domains where business is mentioned

@@ -88,6 +88,16 @@ export async function GET() {
         "Gates the /admin/scans dashboard + /api/admin/* endpoints. Must be 24+ chars random.",
       fix: "Vercel → Settings → Environment Variables → ADMIN_TOKEN (Production + Preview). Then REDEPLOY — env var changes don't apply to running deploys.",
     },
+    // Phase 1.5: Google Places API for real GBP signals (rating, reviews,
+    // hours, categories). Without it, the scan can detect whether a GBP
+    // exists (via Claude+web_search inference) but can't measure quality.
+    GOOGLE_PLACES_API_KEY: {
+      set: Boolean(process.env.GOOGLE_PLACES_API_KEY),
+      required: false,
+      purpose:
+        "Pulls real GBP data (rating, reviews, hours, categories) via Google Places API. Without it, scans fall back to inferred 'gbpFound only' from search snippets. Adds ~$0.034 per scan.",
+      fix: "GCP → APIs & Services → Enable Places API → Create API key restricted to Places API. Then add as GOOGLE_PLACES_API_KEY env var in Vercel and redeploy.",
+    },
   };
 
   const requiredMissing = Object.entries(checks)

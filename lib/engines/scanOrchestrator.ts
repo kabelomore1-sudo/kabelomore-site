@@ -19,6 +19,7 @@
 import { discoverPresence } from "./presenceDiscovery";
 import { analyzeCitations } from "./citationAnalyzer";
 import { simulateAIQueries } from "./visibilitySimulator";
+import { findPlace } from "./gbpFetcher";
 import { computeScore } from "./scoring";
 import { classify } from "./classification";
 import { generateRecommendations } from "./recommendation";
@@ -34,6 +35,7 @@ export type StageStatus = "ok" | "partial" | "failed" | "skipped";
 export type ScanStageReport = {
   discovery: StageStatus;
   presenceCheck: StageStatus;
+  gbpLookup: StageStatus;
   citationAnalysis: StageStatus;
   visibilitySimulation: StageStatus;
 };
@@ -45,6 +47,7 @@ export async function runFullScan(
   const stageReport: ScanStageReport = {
     discovery: "skipped",
     presenceCheck: "skipped",
+    gbpLookup: "skipped",
     citationAnalysis: "skipped",
     visibilitySimulation: "skipped",
   };
@@ -95,14 +98,24 @@ export async function runFullScan(
     };
   }
 
-  // ─── Stage 3 + 4: Citation + Visibility (run in parallel for speed) ──
+  // ─── Stage 3 + 4 + 2.5: Citation + Visibility + GBP lookup (parallel) ──
+  //
+  // GBP lookup (Stage 2.5) runs alongside citation analysis and
+  // visibility simulation because all three are independent (no shared
+  // state) and the Places API call (~1-2s) is cheap relative to the
+  // others. Parallelizing keeps the total scan budget under 60s.
+  //
+  // GBP lookup fails gracefully if GOOGLE_PLACES_API_KEY isn't set or
+  // the API errors out — the rest of the scan continues with
+  // gbpFound from presence discovery and the GBP-quality signals
+  // simply undefined.
   const profileForEngines: BusinessProfile = {
     ...profile,
     website: resolvedWebsite,
     gbpUrl: resolvedGbpUrl,
   };
 
-  const [citationResult, visibilityResult] = await Promise.all([
+  const [citationResult, visibilityResult, gbpResult] = await Promise.all([
     analyzeCitations(profileForEngines).catch((err) => {
       console.error("[scanOrchestrator] citation analysis failed:", err);
       return null;
@@ -111,7 +124,29 @@ export async function runFullScan(
       console.error("[scanOrchestrator] visibility simulation failed:", err);
       return null;
     }),
+    findPlace(profileForEngines).catch((err) => {
+      console.error("[scanOrchestrator] GBP lookup failed:", err);
+      return null;
+    }),
   ]);
+
+  // GBP stage report: "skipped" if API key missing (we infer this from
+  // the notes field), "ok" if found, "failed" if returned but found=false
+  // due to API error (vs legitimate ZERO_RESULTS which we treat as ok).
+  if (!gbpResult) {
+    stageReport.gbpLookup = "failed";
+  } else if (
+    gbpResult.notes.includes("GOOGLE_PLACES_API_KEY not configured")
+  ) {
+    stageReport.gbpLookup = "skipped";
+  } else if (gbpResult.found) {
+    stageReport.gbpLookup = "ok";
+  } else {
+    // Searched but didn't find — could be the API errored OR the
+    // business genuinely has no GBP. Both are useful signals; we mark
+    // as "ok" because the stage ran successfully, just with no data.
+    stageReport.gbpLookup = "ok";
+  }
 
   // Status based on whether engines actually ran (not just whether results were 0)
   const citationData = citationResult ?? {
@@ -133,13 +168,35 @@ export async function runFullScan(
     visibilityResult && visibilityResult.checks.length > 0 ? "ok" : "failed";
 
   // ─── Stage 5: Synthesize ─────────────────────────────────────
+  //
+  // gbpFound: if Places API confirmed the listing, that trumps the
+  // inference-based gbpFound from presence discovery. The Places API
+  // is authoritative (it's reading Google's actual data); presence
+  // discovery is a search-snippet inference.
+  //
+  // gbpCompleteness: derived from the new fields when available.
+  // Score: rating present (+25) + reviews >0 (+25) + hours present
+  // (+25) + categories present (+25) = 0-100. Gives the legacy
+  // gbpCompleteness signal real data instead of being always undefined.
+  const placesFound = gbpResult?.found === true;
+  const gbpCompletenessDerived = gbpResult?.found
+    ? computeGbpCompleteness(gbpResult)
+    : presenceData.gbpCompleteness;
+
   const detected: DetectedSignals = {
     websiteReachable: presenceData.websiteReachable,
     websiteHasSchema: presenceData.websiteHasSchema,
     websiteHasFAQSchema: presenceData.websiteHasFAQSchema,
     websiteHasLocalBusinessSchema: presenceData.websiteHasLocalBusinessSchema,
-    gbpFound: presenceData.gbpFound,
-    gbpCompleteness: presenceData.gbpCompleteness,
+    gbpFound: presenceData.gbpFound || placesFound,
+    gbpCompleteness: gbpCompletenessDerived,
+    // Phase 1.5 GBP signals — undefined when Places API didn't run
+    gbpRating: gbpResult?.rating ?? undefined,
+    gbpReviewCount: gbpResult?.reviewCount ?? undefined,
+    gbpPrimaryCategory: gbpResult?.primaryCategory ?? undefined,
+    gbpCategories: gbpResult?.categories ?? undefined,
+    gbpHasHours: gbpResult?.hasHours ?? undefined,
+    gbpVerifiedHeuristic: gbpResult?.verifiedHeuristic ?? undefined,
     citationCount: citationData.count,
     citationLevel: citationData.level,
     citationSources: citationData.sources,
@@ -245,6 +302,32 @@ async function checkPresence(
     gbpFound: Boolean(gbpUrl),
     // gbpCompleteness deferred to Phase 1.5 (requires Google Places / GBP API)
   };
+}
+
+/**
+ * Compute a 0-100 GBP completeness score from Places API data.
+ *
+ * 25 points each for:
+ *   - Has a rating (filled-in star rating)
+ *   - Has at least 1 review
+ *   - Has opening hours
+ *   - Has at least one category (always true if Places returned anything,
+ *     but defensive)
+ *
+ * This is a coarse signal — a 5-star single-review listing scores 50%
+ * the same as a 4-star 200-review listing. Refinement (review velocity,
+ * photo count thresholds, primary category match to industry) is a
+ * Phase 1.6 concern.
+ */
+function computeGbpCompleteness(
+  gbp: import("./gbpFetcher").GbpData,
+): number {
+  let pts = 0;
+  if (typeof gbp.rating === "number" && gbp.rating > 0) pts += 25;
+  if (typeof gbp.reviewCount === "number" && gbp.reviewCount > 0) pts += 25;
+  if (gbp.hasHours) pts += 25;
+  if (gbp.categories.length > 0) pts += 25;
+  return pts;
 }
 
 async function isUrlReachable(url: string): Promise<boolean> {
