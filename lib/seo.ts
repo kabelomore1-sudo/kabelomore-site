@@ -42,12 +42,17 @@ export function organizationJsonLd() {
     },
     address: {
       "@type": "PostalAddress",
-      // Specific street address improves local trust signal. If the
-      // operating address changes, update this single line.
-      streetAddress: "Pretoria CBD",
+      // Canonical postal address — must match exactly across every
+      // directory submission (Brabys, Cylex, LME register, etc.) for
+      // NAP consistency. Any drift between schema + directories = AI
+      // trust downgrade.
+      // Format note: streetAddress carries the full PO box descriptor
+      // including suburb (Menlo Park). addressLocality is the city
+      // (Pretoria) since LLMs / Google's KG resolve cities not suburbs.
+      streetAddress: "PostNet Suite 104, Private Bag X15, Menlo Park",
       addressLocality: "Pretoria",
       addressRegion: "Gauteng",
-      postalCode: "0002",
+      postalCode: "0102",
       addressCountry: "ZA",
     },
     areaServed: [
