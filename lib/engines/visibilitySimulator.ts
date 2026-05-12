@@ -58,14 +58,36 @@ export async function simulateAIQueries(
 ): Promise<VisibilityAnalysis> {
   const queries = generateCustomerQueries(profile);
 
+  // PARALLEL execution — previous version ran queries sequentially
+  // (~48s for 4 queries × 12s each), which pushed the total scan
+  // over Vercel Hobby's 60s function ceiling and returned 504s.
+  // The queries are independent (no shared state, no ordering
+  // requirement, separate web_search invocations) so running in
+  // parallel collapses the total to ~12-15s — the slowest single
+  // query, not the sum.
+  //
+  // Anthropic web_search rate limits comfortably handle 4 parallel
+  // requests (with max_uses=2 each = 8 searches in a burst). If we
+  // ever expand to 8 intent types we may need to chunk these or
+  // batch via the messages.batch API, but at 4 we're well inside
+  // the safe zone.
+  //
+  // Promise.allSettled (not .all) so one query's failure doesn't
+  // tank the whole scan — we just drop that check and continue.
+  const settled = await Promise.allSettled(
+    queries.map((def) => runQuery(def, profile)),
+  );
+
   const checks: VisibilityCheck[] = [];
-  for (const def of queries) {
-    try {
-      const check = await runQuery(def, profile);
-      checks.push(check);
-    } catch (err) {
-      // If a single query fails, log and continue with the others
-      console.error(`[visibilitySimulator] Query failed: "${def.query}"`, err);
+  for (let i = 0; i < settled.length; i++) {
+    const result = settled[i];
+    if (result.status === "fulfilled") {
+      checks.push(result.value);
+    } else {
+      console.error(
+        `[visibilitySimulator] Query failed: "${queries[i].query}"`,
+        result.reason,
+      );
     }
   }
 
