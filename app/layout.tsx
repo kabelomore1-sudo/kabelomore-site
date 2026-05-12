@@ -7,7 +7,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { StickyMobileCta } from "@/components/sticky-mobile-cta";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { JsonLd } from "@/components/ui/jsonld";
-import { organizationJsonLd } from "@/lib/seo";
+import {
+  organizationJsonLd,
+  kabeloPersonJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -91,7 +95,19 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col">
-        <JsonLd data={organizationJsonLd()} />
+        {/* Connected entity graph: every page emits Organization +
+            Person + WebSite as three linked entities. The @id
+            cross-references (#organization, #kabelo, #website) let
+            LLMs resolve "Kabelo More" → the specific person who runs
+            Kabelomore Consulting → published on kabelomore.com.
+            Without these three connected, LLMs see fragmented blobs. */}
+        <JsonLd
+          data={[
+            organizationJsonLd(),
+            kabeloPersonJsonLd(),
+            websiteJsonLd(),
+          ]}
+        />
         <SiteHeader />
         {/* pb-24 buffer prevents the sticky scan bar from covering the
             last content of any page (e.g., final-CTA buttons). */}

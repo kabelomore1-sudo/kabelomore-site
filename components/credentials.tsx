@@ -74,18 +74,29 @@ export function CredentialsBadgeRow() {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-ink-500">
       <span className="font-medium text-ink-700">Certified:</span>
-      {credentials.map((c) => {
-        const Icon = c.icon;
-        return (
-          <span
-            key={c.name}
-            className="inline-flex items-center gap-1.5 rounded-full border border-rule bg-white px-3 py-1 text-xs font-medium text-ink-700 shadow-sm"
-          >
-            <Icon className="h-3.5 w-3.5 text-ink-400" />
-            {c.issuer} {c.name === "Marketing AI" ? "(soon)" : ""}
-          </span>
-        );
-      })}
+      {/* Badge row shows COMPLETED certifications only.
+          Adding "(soon)" to a credential badge invited downgrade
+          signals — both AEO-wise (LLMs treat hedged credentials as
+          weaker) and trust-wise (a "coming soon" badge reads as
+          padding). In-progress credentials are still listed in full
+          on /about's <Credentials /> card grid with the "In progress"
+          chip — that surface is the honest place to declare them.
+          Once the HubSpot cert lands, drop the `c.badge !== "In progress"`
+          filter so it appears in the badge row automatically. */}
+      {credentials
+        .filter((c) => c.badge !== "In progress")
+        .map((c) => {
+          const Icon = c.icon;
+          return (
+            <span
+              key={c.name}
+              className="inline-flex items-center gap-1.5 rounded-full border border-rule bg-white px-3 py-1 text-xs font-medium text-ink-700 shadow-sm"
+            >
+              <Icon className="h-3.5 w-3.5 text-ink-400" />
+              {c.issuer}
+            </span>
+          );
+        })}
     </div>
   );
 }

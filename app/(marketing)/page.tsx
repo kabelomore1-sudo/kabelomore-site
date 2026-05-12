@@ -542,6 +542,53 @@ export default function HomePage() {
         </div>
       </Section>
 
+      {/* ─── HOMEPAGE FAQ — visible HTML mirrors the FAQPage schema ─
+          Critical: the FAQPage schema in the JsonLd at the top of this
+          page declares 9 questions + answers. Per Google's structured-
+          data guidelines, the same content MUST be visible to users on
+          the page. Without this section the schema was orphaned data
+          and Google's parser could downgrade or ignore the FAQ markup
+          entirely. Rendering visibly closes the data/markup mismatch. */}
+      <Section variant="default" padding="lg" containerSize="narrow">
+        <div className="mx-auto max-w-3xl">
+          <div className="text-center">
+            <Eyebrow className="justify-center">Frequently asked</Eyebrow>
+            <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
+              Questions clients actually ask.
+            </h2>
+            <p className="mt-3 text-base text-ink-500">
+              The most common questions about AEO, pricing, and what to
+              expect from working together.
+            </p>
+          </div>
+
+          <div className="mt-10 space-y-3">
+            {homepageFaqs.map((faq, idx) => (
+              <details
+                key={faq.q}
+                className="group rounded-2xl border border-rule bg-white p-5 shadow-soft transition-colors hover:border-accent-300 md:p-6"
+                {...(idx === 0 ? { open: true } : {})}
+              >
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
+                  <h3 className="text-base font-semibold text-ink-900 md:text-lg">
+                    {faq.q}
+                  </h3>
+                  <span
+                    className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-ink-50 text-base font-medium text-ink-700 transition-transform group-open:rotate-45"
+                    aria-hidden="true"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="mt-4 text-sm text-ink-700 leading-relaxed md:text-base">
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </Section>
+
       {/* ─── FINAL CTA ────────────────────────────────────────────── */}
       <Section variant="tinted" padding="lg">
         <div className="mx-auto max-w-3xl text-center">

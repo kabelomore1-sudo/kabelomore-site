@@ -2,8 +2,20 @@ import { site } from "./site";
 
 /**
  * Build an Organization JSON-LD object — applied site-wide.
- * Surfaces Kabelomore as a Person, the consulting service as an Organization,
- * and the NPC as a separate verifiable entity.
+ *
+ * Critical schema choices:
+ *   - @id self-reference (`/#organization`) so other schemas (Person,
+ *     Article, Service) can link to this entity via @id reference,
+ *     forming a connected entity graph that LLMs can reason about
+ *     as a single business across pages.
+ *   - telephone: filled with E.164-formatted number. Empty strings
+ *     are worse than omitted properties — Google's parser flags
+ *     declared-but-empty fields as low-quality data.
+ *   - address: complete with streetAddress placeholder, postalCode,
+ *     addressRegion. AI engines weight specific addresses heavily
+ *     for local trust.
+ *   - Person nested AND exposed via separate kabeloPersonJsonLd()
+ *     for entity disambiguation (vs other Kabelo Mores out there).
  */
 export function organizationJsonLd() {
   return {
@@ -16,7 +28,10 @@ export function organizationJsonLd() {
     url: site.url,
     email: site.contact.email,
     image: `${site.url}${site.ogImage}`,
-    telephone: "",
+    // E.164-formatted phone — Google requires this format for telephone
+    // properties on Organization. Format: +[country][area][number]
+    // with no spaces or dashes for max compatibility.
+    telephone: `+${site.contact.whatsappE164}`,
     founder: {
       "@type": "Person",
       "@id": `${site.url}/#kabelo`,
@@ -27,7 +42,12 @@ export function organizationJsonLd() {
     },
     address: {
       "@type": "PostalAddress",
+      // Specific street address improves local trust signal. If the
+      // operating address changes, update this single line.
+      streetAddress: "Pretoria CBD",
       addressLocality: "Pretoria",
+      addressRegion: "Gauteng",
+      postalCode: "0002",
       addressCountry: "ZA",
     },
     areaServed: [
@@ -37,6 +57,93 @@ export function organizationJsonLd() {
     ],
     serviceType: "AI Visibility / Answer Engine Optimisation (AEO) Consulting",
     sameAs: [site.social.linkedin, site.social.instagram].filter(Boolean),
+  };
+}
+
+/**
+ * Build a standalone Person JSON-LD entry for Kabelo More.
+ *
+ * Why a separate Person schema (in addition to the nested founder on
+ * the Organization):
+ *   - Entity establishment / disambiguation. Without this, LLMs may
+ *     conflate "Kabelo More" with the Mamelodi Sundowns player or
+ *     any other public Kabelo More.
+ *   - Richer entity graph. The nested founder has only 4 properties.
+ *     Standalone Person carries image, description, knowsAbout (skills
+ *     graph), and worksFor (links back to the org via @id).
+ *   - Cross-page citation. Articles can now reference this entity
+ *     via { author: { "@id": "...#kabelo" } } and LLMs will resolve
+ *     to the full Person record.
+ *
+ * Loaded site-wide via the root layout alongside Organization +
+ * WebSite, so every page reinforces the same entity graph.
+ */
+export function kabeloPersonJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": `${site.url}/#kabelo`,
+    name: site.name,
+    givenName: "Kabelo",
+    familyName: "More",
+    jobTitle: "AI Visibility Consultant",
+    description:
+      "AI Visibility / AEO consultant based in Pretoria, South Africa. 8 years of local SEO experience now applied to AI search. Works with industrial, professional, and medical service businesses across SA, UK, and US.",
+    url: `${site.url}/about`,
+    image: `${site.url}/images/kabelo-more.jpg`,
+    worksFor: { "@id": `${site.url}/#organization` },
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Pretoria",
+      addressRegion: "Gauteng",
+      addressCountry: "ZA",
+    },
+    knowsAbout: [
+      "Answer Engine Optimisation (AEO)",
+      "Generative Engine Optimisation (GEO)",
+      "AI Search Visibility",
+      "Local SEO",
+      "Schema.org Structured Data",
+      "JSON-LD Markup",
+      "Google Business Profile Optimisation",
+      "Citation Building",
+      "Content Strategy for AI Engines",
+      "LLM Visibility",
+      "ChatGPT Search Visibility",
+      "Claude Search Visibility",
+      "Gemini Visibility",
+      "Perplexity SEO",
+    ],
+    sameAs: [site.social.linkedin, site.social.instagram].filter(Boolean),
+  };
+}
+
+/**
+ * Build a WebSite JSON-LD entry.
+ *
+ * Foundational entity declaration — tells Google + AI engines that
+ * kabelomore.com is a searchable website with a defined publisher.
+ * The publisher @id reference links back to the Organization so the
+ * entity graph stays connected.
+ *
+ * potentialAction.SearchAction is omitted because we don't have a
+ * site-wide search UI yet. When site search is added, append:
+ *   potentialAction: {
+ *     "@type": "SearchAction",
+ *     target: `${site.url}/search?q={search_term_string}`,
+ *     "query-input": "required name=search_term_string",
+ *   }
+ */
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${site.url}/#website`,
+    url: site.url,
+    name: site.brand,
+    description: site.description,
+    inLanguage: "en-ZA",
+    publisher: { "@id": `${site.url}/#organization` },
   };
 }
 
