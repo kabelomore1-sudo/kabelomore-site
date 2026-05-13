@@ -25,7 +25,6 @@ export function TallyEmbed({
     );
     if (existing) {
       // Re-trigger on existing script
-      // @ts-expect-error — Tally attaches to window.Tally
       window.Tally?.loadEmbeds?.();
       return;
     }
