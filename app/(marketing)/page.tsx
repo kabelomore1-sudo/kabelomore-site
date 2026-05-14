@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { CredentialsBadgeRow } from "@/components/credentials";
 import { BeforeAfter } from "@/components/before-after";
+import { HEADLINE_PRICE_RANGE } from "@/lib/pricing";
 
 const homepageFaqs = [
   {
@@ -185,15 +186,17 @@ export default function HomePage() {
               24h turnaround · No card · No forced packages
             </p>
 
-            {/* Pricing pre-qualifier — reduces post-scan sticker shock */}
+            {/* Pricing pre-qualifier — reduces post-scan sticker shock.
+                Range pulled from canonical lib/pricing HEADLINE_PRICE_RANGE
+                so any pricing change propagates here automatically. */}
             <p className="mt-2 text-sm text-ink-500">
               Most engagements:{" "}
               <span className="font-semibold text-ink-700">
-                R5,500–R12,500 once-off
+                {HEADLINE_PRICE_RANGE}
               </span>{" "}
               ·{" "}
               <Link
-                href="/services"
+                href="/pricing"
                 className="text-accent-600 hover:text-accent-700"
               >
                 See full pricing
@@ -400,9 +403,9 @@ export default function HomePage() {
             },
             {
               n: "02",
-              h: "Quote",
+              h: "Recommendation",
               accent: "bg-accent-500 text-white",
-              p: "We send a custom quote based on what your scan revealed. Typically R5,500 to R12,500 once-off. No standard packages forced on you.",
+              p: "We match your scan to one of three fixed-tier packages — Starter (R5,000), Optimization Pack (R10,500), or Growth retainer (R5,500/mo). No custom quotes, no surprises. Full menu on /pricing.",
             },
             {
               n: "03",
