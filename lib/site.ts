@@ -85,18 +85,32 @@ export function whatsappLink(prefilledText?: string): string {
 
 export const navigation = {
   // Primary nav follows the buyer journey:
-  //   Overview → Scan → Services → How it works → Proof → Pricing → Contact
+  //   Overview → Scan → Services → How it works → Proof → Blog → Pricing
   // Each entry is a top-level destination — one click, never deeper than
-  // one level. Resources / Discover / Index / Newsletter / About are now
-  // surfaced via the footer (support content, not the main conversion path).
+  // one level.
+  //
+  // Contact was removed from primary nav 2026-05-14 because every page
+  // already exposes contact via:
+  //   - the always-visible WhatsApp button (StickyMobileCta)
+  //   - footer email + mailto links
+  //   - "Reply by email" CTAs on the scan results page
+  //   - the contact form at /scan (capture is the primary intent)
+  // Keeping a Contact nav item burns hero-bar real estate on a
+  // destination that's reachable from every other surface.
+  //
+  // Blog added between Proof and Pricing as the authority surface —
+  // every cornerstone content piece lands there.
+  //
+  // Footer still carries Contact + Blog + Resources / Discover / Index
+  // / Newsletter / About for visitors who want to deep-link.
   primary: [
     { label: "Overview", href: "/" },
     { label: "Scan", href: "/scan" },
     { label: "Services", href: "/services" },
     { label: "How it works", href: "/how-we-work" },
     { label: "Proof", href: "/case-studies" },
+    { label: "Blog", href: "/blog" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Contact", href: "/contact" },
   ],
   cta: { label: "Free AI Scan", href: "/scan" },
 } as const;
