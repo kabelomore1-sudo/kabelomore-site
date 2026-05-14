@@ -6,11 +6,19 @@ import { JsonLd } from "@/components/ui/jsonld";
 import { faqJsonLd, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { tiers, addOns, site } from "@/lib/site";
 import { publicPackages } from "@/lib/public-packages";
-import { PublicPackagesGrid } from "@/components/public-packages-grid";
 import { SerpRealEstateMap } from "@/components/serp-real-estate-map";
 import { TierComparisonTable } from "@/components/tier-comparison-table";
 import { TrackPageView } from "@/components/track-page-view";
 import { TrustStrip } from "@/components/trust-strip";
+import { CheckCircle2 } from "lucide-react";
+import {
+  PACKAGES,
+  RETAINERS,
+  formatPrice,
+  formatPriceMonthly,
+  HEADLINE_PRICE_RANGE,
+  HEADLINE_RETAINER_RANGE,
+} from "@/lib/pricing";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -117,7 +125,7 @@ export default function ServicesPage() {
             <span className="text-ink-500">more options. They need the right next step.</span>
           </h1>
           <p className="mt-5 text-lg text-ink-500">
-            Three packages, all running{" "}
+            Fixed-tier packages, all running{" "}
             <Link
               href="/about"
               className="font-medium text-ink-700 underline decoration-accent-300 underline-offset-4 hover:text-accent-700"
@@ -125,7 +133,14 @@ export default function ServicesPage() {
               The Real Estate Method
             </Link>
             . Tell us about your business — we&apos;ll match you to the right
-            one. Or browse all three if you&apos;d rather choose yourself.
+            one. Or browse all options on the{" "}
+            <Link
+              href="/pricing"
+              className="font-medium text-ink-700 underline decoration-accent-300 underline-offset-4 hover:text-accent-700"
+            >
+              full pricing page
+            </Link>
+            .
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -144,27 +159,32 @@ export default function ServicesPage() {
             10-min Discovery · Personalised recommendation in 24 hours · No card
           </p>
 
-          {/* Above-the-fold pricing summary — visitors who came to see
-              prices shouldn't have to scroll past two hero sections to
-              find them. One-line preview with anchor link to the cards. */}
+          {/* Above-the-fold pricing summary — pulled from canonical
+              lib/pricing headline range constants so any pricing change
+              propagates here automatically. */}
           <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-rule bg-white px-5 py-4 shadow-soft md:px-6">
             <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-sm">
               <span className="font-semibold text-ink-900">
-                Starter <span className="font-normal text-ink-500">from R5,000</span>
+                Once-off:{" "}
+                <span className="font-normal text-ink-500">
+                  {HEADLINE_PRICE_RANGE}
+                </span>
               </span>
-              <span className="hidden h-3 w-px bg-rule sm:inline-block" aria-hidden="true" />
+              <span
+                className="hidden h-3 w-px bg-rule sm:inline-block"
+                aria-hidden="true"
+              />
               <span className="font-semibold text-ink-900">
-                Growth <span className="font-normal text-ink-500">R5,500/mo</span>
-              </span>
-              <span className="hidden h-3 w-px bg-rule sm:inline-block" aria-hidden="true" />
-              <span className="font-semibold text-ink-900">
-                Premium <span className="font-normal text-ink-500">from R10,500/mo</span>
+                Monthly:{" "}
+                <span className="font-normal text-ink-500">
+                  {HEADLINE_RETAINER_RANGE}
+                </span>
               </span>
             </div>
             <div className="mt-2 text-center text-[11px] text-ink-400">
-              All 50/50 payment terms · Cancel monthly retainers after month 3 ·{" "}
+              50/50 once-off · 3-month minimum on retainers ·{" "}
               <a href="#packages" className="text-accent-600 hover:text-accent-700">
-                See what each includes ↓
+                See packages ↓
               </a>
             </div>
           </div>
@@ -181,14 +201,21 @@ export default function ServicesPage() {
           ───────────────────────────────────────────────────────────── */}
       <Section variant="default" padding="lg" id="packages">
         <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">Three paths</Eyebrow>
+          <Eyebrow className="justify-center">Core packages</Eyebrow>
           <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
             Pick what fits where you are.
           </h2>
           <p className="mt-4 text-base text-ink-500 leading-relaxed">
-            Most clients land on Growth. But if you don&apos;t have the basics
-            in place, start with Starter. If you&apos;re already running at
-            scale, Premium fits.
+            Most one-time clients land on the Optimization Pack. Starter is
+            the entry-level once-off. Growth is the modal monthly retainer.
+            See the{" "}
+            <Link
+              href="/pricing"
+              className="font-semibold text-ink-700 underline decoration-accent-300 underline-offset-4 hover:text-accent-700"
+            >
+              full pricing page
+            </Link>{" "}
+            for Foundation Build, Premium, and detail.
           </p>
         </div>
 
@@ -196,8 +223,66 @@ export default function ServicesPage() {
           <TrustStrip />
         </div>
 
-        <div className="mx-auto mt-10 max-w-6xl">
-          <PublicPackagesGrid />
+        <div className="mx-auto mt-10 grid max-w-6xl gap-6 md:grid-cols-3">
+          <ServicesPackageCard
+            name={PACKAGES.starter.name}
+            tagline={PACKAGES.starter.tagline}
+            priceDisplay={formatPrice(PACKAGES.starter.price)}
+            priceSubtitle="Once-off"
+            highlights={[
+              "10 directory citations",
+              "GBP claim and basic setup",
+              "LocalBusiness schema",
+              "Day 0 baseline scan",
+              "GA4 + Search Console verified",
+            ]}
+            slug={PACKAGES.starter.slug}
+            setupPrice={PACKAGES.starter.price}
+            monthlyPrice={0}
+            cta="Start with a free scan"
+            highlight={false}
+          />
+          <ServicesPackageCard
+            name={PACKAGES.optimizationPack.name}
+            tagline={PACKAGES.optimizationPack.tagline}
+            priceDisplay={formatPrice(PACKAGES.optimizationPack.price)}
+            priceSubtitle="Once-off · 50/50 · Day 30 delivery"
+            highlights={[
+              "Full measurement stack (GA4, GSC, BWT, Clarity)",
+              "JSON-LD schemas across service pages",
+              "GBP complete rebuild + review workflow",
+              "10 citations with NAP consistency",
+              "3 pages rewritten in answer-shape",
+              "10-12 FAQ items with FAQPage schema",
+              "Day 0 and Day 30 rescans",
+            ]}
+            slug={PACKAGES.optimizationPack.slug}
+            setupPrice={PACKAGES.optimizationPack.price}
+            monthlyPrice={0}
+            cta="Run the Optimization Pack"
+            badgeLabel="Most clients land here"
+            highlight={true}
+          />
+          <ServicesPackageCard
+            name={RETAINERS.growth.name}
+            tagline={RETAINERS.growth.tagline}
+            priceDisplay={formatPriceMonthly(RETAINERS.growth.price)}
+            priceSubtitle={`Monthly · ${RETAINERS.growth.minimumMonths}-month minimum`}
+            highlights={[
+              "4 LinkedIn company + 2 personal posts/mo",
+              "4 GBP posts/mo + 1 short video/mo",
+              "1 cornerstone content piece/mo",
+              "3-5 additional citations/mo",
+              "Monthly AI engine rescan + progress report",
+              "Monthly 60-min strategy call",
+              "Review acquisition push (5-8/mo target)",
+            ]}
+            slug={RETAINERS.growth.slug}
+            setupPrice={0}
+            monthlyPrice={RETAINERS.growth.price}
+            cta="Start growing"
+            highlight={false}
+          />
         </div>
 
         {/* Soft 'Talk to Kabelo' fallback below the grid */}
@@ -431,5 +516,103 @@ export default function ServicesPage() {
         </div>
       </Section>
     </>
+  );
+}
+
+// ─── ServicesPackageCard ──────────────────────────────────────────
+// Inline package card used in the /services 3-card overview. Pulls
+// display data from props rather than a tier registry so callers can
+// shape what's surfaced without a parallel data source.
+//
+// Why not reuse PublicPackagesGrid: that component reads from
+// lib/public-packages.ts which is now legacy (only /discover's
+// matching engine still depends on it). This card reads from props
+// that the caller composes from lib/pricing — so there's exactly one
+// authoritative pricing source on this page.
+function ServicesPackageCard({
+  name,
+  tagline,
+  priceDisplay,
+  priceSubtitle,
+  highlights,
+  slug,
+  setupPrice,
+  monthlyPrice,
+  cta,
+  highlight,
+  badgeLabel,
+}: {
+  name: string;
+  tagline: string;
+  priceDisplay: string;
+  priceSubtitle: string;
+  highlights: string[];
+  slug: string;
+  setupPrice: number;
+  monthlyPrice: number;
+  cta: string;
+  highlight: boolean;
+  badgeLabel?: string;
+}) {
+  const cardClasses = highlight
+    ? "relative rounded-3xl border-2 border-accent-500 bg-white p-7 shadow-card md:p-8 md:-translate-y-1"
+    : "relative rounded-3xl border border-rule bg-white p-7 shadow-soft md:p-8";
+
+  const ctaClasses = highlight
+    ? "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink-900 px-6 text-sm font-semibold text-white shadow-soft transition-all hover:bg-ink-800 hover:shadow-card"
+    : "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-6 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50";
+
+  return (
+    <article className={cardClasses}>
+      {highlight && badgeLabel && (
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+          <span className="rounded-full bg-accent-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft">
+            {badgeLabel}
+          </span>
+        </div>
+      )}
+
+      <h3 className="text-2xl font-semibold tracking-tight text-ink-900">
+        {name}
+      </h3>
+      <p className="mt-2 text-sm text-ink-500 leading-relaxed">{tagline}</p>
+
+      <div className="mt-6 border-t border-rule pt-5">
+        <div className="text-3xl font-bold tracking-tight text-ink-900 md:text-4xl">
+          {priceDisplay}
+        </div>
+        <div className="mt-1 text-[11px] text-ink-500">{priceSubtitle}</div>
+      </div>
+
+      <ul className="mt-6 space-y-2.5">
+        {highlights.map((h) => (
+          <li key={h} className="flex items-start gap-2.5 text-sm">
+            <CheckCircle2
+              className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
+                highlight ? "text-accent-600" : "text-emerald-500"
+              }`}
+            />
+            <span className="text-ink-700 leading-snug">{h}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-7">
+        <a
+          href="/scan"
+          data-tier={slug}
+          data-setup-price={String(setupPrice)}
+          data-monthly-price={String(monthlyPrice)}
+          data-currency="ZAR"
+          className={ctaClasses}
+        >
+          {cta}
+          <ArrowRight className="h-4 w-4" />
+        </a>
+      </div>
+      <p className="mt-3 text-center text-[10px] italic text-ink-400">
+        Starts with a free scan · No card to begin
+      </p>
+    </article>
   );
 }
