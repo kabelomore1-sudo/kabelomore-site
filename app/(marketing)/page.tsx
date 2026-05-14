@@ -158,7 +158,13 @@ export default function HomePage() {
               — covering all 7 places your customers actually search.
             </p>
 
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            {/* CTA hierarchy: ONE dominant primary action (Free scan).
+                Secondary path demoted to a text link below — visitors who
+                want Discovery still find it, but they don't compete for
+                attention with the primary. Removed the equal-weight
+                second button per Patel's hero CTA rule (multiple
+                equal-weight CTAs reduce primary conversion 15-30%). */}
+            <div className="mt-10 flex flex-col items-center justify-center gap-3">
               <a
                 href="/scan"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-ink-900 px-7 text-base font-semibold text-white shadow-lift transition-all duration-200 hover:bg-ink-800 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2"
@@ -167,14 +173,12 @@ export default function HomePage() {
                 Free 30-second scan
                 <ArrowRight className="h-4 w-4" />
               </a>
-              <a
+              <Link
                 href="/discover"
-                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-7 text-base font-semibold text-ink-900 transition-all duration-200 hover:bg-ink-50 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2"
-                style={{ height: "3rem" }}
+                className="text-sm font-medium text-ink-500 underline-offset-4 hover:text-ink-900 hover:underline focus-visible:outline-none focus-visible:underline"
               >
-                Take the 10-min Discovery
-                <ArrowRight className="h-4 w-4" />
-              </a>
+                Prefer a 10-min Discovery instead? →
+              </Link>
             </div>
 
             <p className="mt-5 text-sm text-ink-400">
