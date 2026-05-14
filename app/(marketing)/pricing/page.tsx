@@ -6,147 +6,144 @@ import { site } from "@/lib/site";
 import { Section, Eyebrow } from "@/components/ui/section";
 import { Container } from "@/components/ui/container";
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import {
+  PACKAGES,
+  RETAINERS,
+  formatPrice,
+  formatPriceMonthly,
+  formatPriceRange,
+} from "@/lib/pricing";
 
 /**
- * Pricing page — rebuilt around 3 tiers + 1 Foundation Pack.
+ * Pricing page — every price imported from lib/pricing (single source
+ * of truth). No hardcoded amounts. No standalone tier names.
  *
- * Replaces the previous 11-package + 9-add-on layout that caused
- * decision paralysis. Decision rule for this page: if a SA business
- * owner can't pick a tier within 10 seconds of landing here, the
- * page has failed. Three cards. One highlighted. Done.
+ * Display structure follows the buyer's mental model, not the data
+ * structure of lib/pricing:
+ *   - Free scan banner first (every paid path starts here)
+ *   - Once-off packages (Starter / Optimization Pack [modal] / Foundation Build Lite)
+ *   - Foundation Build (multi-page, ranged price) as a secondary card
+ *   - Monthly retainers (Growth [modal] / Premium)
+ *   - Score target visual + FAQ + final CTA
  *
- * Stripe-ready: every CTA button carries data-tier, data-setup-price,
- * data-monthly-price, and data-currency attributes. When Stripe
- * Checkout is wired up later (next sprint), these attributes map to
- * Price IDs. For now all CTAs route to /scan because every paid path
- * starts with a free scan.
- *
- * NOT YET CONSISTENT WITH (separate cleanup sprint):
- *   - /services (still uses Starter / Growth / Premium naming)
- *   - lib/public-packages.ts (Starter/Growth/Premium copy)
- *   - lib/site.ts internal tier registry
- *   - Recommendation engine in scan results
- *   - conversion-block + /brief/[tier] routes
+ * Stripe-readiness preserved: every CTA carries data-tier, data-setup-
+ * price, data-monthly-price, data-currency attributes mapping to the
+ * canonical slugs in lib/pricing.
  */
 
 export const metadata: Metadata = {
-  title: "Pricing — Fix your AI visibility. Get recommended.",
-  description:
-    "Three plans built around your AI visibility score: Fix It (R7,500 once-off), Grow It (setup + R2,950/mo), Own It (setup + R5,500/mo). Foundation Pack for businesses without a website yet.",
+  title: "Pricing — Fixed-tier AEO packages for SA, UK, and US businesses",
+  description: `Three core packages: Starter R5,000 once-off, Optimization Pack R10,500 (the modal once-off), Growth retainer R5,500/month. Foundation Build adds website + AEO. Premium retainer for category leadership. All prices fixed, no custom quotes after the scan.`,
   alternates: { canonical: `${site.url}/pricing` },
 };
 
 const pricingFaqs = [
   {
-    q: "What's included in the R7,500 setup?",
-    a: "Everything to build your AEO foundation: 30 directory citations, full schema markup deployment (LocalBusiness + FAQ + Service), Google Business Profile optimisation, NAP consistency audit, 12 FAQs written and published with schema, review acquisition system, and a 60-day AI re-scan to measure the improvement.",
+    q: "What's included in the R10,500 Optimization Pack?",
+    a: "Everything to build your AEO layer: full measurement stack (GA4, GSC, BWT, Clarity), JSON-LD schemas across service pages, llms.txt + robots.txt rebuilt, GBP complete rebuild, 10 directory citations with NAP consistency, 3 priority pages rewritten in answer-shape, 10-12 FAQ items with FAQPage schema, LinkedIn refresh, and Day 0 + Day 30 rescans with progress report. 32-40 hours of work over 3 weeks.",
   },
   {
-    q: "Can I start with Fix It and upgrade later?",
-    a: "Yes. Fix It builds the foundation. You can add Grow It monthly at any time to keep building momentum without rebuilding the foundation.",
+    q: "Can I start with Starter and upgrade later?",
+    a: "Yes. Starter (R5,000) lays the foundations. You can move to Optimization Pack (R10,500) or a Growth retainer (R5,500/mo) at any time. We do not double-bill — Starter work carries forward.",
   },
   {
-    q: "What happens after the 3-month minimum?",
-    a: "You continue month-to-month or cancel anytime. No lock-in after the minimum. Most clients stay on Grow It for 6-12 months because AEO compounds — citation density builds quarter by quarter.",
+    q: "What happens after the 3-month Growth minimum?",
+    a: "Continue month-to-month or cancel anytime. No lock-in after the minimum. Most clients stay on Growth for 6-12 months because AEO compounds quarter over quarter.",
   },
   {
     q: "How quickly will I see results?",
-    a: "Citations go live within 1-2 weeks. GBP changes take effect within days. Schema markup is parsed by AI engines on their next crawl (typically 7-14 days). Your 60-day re-scan measures the full impact and is included in every tier.",
+    a: "Citations go live within 1-2 weeks. GBP changes take effect within days. Schema markup is parsed by AI engines on their next crawl (typically 7-14 days). The Optimization Pack includes a Day 30 rescan that measures the full impact.",
   },
   {
     q: "What if I don't have a website?",
-    a: "Start with the Foundation Pack (R12,500 once-off). We build your website, set up your GBP, and deploy schema. Then add any tier above to drive AI visibility on top of the new foundation.",
+    a: "Foundation Build Lite (R12,500 once-off, solo professionals) or Foundation Build (R18,500–R24,500 once-off, multi-page businesses). Both include everything from the Optimization Pack baked in from line one — you don't need to buy the AEO layer separately.",
   },
   {
     q: "Do you offer payment plans?",
-    a: "Setup costs: 50% to start, 50% on delivery. Monthly tiers are billed monthly in advance, 3-month minimum. All payments via card or EFT in South African Rand. International clients can pay in USD or GBP at the displayed equivalent.",
+    a: "Once-off packages: 50% deposit, 50% on delivery. Monthly retainers billed in advance — Growth 3-month minimum, Premium 6-month minimum. All payments via card or EFT in South African Rand. International clients pay in USD or GBP at the displayed equivalent.",
   },
 ];
 
-// ─── Tier data — single source of truth for the page ──────────────
-const tiers = [
+// ─── Once-off tier display data ───────────────────────────────────
+// Pulls from canonical lib/pricing PACKAGES + adds display-specific
+// fields (highlight state, CTA copy, score target language) that don't
+// belong in the pricing data model itself.
+const onceOffCards = [
   {
-    id: "fix-it" as const,
-    name: "Fix It",
-    tagline: "Once-off cleanup. Quick wins from your current foundation.",
-    setupPrice: 7500,
-    monthlyPrice: 0,
-    priceDisplay: "R7,500",
+    pkg: PACKAGES.starter,
+    priceDisplay: formatPrice(PACKAGES.starter.price),
     priceSubtitle: "Once-off · 50% deposit / 50% on delivery",
-    intlPrice: "$495 · £395",
+    intlPrice: "$295 · £235",
     forWho:
-      "Businesses with a website scoring below 50 on their AI scan. You have the basics; the AEO layer is missing.",
-    delivery: "4 weeks from kickoff",
-    scoreTarget: "20-40 → 60-75",
+      "Solo professionals and small service businesses with a website that needs the AEO foundation laid.",
+    delivery: PACKAGES.starter.timeInvestment + " of work · 1-2 weeks",
+    scoreTarget: "Lays the foundation",
     scoreColor: "#84cc16",
-    includes: [
-      "30 directory citations built (general + industry-specific)",
-      "NAP consistency audit and correction across the web",
-      "LocalBusiness + FAQ schema deployed on your website",
-      "12 FAQs written and published with schema markup",
-      "Google Business Profile fully optimised",
-      "Review acquisition system set up (templates + link + QR code)",
-      "60-day AI visibility re-scan with before/after report",
-    ],
-    cta: "Get started",
+    cta: "Start with Starter",
     ctaStyle: "outline" as const,
     highlight: false,
+    setupPrice: PACKAGES.starter.price,
   },
   {
-    id: "grow-it" as const,
-    name: "Grow It",
-    tagline: "Compound your visibility every month. Where most clients land.",
-    setupPrice: 7500,
-    monthlyPrice: 2950,
-    priceDisplay: "R7,500 + R2,950",
-    priceSubtitle: "Setup + monthly · 3-month minimum",
-    intlPrice: "$195 · £155 / month",
+    pkg: PACKAGES.optimizationPack,
+    priceDisplay: formatPrice(PACKAGES.optimizationPack.price),
+    priceSubtitle: "Once-off · 50% deposit / 50% on Day 30 delivery",
+    intlPrice: "$595 · £475",
     forWho:
-      "Businesses that want ongoing growth, not just a one-time fix. AI visibility compounds — six months of consistent work doubles or triples cited rate.",
-    delivery: "Month 1: implementation. Months 2+: compounding growth.",
-    scoreTarget: "20-40 → 75-85 and climbing",
+      "Businesses with a website that need the full AEO layer in 3 weeks. The modal once-off — where most one-time clients land.",
+    delivery: PACKAGES.optimizationPack.timeInvestment + " over 3 weeks",
+    scoreTarget: "20-40 → 60-75",
     scoreColor: "#22c55e",
-    includes: [
-      "Everything in Fix It",
-      "4 Google Business Posts per week",
-      "2 answer-shaped blog posts per month",
-      "Monthly review acquisition campaigns",
-      "AI visibility tracking — your score + top 3 competitors",
-      "Competitor monitoring — see when they gain or lose visibility",
-      "Quarterly re-scan with before/after impact report",
-    ],
+    cta: "Run the Optimization Pack",
+    ctaStyle: "primary" as const,
+    highlight: true,
+    setupPrice: PACKAGES.optimizationPack.price,
+  },
+  {
+    pkg: PACKAGES.foundationBuildLite,
+    priceDisplay: formatPrice(PACKAGES.foundationBuildLite.price),
+    priceSubtitle: "Once-off · 50% deposit / 50% on delivery",
+    intlPrice: "$735 · £585",
+    forWho:
+      "Solo professionals without a website. One-page site with AEO baked in from launch.",
+    delivery: PACKAGES.foundationBuildLite.timeInvestment + " · 2-3 weeks",
+    scoreTarget: "0 → 60-75",
+    scoreColor: "#16a34a",
+    cta: "Build my foundation",
+    ctaStyle: "outline" as const,
+    highlight: false,
+    setupPrice: PACKAGES.foundationBuildLite.price,
+  },
+];
+
+const retainerCards = [
+  {
+    ret: RETAINERS.growth,
+    priceDisplay: formatPriceMonthly(RETAINERS.growth.price),
+    priceSubtitle: `Monthly · ${RETAINERS.growth.minimumMonths}-month minimum`,
+    intlPrice: "$395 / £315 / month",
+    forWho:
+      "The standard retainer for clients post-Foundation. Compounding monthly work that lifts you into category-leading visibility.",
+    scoreTarget: "75-85 and climbing",
+    scoreColor: "#22c55e",
     cta: "Start growing",
     ctaStyle: "primary" as const,
     highlight: true,
+    monthlyPrice: RETAINERS.growth.price,
   },
   {
-    id: "own-it" as const,
-    name: "Own It",
-    tagline: "Be the recommendation in your category.",
-    setupPrice: 7500,
-    monthlyPrice: 5500,
-    priceDisplay: "R7,500 + R5,500",
-    priceSubtitle: "Setup + monthly · 3-month minimum",
-    intlPrice: "$365 · £285 / month",
+    ret: RETAINERS.premium,
+    priceDisplay: `from ${formatPriceMonthly(RETAINERS.premium.priceMin)}`,
+    priceSubtitle: `Monthly · ${RETAINERS.premium.minimumMonths}-month minimum`,
+    intlPrice: "from $735 / £585 / month",
     forWho:
-      "Businesses that want to BE the recommendation in their category. Mid-market firms, multi-region operations, or anyone making AI visibility their primary growth channel.",
-    delivery: "Month 1: implementation. Months 2+: category dominance work.",
+      "Mid-market firms pursuing category leadership. Daily content cadence, paid ads management, PR outreach, weekly strategy calls.",
     scoreTarget: "85+ — category dominance",
     scoreColor: "#16a34a",
-    includes: [
-      "Everything in Grow It",
-      "60+ citations (general + industry + hyper-local)",
-      "2 long-form authority articles per month",
-      "Authority listicle placement (industry benchmarking)",
-      "LinkedIn company page — 3 posts per week",
-      "Founder/principal LinkedIn — 1 ghost-written post per week",
-      "Active digital PR outreach — 1-2 placements per month target",
-      "Monthly strategy call (30 min)",
-      "30-day and 90-day re-scans with documented before/after",
-    ],
-    cta: "Dominate your category",
+    cta: "Apply for Premium",
     ctaStyle: "outline" as const,
     highlight: false,
+    monthlyPrice: RETAINERS.premium.priceMin,
   },
 ];
 
@@ -170,12 +167,12 @@ export default function PricingPage() {
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
             See your score.
             <br />
-            <span className="text-ink-500">Pick your fix. Get recommended.</span>
+            <span className="text-ink-500">Pick your package. Get recommended.</span>
           </h1>
           <p className="mt-5 text-lg text-ink-500 leading-relaxed">
             Every plan starts with a free AI visibility scan.
             <br className="hidden md:block" />
-            We fix exactly what it finds.
+            Fixed-tier pricing — no custom quotes, no surprises.
           </p>
         </div>
       </Section>
@@ -211,28 +208,87 @@ export default function PricingPage() {
         </div>
       </Section>
 
-      {/* ─── THREE TIER CARDS ──────────────────────────────── */}
-      <Section variant="default" padding="lg" id="tiers">
+      {/* ─── ONCE-OFF PACKAGES ─────────────────────────────── */}
+      <Section variant="default" padding="lg" id="packages">
         <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">Three plans</Eyebrow>
+          <Eyebrow className="justify-center">Once-off packages</Eyebrow>
           <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
             Pick the level of work your score needs.
           </h2>
           <p className="mt-4 text-base text-ink-500">
-            Each plan starts with the same R7,500 foundation setup. Monthly
-            tiers add compounding growth on top.
+            Most one-time clients land on the Optimization Pack. Starter is
+            entry-level. Foundation Build Lite covers no-website clients.
           </p>
         </div>
 
         <div className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-3">
-          {tiers.map((tier) => (
-            <TierCard key={tier.id} tier={tier} />
+          {onceOffCards.map((card) => (
+            <OnceOffCard key={card.pkg.slug} card={card} />
+          ))}
+        </div>
+
+        {/* Foundation Build (ranged price) — secondary card */}
+        <div className="mx-auto mt-10 max-w-4xl">
+          <div className="rounded-2xl border border-rule bg-ink-50/40 p-6 md:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex-1 min-w-[280px]">
+                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
+                  Multi-page website build
+                </div>
+                <h3 className="mt-2 text-xl font-semibold tracking-tight text-ink-900">
+                  {PACKAGES.foundationBuild.name} —{" "}
+                  <span className="font-bold">
+                    {formatPriceRange(
+                      PACKAGES.foundationBuild.priceMin,
+                      PACKAGES.foundationBuild.priceMax,
+                    )}
+                  </span>
+                  <span className="text-base font-normal text-ink-500"> once-off</span>
+                </h3>
+                <p className="mt-2 text-sm text-ink-500 leading-relaxed">
+                  3-9+ page site (WordPress or Next.js) with everything from the
+                  Optimization Pack baked in from line one. For businesses that
+                  need a multi-page presence, not a single landing page.
+                </p>
+              </div>
+              <a
+                href="/scan"
+                data-tier={PACKAGES.foundationBuild.slug}
+                data-setup-price={String(PACKAGES.foundationBuild.priceMin)}
+                data-monthly-price="0"
+                data-currency="ZAR"
+                className="inline-flex h-11 flex-shrink-0 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-5 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
+              >
+                Get scoped
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* ─── MONTHLY RETAINERS ──────────────────────────────── */}
+      <Section variant="tinted" padding="lg" id="retainers">
+        <div className="mx-auto max-w-3xl text-center">
+          <Eyebrow className="justify-center">Monthly retainers</Eyebrow>
+          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+            Compounding work, billed monthly.
+          </h2>
+          <p className="mt-4 text-base text-ink-500">
+            AEO compounds quarter over quarter. Retainers run the ongoing
+            content + citation + LinkedIn work that lifts you into category-leading visibility.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
+          {retainerCards.map((card) => (
+            <RetainerCard key={card.ret.slug} card={card} />
           ))}
         </div>
       </Section>
 
       {/* ─── SCORE TARGET VISUAL ───────────────────────────── */}
-      <Section variant="tinted" padding="default">
+      <Section variant="default" padding="default">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
             <Eyebrow className="justify-center">Score-to-tier map</Eyebrow>
@@ -246,42 +302,6 @@ export default function PricingPage() {
           </div>
 
           <ScoreTargetBar />
-        </div>
-      </Section>
-
-      {/* ─── FOUNDATION PACK CARD ──────────────────────────── */}
-      <Section variant="default" padding="default">
-        <div className="mx-auto max-w-3xl">
-          <div className="rounded-2xl border border-rule bg-ink-50/40 p-6 md:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex-1 min-w-[250px]">
-                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
-                  Need a website first?
-                </div>
-                <h3 className="mt-2 text-xl font-semibold tracking-tight text-ink-900">
-                  Foundation Pack —{" "}
-                  <span className="font-bold">R12,500</span>
-                  <span className="text-base font-normal text-ink-500"> once-off</span>
-                </h3>
-                <p className="mt-2 text-sm text-ink-500 leading-relaxed">
-                  Full website build + Google Business Profile setup + schema
-                  + admin panel. After Foundation, add any tier above to drive
-                  AI visibility on the new site.
-                </p>
-              </div>
-              <a
-                href="/foundation"
-                data-tier="foundation"
-                data-setup-price="12500"
-                data-monthly-price="0"
-                data-currency="ZAR"
-                className="inline-flex h-11 flex-shrink-0 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-5 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
-              >
-                Learn more
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            </div>
-          </div>
         </div>
       </Section>
 
@@ -417,11 +437,11 @@ export default function PricingPage() {
       <Section variant="ink" padding="lg">
         <div className="mx-auto max-w-3xl text-center text-white">
           <h2 className="text-display-md font-semibold tracking-tight md:text-display-lg">
-            Not sure which plan fits?
+            Not sure which package fits?
           </h2>
           <p className="mt-4 text-lg text-ink-300 leading-relaxed">
-            Get your free scan first. We&apos;ll recommend the right tier based
-            on what we find. No pressure. No card. Report in 24 hours.
+            Get your free scan first. We&apos;ll recommend one of the packages
+            above based on what we find. No pressure. No card. Report in 24 hours.
           </p>
           <a
             href="/scan"
@@ -440,15 +460,15 @@ export default function PricingPage() {
   );
 }
 
-// ─── TierCard ─────────────────────────────────────────
-function TierCard({ tier }: { tier: (typeof tiers)[number] }) {
-  const isHighlighted = tier.highlight;
+// ─── OnceOffCard ─────────────────────────────────────────
+function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
+  const isHighlighted = card.highlight;
   const cardClasses = isHighlighted
     ? "relative rounded-3xl border-2 border-emerald-500 bg-white p-7 shadow-card md:p-8 md:-translate-y-2"
     : "relative rounded-3xl border border-rule bg-white p-7 shadow-soft md:p-8";
 
   const ctaClasses =
-    tier.ctaStyle === "primary"
+    card.ctaStyle === "primary"
       ? "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink-900 px-6 text-sm font-semibold text-white shadow-soft transition-all hover:bg-ink-800 hover:shadow-card"
       : "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-6 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50";
 
@@ -457,29 +477,26 @@ function TierCard({ tier }: { tier: (typeof tiers)[number] }) {
       {isHighlighted && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
           <span className="rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft">
-            Most popular
+            Most clients land here
           </span>
         </div>
       )}
 
       <div>
         <h3 className="text-2xl font-semibold tracking-tight text-ink-900">
-          {tier.name}
+          {card.pkg.name}
         </h3>
         <p className="mt-2 text-sm text-ink-500 leading-relaxed">
-          {tier.tagline}
+          {card.pkg.tagline}
         </p>
       </div>
 
       <div className="mt-6 border-t border-rule pt-5">
         <div className="text-3xl font-bold tracking-tight text-ink-900 md:text-4xl">
-          {tier.priceDisplay}
-          {tier.monthlyPrice > 0 && (
-            <span className="text-base font-normal text-ink-500">/mo</span>
-          )}
+          {card.priceDisplay}
         </div>
-        <div className="mt-1 text-[11px] text-ink-500">{tier.priceSubtitle}</div>
-        <div className="mt-0.5 text-[11px] text-ink-400">{tier.intlPrice}</div>
+        <div className="mt-1 text-[11px] text-ink-500">{card.priceSubtitle}</div>
+        <div className="mt-0.5 text-[11px] text-ink-400">{card.intlPrice}</div>
       </div>
 
       <div className="mt-5">
@@ -489,19 +506,19 @@ function TierCard({ tier }: { tier: (typeof tiers)[number] }) {
         <div className="mt-1.5 inline-flex items-center gap-2 rounded-full bg-ink-50 px-3 py-1.5 text-xs font-semibold text-ink-900">
           <span
             className="h-2 w-2 rounded-full"
-            style={{ background: tier.scoreColor }}
+            style={{ background: card.scoreColor }}
             aria-hidden="true"
           />
-          {tier.scoreTarget}
+          {card.scoreTarget}
         </div>
       </div>
 
       <div className="mt-5 rounded-xl bg-ink-50/60 p-4 text-xs text-ink-700 leading-relaxed">
-        <strong className="text-ink-900">Best for:</strong> {tier.forWho}
+        <strong className="text-ink-900">Best for:</strong> {card.forWho}
       </div>
 
       <ul className="mt-5 space-y-2.5">
-        {tier.includes.map((item) => (
+        {card.pkg.deliverables.slice(0, 7).map((item) => (
           <li key={item} className="flex items-start gap-2.5 text-sm">
             <CheckCircle2
               className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
@@ -514,19 +531,19 @@ function TierCard({ tier }: { tier: (typeof tiers)[number] }) {
       </ul>
 
       <div className="mt-5 text-[11px] text-ink-500">
-        <strong className="text-ink-700">Delivery:</strong> {tier.delivery}
+        <strong className="text-ink-700">Delivery:</strong> {card.delivery}
       </div>
 
       <div className="mt-7">
         <a
           href="/scan"
-          data-tier={tier.id}
-          data-setup-price={String(tier.setupPrice)}
-          data-monthly-price={String(tier.monthlyPrice)}
+          data-tier={card.pkg.slug}
+          data-setup-price={String(card.setupPrice)}
+          data-monthly-price="0"
           data-currency="ZAR"
           className={ctaClasses}
         >
-          {tier.cta}
+          {card.cta}
           <ArrowRight className="h-4 w-4" />
         </a>
       </div>
@@ -537,14 +554,104 @@ function TierCard({ tier }: { tier: (typeof tiers)[number] }) {
   );
 }
 
+// ─── RetainerCard ─────────────────────────────────────────
+function RetainerCard({ card }: { card: (typeof retainerCards)[number] }) {
+  const isHighlighted = card.highlight;
+  const cardClasses = isHighlighted
+    ? "relative rounded-3xl border-2 border-emerald-500 bg-white p-7 shadow-card md:p-8"
+    : "relative rounded-3xl border border-rule bg-white p-7 shadow-soft md:p-8";
+
+  const ctaClasses =
+    card.ctaStyle === "primary"
+      ? "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink-900 px-6 text-sm font-semibold text-white shadow-soft transition-all hover:bg-ink-800 hover:shadow-card"
+      : "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-6 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50";
+
+  return (
+    <article className={cardClasses}>
+      {isHighlighted && (
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+          <span className="rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft">
+            Standard retainer
+          </span>
+        </div>
+      )}
+
+      <div>
+        <h3 className="text-2xl font-semibold tracking-tight text-ink-900">
+          {card.ret.name}
+        </h3>
+        <p className="mt-2 text-sm text-ink-500 leading-relaxed">
+          {card.ret.tagline}
+        </p>
+      </div>
+
+      <div className="mt-6 border-t border-rule pt-5">
+        <div className="text-3xl font-bold tracking-tight text-ink-900 md:text-4xl">
+          {card.priceDisplay}
+        </div>
+        <div className="mt-1 text-[11px] text-ink-500">{card.priceSubtitle}</div>
+        <div className="mt-0.5 text-[11px] text-ink-400">{card.intlPrice}</div>
+      </div>
+
+      <div className="mt-5">
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">
+          Score target
+        </div>
+        <div className="mt-1.5 inline-flex items-center gap-2 rounded-full bg-ink-50 px-3 py-1.5 text-xs font-semibold text-ink-900">
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ background: card.scoreColor }}
+            aria-hidden="true"
+          />
+          {card.scoreTarget}
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-xl bg-ink-50/60 p-4 text-xs text-ink-700 leading-relaxed">
+        <strong className="text-ink-900">Best for:</strong> {card.forWho}
+      </div>
+
+      <ul className="mt-5 space-y-2.5">
+        {card.ret.deliverables.slice(0, 8).map((item) => (
+          <li key={item} className="flex items-start gap-2.5 text-sm">
+            <CheckCircle2
+              className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
+                isHighlighted ? "text-emerald-600" : "text-emerald-500"
+              }`}
+            />
+            <span className="text-ink-700 leading-snug">{item}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-7">
+        <a
+          href="/scan"
+          data-tier={card.ret.slug}
+          data-setup-price="0"
+          data-monthly-price={String(card.monthlyPrice)}
+          data-currency="ZAR"
+          className={ctaClasses}
+        >
+          {card.cta}
+          <ArrowRight className="h-4 w-4" />
+        </a>
+      </div>
+      <p className="mt-3 text-center text-[10px] italic text-ink-400">
+        Starts with a free scan · {card.ret.minimumMonths}-month minimum
+      </p>
+    </article>
+  );
+}
+
 // ─── ScoreTargetBar ───────────────────────────────────
 function ScoreTargetBar() {
   const segments = [
     { from: 0, to: 30, label: "Where most start", colour: "#ef4444" },
     { from: 30, to: 60, label: "Most SA businesses today", colour: "#f97316" },
-    { from: 60, to: 75, label: "After Fix It", colour: "#84cc16" },
-    { from: 75, to: 85, label: "After Grow It", colour: "#22c55e" },
-    { from: 85, to: 100, label: "After Own It", colour: "#16a34a" },
+    { from: 60, to: 75, label: "After Starter / Optimization", colour: "#84cc16" },
+    { from: 75, to: 85, label: "After 3-6 months Growth", colour: "#22c55e" },
+    { from: 85, to: 100, label: "After Premium + 6+ months", colour: "#16a34a" },
   ];
 
   return (
