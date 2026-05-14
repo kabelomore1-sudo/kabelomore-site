@@ -62,7 +62,7 @@ const homepageFaqs = [
   },
   {
     q: "How much does it cost?",
-    a: "We don't have one fixed package. After your free scan we send a custom quote based on what we found — typically R5,500 to R12,500 once-off, plus an optional monthly partnership (R8,500-15,000/mo) for ongoing work. Once-off projects bill 50% deposit, 50% on delivery. Monthly retainers bill in advance, 3-month minimum. Full price list at /pricing if you want to see the menu before booking the scan.",
+    a: "Three core packages. Starter at R5,000 (foundations for solo professionals), Optimization Pack at R10,500 (the full AEO layer in 3 weeks — most clients start here), and Growth retainer at R5,500/month for compounding monthly work. Once-off projects bill 50% deposit, 50% on delivery. Monthly retainers bill in advance, 3-month minimum. Full price list at /pricing.",
   },
 ];
 
