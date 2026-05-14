@@ -22,6 +22,12 @@ import type {
   DetectedSignals,
   Recommendation,
 } from "@/lib/types/scan";
+import {
+  PACKAGES,
+  RETAINERS,
+  formatPrice,
+  formatPriceMonthly,
+} from "@/lib/pricing";
 
 export function generateRecommendations(
   classification: Classification,
@@ -55,20 +61,19 @@ export function generateRecommendations(
 function recommendForTypeA(_d: DetectedSignals): Omit<Recommendation, "rank">[] {
   return [
     {
-      title: "Foundation Pack — build everything from zero",
-      explanation:
-        "You don't have a website or a Google Business Profile yet. We build both, plus the schema markup AI engines need to actually trust your business. 4 weeks. You own everything when we're done.",
+      title: `${PACKAGES.foundationBuild.name} — build everything from zero`,
+      explanation: `You don't have a website or a Google Business Profile yet. We build both, plus the AEO layer (schema, citations, FAQ markup) AI engines need to trust your business. ${PACKAGES.foundationBuild.priceMin && PACKAGES.foundationBuild.priceMax ? `${formatPrice(PACKAGES.foundationBuild.priceMin)}–${formatPrice(PACKAGES.foundationBuild.priceMax)} depending on page count. ` : ""}You own everything when we're done.`,
       estimatedImpact: "high",
       estimatedEffort: "medium",
-      mapsToTier: "foundation",
+      mapsToTier: PACKAGES.foundationBuild.slug,
     },
     {
-      title: "Or start with Foundation Lite (R6,500)",
+      title: `Or start with ${PACKAGES.foundationBuildLite.name} (${formatPrice(PACKAGES.foundationBuildLite.price)})`,
       explanation:
-        "If you're a sole trader or single-service business, the lighter version covers a 1-page site, GBP, schema, and 5 directory listings in 2 weeks.",
+        "If you're a solo professional or single-service business, the lighter version covers a 1-page site, GBP, schema, and 10 directory listings — same AEO layer baked in, smaller surface.",
       estimatedImpact: "medium",
       estimatedEffort: "low",
-      mapsToTier: "foundation-lite",
+      mapsToTier: PACKAGES.foundationBuildLite.slug,
     },
   ];
 }
@@ -115,12 +120,11 @@ function recommendForTypeB(d: DetectedSignals): Omit<Recommendation, "rank">[] {
 
   // Optimization Pack as the unifying answer
   recs.push({
-    title: "Optimization Pack — full AEO layer in 3 weeks",
-    explanation:
-      "All of the above bundled: schema, GBP rebuild, 10 citations, 3 priority pages rewritten in answer-shape, llms.txt deployed. R10,500. We don't rebuild your site.",
+    title: `${PACKAGES.optimizationPack.name} — ${PACKAGES.optimizationPack.tagline.toLowerCase()}`,
+    explanation: `All of the above bundled: schema, GBP rebuild, 10 citations, 3 priority pages rewritten in answer-shape, llms.txt deployed, full measurement stack. ${formatPrice(PACKAGES.optimizationPack.price)}. We don't rebuild your site.`,
     estimatedImpact: "high",
     estimatedEffort: "medium",
-    mapsToTier: "optimization",
+    mapsToTier: PACKAGES.optimizationPack.slug,
   });
 
   return recs;
@@ -151,12 +155,11 @@ function recommendForTypeC(d: DetectedSignals): Omit<Recommendation, "rank">[] {
   });
 
   recs.push({
-    title: "Growth Retainer — compounding monthly work",
-    explanation:
-      "AEO compounds month over month. 2 articles, 4 GBP posts, schema updates, 1-2 citations, monthly competitor monitoring. R8,500/month. The clients who maintain through months 6-12 widen the gap.",
+    title: `${RETAINERS.growth.name} Retainer — compounding monthly work`,
+    explanation: `AEO compounds month over month. 4 LinkedIn posts, 4 GBP posts, 2 articles, 3-5 citations, monthly competitor monitoring + strategy call. ${formatPriceMonthly(RETAINERS.growth.price)}, ${RETAINERS.growth.minimumMonths}-month minimum. The clients who maintain through months 6-12 widen the gap.`,
     estimatedImpact: "high",
     estimatedEffort: "medium",
-    mapsToTier: "growth",
+    mapsToTier: RETAINERS.growth.slug,
   });
 
   return recs;
@@ -166,20 +169,18 @@ function recommendForTypeC(d: DetectedSignals): Omit<Recommendation, "rank">[] {
 function recommendForTypeD(_d: DetectedSignals): Omit<Recommendation, "rank">[] {
   return [
     {
-      title: "Premium Retainer — dominance strategy",
-      explanation:
-        "You're already well-positioned. Premium adds 4 articles/month, dedicated specialist time, monthly executive call, and reputation monitoring. For businesses where AI visibility IS the growth strategy.",
+      title: `${RETAINERS.premium.name} Retainer — dominance strategy`,
+      explanation: `You're already well-positioned. Premium adds daily content cadence, 2 short videos/mo, paid ads management, PR outreach, and weekly strategy calls. From ${formatPriceMonthly(RETAINERS.premium.priceMin)}, ${RETAINERS.premium.minimumMonths}-month minimum. For businesses where AI visibility IS the growth strategy.`,
       estimatedImpact: "high",
       estimatedEffort: "medium",
-      mapsToTier: "premium",
+      mapsToTier: RETAINERS.premium.slug,
     },
     {
-      title: "Or stay on Growth retainer with content acceleration",
-      explanation:
-        "If Premium scope is more than you need, Growth + Content Boost add-on (extra 2 articles/month) gives you most of the velocity at lower cost.",
+      title: `Or stay on ${RETAINERS.growth.name} retainer`,
+      explanation: `If Premium scope is more than you need, ${RETAINERS.growth.name} at ${formatPriceMonthly(RETAINERS.growth.price)} runs the same compounding work at standard cadence — sufficient for most established practices.`,
       estimatedImpact: "medium",
       estimatedEffort: "low",
-      mapsToTier: "growth",
+      mapsToTier: RETAINERS.growth.slug,
     },
   ];
 }

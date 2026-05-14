@@ -14,6 +14,12 @@ import { IssueDistribution } from "./scan-charts/issue-distribution";
 import { MethodologyDisclosure } from "./methodology-disclosure";
 import type { ScanResult } from "@/lib/types/scan";
 import {
+  PACKAGES,
+  RETAINERS,
+  formatPrice,
+  formatPriceMonthly,
+} from "@/lib/pricing";
+import {
   ArrowRight,
   CheckCircle2,
   XCircle,
@@ -499,37 +505,60 @@ function ResultsView({ result }: { result: ScanResult }) {
               <Mail className="h-4 w-4" /> Reply by email
             </Button>
           </div>
-          {/* Package menu — visible but secondary. Lets self-serve
-              buyers see prices without forcing them to a call. Naval
-              shape: surface the option, don't push it. */}
+          {/* Package menu — visible but secondary. Pulls names + prices
+              from lib/pricing canonical source so any change there
+              propagates here automatically. Shows the three most-
+              likely paths from a scan result:
+                - Starter (entry-level once-off)
+                - Optimization Pack (the modal once-off — recommended)
+                - Growth (the modal monthly retainer)
+              Foundation Build options + Premium retainer live on
+              /pricing for high-end visitors. */}
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 text-left">
             <div className="text-[10px] font-semibold uppercase tracking-wider text-accent-400">
               Or browse packages first
             </div>
             <div className="mt-3 grid gap-3 text-sm md:grid-cols-3">
               <a
-                href="/services#packages"
+                href="/pricing"
                 className="rounded-xl bg-white/10 p-3 hover:bg-white/15"
               >
-                <div className="font-semibold text-white">Starter</div>
-                <div className="mt-0.5 text-xs text-ink-300">From R5,000 once-off</div>
-                <div className="mt-1 text-[11px] text-ink-400">Foundations: schema, GBP, 10 directory listings</div>
+                <div className="font-semibold text-white">{PACKAGES.starter.name}</div>
+                <div className="mt-0.5 text-xs text-ink-300">
+                  {formatPrice(PACKAGES.starter.price)} once-off
+                </div>
+                <div className="mt-1 text-[11px] text-ink-400">
+                  {PACKAGES.starter.description}
+                </div>
               </a>
               <a
-                href="/services#packages"
+                href="/pricing"
                 className="rounded-xl border border-accent-500/40 bg-accent-500/10 p-3 hover:bg-accent-500/15"
               >
-                <div className="font-semibold text-white">Growth <span className="text-[9px] uppercase tracking-wider text-accent-400">· Most fit here</span></div>
-                <div className="mt-0.5 text-xs text-ink-300">R5,500/month</div>
-                <div className="mt-1 text-[11px] text-ink-400">Compounding monthly AEO + citations + LinkedIn</div>
+                <div className="font-semibold text-white">
+                  {PACKAGES.optimizationPack.name}{" "}
+                  <span className="text-[9px] uppercase tracking-wider text-accent-400">
+                    · Most clients land here
+                  </span>
+                </div>
+                <div className="mt-0.5 text-xs text-ink-300">
+                  {formatPrice(PACKAGES.optimizationPack.price)} once-off
+                </div>
+                <div className="mt-1 text-[11px] text-ink-400">
+                  {PACKAGES.optimizationPack.tagline}
+                </div>
               </a>
               <a
-                href="/services#packages"
+                href="/pricing"
                 className="rounded-xl bg-white/10 p-3 hover:bg-white/15"
               >
-                <div className="font-semibold text-white">Premium</div>
-                <div className="mt-0.5 text-xs text-ink-300">From R10,500/month</div>
-                <div className="mt-1 text-[11px] text-ink-400">Visibility + workflow automation + PR</div>
+                <div className="font-semibold text-white">{RETAINERS.growth.name}</div>
+                <div className="mt-0.5 text-xs text-ink-300">
+                  {formatPriceMonthly(RETAINERS.growth.price)}
+                </div>
+                <div className="mt-1 text-[11px] text-ink-400">
+                  {RETAINERS.growth.tagline}
+                </div>
               </a>
             </div>
           </div>
