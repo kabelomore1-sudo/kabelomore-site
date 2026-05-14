@@ -38,6 +38,7 @@ import {
 import { ScanRowActions } from "@/components/admin/scan-row-actions";
 import { Section, Eyebrow } from "@/components/ui/section";
 import { MaskedEmail } from "@/components/admin/masked-email";
+import { IndexNowButton } from "@/components/admin/indexnow-button";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -142,7 +143,8 @@ function Header({
           Claude+web_search call.
         </p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-start gap-2">
+        <IndexNowButton />
         <a
           href="/api/diagnostics"
           target="_blank"
