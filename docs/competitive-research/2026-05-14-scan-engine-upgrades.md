@@ -2,13 +2,17 @@
 
 **Date:** 2026-05-14
 **Source:** `2026-05-14-ubersuggest-ai-scan.md`
-**Scope:** Backlog tickets only. No production code changed this session.
+**Scope:** Backlog tickets derived from the analysis.
+
+**Status log:**
+- ✅ **Ticket 1 — SHIPPED** 2026-05-15 (commit `0c50e33`): prompt mining + intent classification live in the scan engine + report + sample/preview.
+- Tickets 2–5: backlog.
 
 Context: our scan currently runs ~4 fixed query shapes against a Claude + live-web proxy and returns a score, classification, verbatim responses, and competitor names. Ubersuggest's analysis exposes five gaps/opportunities. Tickets are ordered by leverage.
 
 ---
 
-## TICKET 1 — Prompt mining + intent classification ⭐ recommended first
+## TICKET 1 — Prompt mining + intent classification ✅ SHIPPED (commit `0c50e33`, 2026-05-15)
 
 **Why:** Ubersuggest's single strongest feature. Replacing our 4 fixed query shapes with a generated set of *real category questions* (buyer language, SA-localised) makes the diagnosis credible and specific instead of templated. Intent tagging (Informational / Navigational / Transactional) adds a layer Ubersuggest paywalls the *chart* for — we can show the full breakdown free.
 
