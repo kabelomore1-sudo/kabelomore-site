@@ -40,3 +40,6 @@ scripts/raw-videos/*
 
 # TypeScript
 *.tsbuildinfo
+
+# Local-only competitive research image workspace (analysis inputs, not source)
+.tmp-competitive/
