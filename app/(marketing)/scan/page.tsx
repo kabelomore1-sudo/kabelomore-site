@@ -55,15 +55,12 @@ export default async function ScanPage({
         <div className="mx-auto max-w-3xl text-center">
           <Eyebrow className="justify-center">Free · No obligation · 24h turnaround</Eyebrow>
           <h1 className="mt-4 text-display-xl font-semibold tracking-tight text-ink-900">
-            Find out if AI engines
+            See what AI says about
             <br />
-            <span className="text-ink-500">recommend your business.</span>
+            <span className="text-ink-500">your business.</span>
           </h1>
           <p className="mt-5 text-lg text-ink-500">
-            Submit your business details. We run customer-style queries via
-            Claude with live web search (a proxy for ChatGPT, Gemini, and
-            Perplexity) and deliver a personalised report in 24 hours. Free.
-            No follow-up unless you want one.
+            Free report in 24 hours. No card. No follow-up unless you ask.
           </p>
         </div>
       </Section>
@@ -76,75 +73,89 @@ export default async function ScanPage({
         <TrustStrip />
       </Section>
 
-      {/* What's in your report — static, mobile-safe card.
-          REPLACED the AnnotatedScreenshot overlay (numbered hotspots
-          absolutely-positioned by % over a responsive CSS mockup).
-          That approach broke below the md breakpoint: the mockup's
-          2-col grids collapsed to 1-col, the container reflowed, and
-          the hardcoded % coords landed on the wrong elements — markers
-          overlaying the score, floating beside it, sitting on the
-          competitor list. Conversion page; a broken overlay is worse
-          than a clean list. This card conveys the same four points
-          with zero coordinate math and no absolute positioning. */}
+      {/* Show, don't tell. People are lazy to read — so instead of
+          describing the report in text cards, render a visual at-a-
+          glance preview (pure flow layout: score number + bar +
+          classification chip + competitor list — exactly what the real
+          report opens with) and drive to the full LIVE sample at
+          /scan/preview. No absolute positioning, no overlay, no
+          coordinate math (that was the bug we removed). The live
+          sample IS the screenshot — always current, never stale. */}
       <Section variant="default" padding="default" containerSize="narrow">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-8 text-center">
+          <div className="mb-6 text-center">
             <Eyebrow className="justify-center">What you&apos;ll get</Eyebrow>
             <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
-              Inside the scan report.
+              A report that looks like this.
             </h2>
-            <p className="mt-3 text-base text-ink-500">
-              Four things, delivered as a hosted report within 24 hours.
-            </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              {
-                n: "1",
-                title: "Your AI visibility score",
-                body: "A 0-100 directional readiness score. Where you stand without false precision — re-runs may vary 5-10 pts.",
-              },
-              {
-                n: "2",
-                title: "Type classification",
-                body: "Type A / B / C / D — invisible, partially visible, actively cited, or dominant. Each maps to a recommended next step.",
-              },
-              {
-                n: "3",
-                title: "Names that surfaced instead",
-                body: "The businesses AI cited when yours wasn't in the answer. The most actionable part — verify these match your real competitive set.",
-              },
-              {
-                n: "4",
-                title: "Top 3 highest-leverage fixes",
-                body: "Three prioritised recommendations ranked by impact ÷ effort. Concrete actions — DIY or with us.",
-              },
-            ].map((item) => (
-              <div
-                key={item.n}
-                className="rounded-2xl border border-rule bg-white p-5 shadow-soft md:p-6"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-ink-900 text-sm font-bold text-white">
-                    {item.n}
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-ink-900">
-                      {item.title}
-                    </h3>
-                    <p className="mt-1.5 text-sm text-ink-600 leading-relaxed">
-                      {item.body}
-                    </p>
-                  </div>
+          {/* At-a-glance visual preview — flow layout only */}
+          <div className="overflow-hidden rounded-3xl border border-rule bg-white shadow-card">
+            <div className="border-b border-rule bg-ink-50/50 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-ink-500">
+              Sample report · live preview
+            </div>
+            <div className="space-y-5 p-6 md:p-8">
+              {/* Score row */}
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-bold tracking-tight text-amber-600 md:text-6xl">
+                    32
+                  </span>
+                  <span className="text-lg text-ink-400">/100</span>
+                </div>
+                <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-ink-100">
+                  <div className="h-full w-[32%] rounded-full bg-amber-500" />
+                </div>
+                <div className="mt-2 text-sm text-ink-500">
+                  Barely visible · directional readiness
                 </div>
               </div>
-            ))}
+
+              {/* Classification chip */}
+              <div className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-3.5 py-1.5 text-xs font-semibold text-white">
+                Type B — Partial Presence
+              </div>
+
+              {/* Competitor list */}
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-500">
+                  Names that surfaced instead of you
+                </div>
+                <ul className="mt-2.5 space-y-1.5 text-sm text-ink-700">
+                  <li className="flex items-baseline gap-2">
+                    <span className="font-mono text-ink-400">1.</span>
+                    Integrate Lifting SA{" "}
+                    <span className="text-ink-400">· 32 citations</span>
+                  </li>
+                  <li className="flex items-baseline gap-2">
+                    <span className="font-mono text-ink-400">2.</span>
+                    Elephant Lifting Equip.{" "}
+                    <span className="text-ink-400">· 28 citations</span>
+                  </li>
+                  <li className="flex items-baseline gap-2">
+                    <span className="font-mono text-ink-400">3.</span>
+                    RGM Cranes{" "}
+                    <span className="text-ink-400">· 21 citations</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
 
-          <p className="mt-5 text-center text-xs text-ink-400">
-            Sample structure · your real report uses YOUR business data
-          </p>
+          {/* Drive to the real live sample */}
+          <div className="mt-5 text-center">
+            <a
+              href="/scan/preview"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-6 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
+            >
+              See the full live sample report
+              <span aria-hidden="true">→</span>
+            </a>
+            <p className="mt-3 text-xs text-ink-400">
+              Sample data · your report uses YOUR business
+            </p>
+          </div>
         </div>
       </Section>
 
@@ -177,46 +188,13 @@ export default async function ScanPage({
         </p>
       </Section>
 
-      {/* What you get */}
-      <Section variant="tinted" padding="default">
-        <div className="mx-auto max-w-3xl">
-          <Eyebrow>Inside your scan</Eyebrow>
-          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
-            What's actually in the report.
-          </h2>
-
-          <div className="mt-10 grid gap-4">
-            {[
-              {
-                h: "What an AI proxy returns",
-                p: "Verbatim text from Claude with live web search — a stand-in for what ChatGPT, Gemini, and Perplexity blend from public web data. Native per-engine adapters land Phase 1.5.",
-              },
-              {
-                h: "Across 4 buyer-intent queries",
-                p: "We run 4 distinct query shapes (best, top, problem-form, brand) so the result distinguishes 'no AI footprint at all' from 'no footprint for this query'.",
-              },
-              {
-                h: "Who surfaced instead of you",
-                p: "Names of the businesses our test answers cited when yours wasn't there. Verify they're your actual competitors — search sometimes surfaces adjacent firms.",
-              },
-              {
-                h: "Top 3 fixes",
-                p: "Three concrete, prioritised recommendations. The ones that move the needle most for least effort — based on what we observed.",
-              },
-            ].map((item) => (
-              <div
-                key={item.h}
-                className="rounded-2xl border border-rule bg-white p-6"
-              >
-                <div className="font-semibold text-ink-900">{item.h}</div>
-                <div className="mt-2 text-sm text-ink-500 leading-relaxed">
-                  {item.p}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Section>
+      {/* DELETED the redundant "Inside your scan / What's actually in
+          the report" 4-card section. It explained the report contents
+          a SECOND time (the visual preview above + the FAQ already
+          cover this). Two text-card sections saying the same thing was
+          the wall-of-text problem. The methodology nuance (proxy, 4
+          query shapes) lives in the FAQ where someone who actually
+          wants it can find it — not forced on every visitor. */}
 
       {/* FAQ */}
       <Section variant="default" padding="default" containerSize="narrow">
