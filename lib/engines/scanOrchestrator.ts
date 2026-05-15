@@ -163,7 +163,11 @@ export async function runFullScan(
       : "partial"
     : "failed";
 
-  const visibilityData = visibilityResult ?? { checks: [], competitors: [] };
+  const visibilityData = visibilityResult ?? {
+    checks: [],
+    competitors: [],
+    minedPrompts: [],
+  };
   stageReport.visibilitySimulation =
     visibilityResult && visibilityResult.checks.length > 0 ? "ok" : "failed";
 
@@ -230,6 +234,7 @@ export async function runFullScan(
     recommendations,
     competitors: visibilityData.competitors,
     visibilityChecks: visibilityData.checks,
+    minedPrompts: visibilityData.minedPrompts,
     diagnosisOneLiner: oneLiner,
     diagnosisFull: full,
     scannedAt: new Date().toISOString(),

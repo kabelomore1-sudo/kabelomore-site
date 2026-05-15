@@ -31,6 +31,22 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+// Short, human labels for each QueryIntent — used by the mined-prompts
+// section so a buyer reads "Comparison" not "comparison". Any intent
+// not in the map falls back to its raw value (defensive — the union
+// may grow).
+const INTENT_LABELS: Record<string, string> = {
+  recommendation: "Recommendation",
+  research: "Research",
+  problem: "Problem",
+  brand: "Brand",
+  urgency: "Urgency",
+  comparison: "Comparison",
+  cost: "Cost",
+  conversational: "Conversational",
+  review: "Review",
+};
+
 type LoadState =
   | { status: "loading" }
   | { status: "loaded"; result: ScanResult }
@@ -309,6 +325,66 @@ function ResultsView({ result }: { result: ScanResult }) {
           ))}
         </div>
       </Section>
+
+      {/* QUESTIONS YOUR CUSTOMERS ASK AI — the mined prompt set
+          (Ticket 1). Cheap to surface (generated, not web-searched) and
+          high-signal: it shows the prospect the *actual* language their
+          buyers use with AI, intent-tagged. The subset marked "tested
+          live" was run through web_search — those verbatim results are
+          in the next section. */}
+      {result.minedPrompts && result.minedPrompts.length > 0 && (
+        <Section variant="default" padding="lg" containerSize="narrow">
+          <Eyebrow>What your customers actually ask AI</Eyebrow>
+          <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+            The questions buyers type — before they know you exist.
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm text-ink-500 leading-relaxed">
+            We mined these for your specific category and location — the
+            real phrasing customers use with ChatGPT, Gemini, and
+            Perplexity, not keyword strings. The ones marked{" "}
+            <span className="font-semibold text-emerald-700">tested live</span>{" "}
+            were run through live{" "}
+            <code className="rounded bg-ink-50 px-1 py-0.5 text-[11px]">
+              web_search
+            </code>{" "}
+            this scan — their verbatim results are in the next section.
+          </p>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            {result.minedPrompts.map((p, idx) => (
+              <div
+                key={`${p.query}-${idx}`}
+                className="flex flex-col gap-3 rounded-2xl border border-rule bg-white p-5 shadow-soft"
+              >
+                <p className="text-sm font-medium text-ink-900 leading-relaxed">
+                  &ldquo;{p.query}&rdquo;
+                </p>
+                <div className="mt-auto flex flex-wrap items-center gap-2">
+                  <span className="inline-flex rounded-full bg-ink-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ink-600">
+                    {INTENT_LABELS[p.intent] ?? p.intent}
+                  </span>
+                  {p.executed ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                      <CheckCircle2 className="h-3 w-3" /> Tested live
+                    </span>
+                  ) : (
+                    <span className="inline-flex rounded-full bg-ink-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ink-400">
+                      Listed
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-5 text-xs italic text-ink-500">
+            We deep-test an intent-diverse subset live each scan to keep
+            turnaround fast; the full set above is what your buyers are
+            asking. Want any specific question tested? Reply and we&apos;ll
+            run it.
+          </p>
+        </Section>
+      )}
 
       {/* What AI says (the gut punch).
           Honest framing: ran live via Claude+web_search proxy. The

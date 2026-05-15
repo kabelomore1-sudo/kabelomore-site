@@ -195,6 +195,30 @@ export type VisibilityCheck = {
   intent?: QueryIntent;
 };
 
+/**
+ * A customer question mined for THIS specific business, intent-tagged.
+ *
+ * Ticket 1 (prompt mining, derived from the Ubersuggest competitive
+ * analysis — see docs/competitive-research/2026-05-14-*): instead of 4
+ * hardcoded query templates we generate 8-12 realistic buyer questions
+ * per scan, localised to the business's vertical / city / country, each
+ * classified by QueryIntent.
+ *
+ * The full list is surfaced in the report ("the questions your customers
+ * ask AI") — cheap, because generation is a single non-web_search call.
+ * Only an intent-diverse subset is executed via live web_search
+ * (`executed: true`, verbatim capture in visibilityChecks) to keep the
+ * scan inside the Vercel 60s function ceiling.
+ */
+export type MinedPrompt = {
+  query: string;
+  intent: QueryIntent;
+  /** True if this prompt was run through live web_search (its verbatim
+   *  result appears in visibilityChecks). False = surfaced in the
+   *  report as a known buyer question, but not deep-tested this run. */
+  executed: boolean;
+};
+
 export type ScoreLayers = {
   presence: number; // 0-25
   authority: number; // 0-40 (DOMINANT)
@@ -221,6 +245,12 @@ export type ScanResult = {
   recommendations: Recommendation[]; // ranked by impact/effort
   competitors: CompetitorMention[];
   visibilityChecks: VisibilityCheck[]; // 3-5 query results
+  /** Ticket 1: the full set of customer questions we mined for this
+   *  business, each intent-tagged. A subset (executed:true) was run
+   *  live (their verbatim results are in visibilityChecks); the rest
+   *  are surfaced as "what your customers ask AI". Optional — older
+   *  scans pre-date prompt mining and simply omit it. */
+  minedPrompts?: MinedPrompt[];
 
   // Plain-English summary
   diagnosisOneLiner: string; // for WhatsApp + meta

@@ -371,6 +371,55 @@ export function generateSampleReport(
     },
   ];
 
+  // Mined prompts (Ticket 1) — the full set of buyer questions we'd
+  // surface for this category, intent-tagged. The 4 marked executed
+  // mirror the visibilityChecks above (deep-tested live); the rest are
+  // "listed" so the sample demonstrates both states.
+  const minedPrompts =
+    sector === "industrial"
+      ? [
+          { query: "Best industrial lifting equipment suppliers in Pretoria", intent: "recommendation" as const, executed: true },
+          { query: `Reviews and reputation of ${businessName}`, intent: "brand" as const, executed: true },
+          { query: "BBBEE Level 1 lifting equipment supplier in Gauteng", intent: "research" as const, executed: true },
+          { query: "Lifting equipment supplier for mining contracts in South Africa", intent: "problem" as const, executed: true },
+          { query: "Overhead crane vs gantry crane — which is better for a factory?", intent: "comparison" as const, executed: false },
+          { query: "How much does a 10-ton overhead crane cost in South Africa?", intent: "cost" as const, executed: false },
+          { query: "Urgent hoist repair near me in Pretoria", intent: "urgency" as const, executed: false },
+          { query: "Who can service my electric chain hoist in Gauteng?", intent: "problem" as const, executed: false },
+          { query: "Is it cheaper to rent or buy lifting equipment for a short project?", intent: "cost" as const, executed: false },
+          { query: "What lifting equipment do I need to move a 5-ton machine safely?", intent: "conversational" as const, executed: false },
+        ]
+      : sector === "medical"
+        ? [
+            { query: "Best specialist near me accepting Discovery medical aid", intent: "recommendation" as const, executed: true },
+            { query: `Reviews and patient experience at ${businessName}`, intent: "brand" as const, executed: true },
+            { query: "Top-rated medical practitioner in Pretoria", intent: "research" as const, executed: true },
+            { query: "Which doctor can help with this urgently in Pretoria?", intent: "urgency" as const, executed: true },
+            { query: "Private vs public specialist consultation — what's the difference?", intent: "comparison" as const, executed: false },
+            { query: "How much is a specialist consultation without medical aid in SA?", intent: "cost" as const, executed: false },
+            { query: "What should I ask before booking this procedure?", intent: "conversational" as const, executed: false },
+            { query: "Practitioners accepting new patients in Gauteng", intent: "problem" as const, executed: false },
+          ]
+        : sector === "legal"
+          ? [
+              { query: "Best commercial attorney in Johannesburg", intent: "recommendation" as const, executed: true },
+              { query: `Reviews and reputation of ${businessName}`, intent: "brand" as const, executed: true },
+              { query: "Top SA law firm for SaaS and tech startups", intent: "research" as const, executed: true },
+              { query: "Who can help me with a contract dispute urgently?", intent: "urgency" as const, executed: true },
+              { query: "Big firm vs boutique law firm for a startup — which is better?", intent: "comparison" as const, executed: false },
+              { query: "Typical fee for a commercial contract review in South Africa", intent: "cost" as const, executed: false },
+              { query: "What do I need to prepare before a first legal consultation?", intent: "conversational" as const, executed: false },
+              { query: "Attorney experienced in shareholder agreements in Gauteng", intent: "problem" as const, executed: false },
+            ]
+          : [
+              { query: `Best ${sector} provider near me`, intent: "recommendation" as const, executed: true },
+              { query: `Reviews and reputation of ${businessName}`, intent: "brand" as const, executed: true },
+              { query: `Top ${sector} companies in South Africa`, intent: "research" as const, executed: true },
+              { query: `Who can help me with ${sector} services urgently?`, intent: "urgency" as const, executed: true },
+              { query: `${sector} pricing in South Africa — what's typical?`, intent: "cost" as const, executed: false },
+              { query: `How do I choose the right ${sector} provider?`, intent: "conversational" as const, executed: false },
+            ];
+
   return {
     id: "preview",
     businessName,
@@ -406,6 +455,7 @@ export function generateSampleReport(
     recommendations,
     competitors,
     visibilityChecks,
+    minedPrompts,
     diagnosisOneLiner: `For a typical SA ${sector} firm, AI engine visibility usually starts in the bottom quartile — even when Google rankings are reasonable. Three high-impact fixes typically move firms to the top quartile within 60 days. (Score is directional, not deterministic.)`,
     diagnosisFull: `Across customer-style queries we run via Claude + live web search (a proxy for ChatGPT, Gemini, Perplexity until native adapters ship in Phase 1.5), the typical baseline shows the business appearing in ${visibilityChecks.filter((v) => v.businessAppears).length} of ${visibilityChecks.length} buyer-intent queries. This is independent of Google search performance — businesses ranking well on Google Maps can still be invisible to AI engines because the systems weight signals differently. The good news: the highest-impact fixes for AI visibility are quick wins — schema deployment, key directory listings, and a few specific changes to your Google Business Profile that AI engines weight heavily.`,
     scannedAt: new Date().toISOString(),

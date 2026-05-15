@@ -6,22 +6,28 @@
  *   "Here's exactly what AI says when your customers search.
  *    Notice who's listed. Notice who isn't."
  *
- * QUERY DIVERSITY (post-honesty-audit):
- *   We run 4 queries across distinct buyer-intent shapes — not 4
- *   reskins of the same query. The shapes:
- *     1. SUPERLATIVE   "Best [service] in [city]"
- *     2. CATEGORY      "Top [industry] companies in [city]"
- *     3. PROBLEM       "Who can help with [service]?"
- *     4. BRAND         "Reviews for [business name]"
- *   Each shape exercises a different retrieval pattern (general
- *   recommendation, category list, intent match, brand awareness).
- *   2 queries weren't enough — they were too similar to differentiate
- *   between "no AI footprint at all" and "no footprint for THIS query
- *   shape."
+ * PROMPT MINING (Ticket 1 — from the Ubersuggest competitive analysis,
+ * docs/competitive-research/2026-05-14-*):
+ *   Ubersuggest's strongest feature is showing the REAL questions
+ *   buyers ask AI in a category, not templated keyword strings. We now
+ *   do the same:
+ *     1. MINE — one Claude call (NO web_search, ~4-6s) generates 8-12
+ *        realistic buyer questions, localised to this business's
+ *        vertical / city / country, each intent-tagged.
+ *     2. EXECUTE — an intent-diverse subset (MAX_EXECUTED) is run
+ *        through live web_search for verbatim capture. Mining is cheap;
+ *        web_search is the expensive 60s-ceiling/rate-limit risk, so we
+ *        bound how many we actually execute.
+ *     3. SURFACE — the FULL mined list (executed + listed-only) is
+ *        returned so the report can show "the questions your customers
+ *        ask AI" with intent tags.
+ *   Fallback: if mining fails or yields too few, we fall back to the
+ *   original 4 hardcoded intent shapes. The scan never fails on this.
  *
- * Each query: ~10-12 seconds. 4 queries × 12s = ~48s sequential.
- * Hard cap at the orchestrator level keeps us inside the 60s Vercel
- * function timeout.
+ * Budget: mining (serial, no web_search) ~4-6s, then MAX_EXECUTED
+ * web_search queries in PARALLEL ~15-20s (slowest, not sum). Runs
+ * alongside citation analysis in the orchestrator's Promise.all; total
+ * stays inside the Vercel 60s function ceiling.
  */
 
 import {
@@ -33,9 +39,44 @@ import {
 import type {
   BusinessProfile,
   CompetitorMention,
+  MinedPrompt,
   QueryIntent,
   VisibilityCheck,
 } from "@/lib/types/scan";
+
+/**
+ * How many mined prompts we actually run through live web_search.
+ *
+ * The old engine ran 4 in parallel "well inside the safe zone" (its
+ * own comment noted 8 would need chunking). 5 keeps us conservative on
+ * both the Anthropic web_search rate limit (5 × max_uses 2 = 10 search
+ * burst) and the Vercel 60s ceiling, while giving one more intent slot
+ * than before. Promise.allSettled means a rate-limited query just
+ * drops — the scan continues with the rest.
+ */
+const MAX_EXECUTED_QUERIES = 5;
+
+/** Target size of the mined prompt list surfaced in the report. */
+const TARGET_MINED_PROMPTS = 12;
+
+/**
+ * Runtime allow-list mirroring the QueryIntent union (which is
+ * compile-time only). Used to validate model-generated intents — an
+ * unrecognised value is coerced to "research" (a safe, generic shape)
+ * rather than dropped, so we never silently lose a mined prompt.
+ */
+const VALID_INTENTS: readonly QueryIntent[] = [
+  "recommendation",
+  "research",
+  "problem",
+  "brand",
+  "urgency",
+  "comparison",
+  "cost",
+  "conversational",
+  "review",
+] as const;
+const VALID_INTENT_SET = new Set<string>(VALID_INTENTS);
 
 /**
  * A query + its intent — paired at definition time so the intent
@@ -51,31 +92,54 @@ type QueryDefinition = {
 export type VisibilityAnalysis = {
   checks: VisibilityCheck[];
   competitors: CompetitorMention[];
+  /** The full mined prompt list (executed + listed-only), for the
+   *  report's "questions your customers ask AI" section. */
+  minedPrompts: MinedPrompt[];
 };
 
 export async function simulateAIQueries(
   profile: BusinessProfile,
 ): Promise<VisibilityAnalysis> {
-  const queries = generateCustomerQueries(profile);
+  // ── Step 1: MINE (cheap — one Claude call, no web_search) ────────
+  // If mining fails or returns too few usable prompts, fall back to
+  // the original hardcoded intent shapes. The scan never fails here.
+  const mined = await mineCustomerPrompts(profile).catch((err) => {
+    console.error("[visibilitySimulator] prompt mining failed:", err);
+    return [] as QueryDefinition[];
+  });
 
-  // PARALLEL execution — previous version ran queries sequentially
-  // (~48s for 4 queries × 12s each), which pushed the total scan
-  // over Vercel Hobby's 60s function ceiling and returned 504s.
-  // The queries are independent (no shared state, no ordering
-  // requirement, separate web_search invocations) so running in
-  // parallel collapses the total to ~12-15s — the slowest single
-  // query, not the sum.
+  let promptPool: QueryDefinition[] =
+    mined.length >= 4 ? mined : fallbackCustomerQueries(profile);
+
+  // Guarantee a brand-awareness probe regardless of what mining
+  // produced — testing whether AI knows the business when asked
+  // directly by name is a distinct, high-signal check the old engine
+  // always ran. Append (don't replace) so it also appears in the
+  // surfaced list.
+  if (!promptPool.some((p) => p.intent === "brand")) {
+    promptPool = [
+      ...promptPool,
+      {
+        query: `Reviews and reputation of ${profile.businessName}`,
+        intent: "brand",
+      },
+    ];
+  }
+  promptPool = dedupeQueries(promptPool).slice(0, TARGET_MINED_PROMPTS);
+
+  // ── Step 2: SELECT an intent-diverse subset to execute live ──────
+  const toExecute = selectExecutionSubset(promptPool);
+  const executedKeys = new Set(toExecute.map((q) => q.query.toLowerCase()));
+
+  // PARALLEL execution — the queries are independent (no shared state,
+  // separate web_search invocations) so running in parallel collapses
+  // the total to ~15-20s (the slowest single query, not the sum),
+  // keeping us inside Vercel's 60s function ceiling.
   //
-  // Anthropic web_search rate limits comfortably handle 4 parallel
-  // requests (with max_uses=2 each = 8 searches in a burst). If we
-  // ever expand to 8 intent types we may need to chunk these or
-  // batch via the messages.batch API, but at 4 we're well inside
-  // the safe zone.
-  //
-  // Promise.allSettled (not .all) so one query's failure doesn't
-  // tank the whole scan — we just drop that check and continue.
+  // Promise.allSettled (not .all) so one query's failure doesn't tank
+  // the whole scan — we drop that check and continue.
   const settled = await Promise.allSettled(
-    queries.map((def) => runQuery(def, profile)),
+    toExecute.map((def) => runQuery(def, profile)),
   );
 
   const checks: VisibilityCheck[] = [];
@@ -85,7 +149,7 @@ export async function simulateAIQueries(
       checks.push(result.value);
     } else {
       console.error(
-        `[visibilitySimulator] Query failed: "${queries[i].query}"`,
+        `[visibilitySimulator] Query failed: "${toExecute[i].query}"`,
         result.reason,
       );
     }
@@ -93,30 +157,177 @@ export async function simulateAIQueries(
 
   const competitors = aggregateCompetitors(checks);
 
-  return { checks, competitors };
+  // ── Step 3: SURFACE the full mined list with executed flags ──────
+  const minedPrompts: MinedPrompt[] = promptPool.map((p) => ({
+    query: p.query,
+    intent: p.intent,
+    executed: executedKeys.has(p.query.toLowerCase()),
+  }));
+
+  return { checks, competitors, minedPrompts };
 }
 
-// ─── Query generation ─────────────────────────────────────────────
-// 4 distinct intent shapes — each exercises a different AI retrieval
-// pattern. Each query is tagged with its intent so the report can
-// segment results ("visible for research, invisible for problem").
-// We run all 4 sequentially because Anthropic's web_search has tighter
-// rate limits than its base model.
-function generateCustomerQueries(profile: BusinessProfile): QueryDefinition[] {
+// ─── Prompt mining (Ticket 1) ─────────────────────────────────────
+//
+// One Claude call, NO web_search — this is generation, not retrieval,
+// so it's fast (~4-6s) and cheap. Produces realistic, localised buyer
+// questions the way a customer actually types them, intent-tagged.
+// Validated + sanitised before use; never trusted raw.
+async function mineCustomerPrompts(
+  profile: BusinessProfile,
+): Promise<QueryDefinition[]> {
+  const industryWords = profile.industry.replace(/-/g, " ");
+  const country = countryName(profile.country);
+  const services = profile.servicesText
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(", ");
+
+  const prompt = `You are mining the REAL questions a potential customer types into an AI assistant (ChatGPT, Gemini, Perplexity) when looking for a business like this one — usually BEFORE they know its name.
+
+Business context:
+- Name: ${profile.businessName}
+- Industry: ${industryWords}
+- Services: ${services || industryWords}
+- Location: ${profile.city}, ${country}
+
+Generate ${TARGET_MINED_PROMPTS} distinct, natural-language questions a real buyer would actually ask. Rules:
+- Phrase them the way a real person types — full questions, not keyword strings.
+- Localise: include "${profile.city}" or "${country}" where a real buyer naturally would (not every single one).
+- Cover a SPREAD of buyer intents — do not cluster on one shape.
+- Exactly 1-2 should name "${profile.businessName}" directly (tests whether AI knows the business by name).
+- The rest must be category / problem / comparison / cost / urgency questions where the buyer does NOT yet know this specific business.
+
+Classify each question with exactly ONE intent from this list (use the closest fit):
+recommendation, research, problem, brand, urgency, comparison, cost, conversational, review
+
+Respond with ONLY a JSON object — no prose, no markdown, no code fences:
+{ "prompts": [ { "query": "...", "intent": "recommendation" } ] }`;
+
+  const response = await anthropic.messages.create({
+    model: SCAN_MODEL,
+    max_tokens: 1500,
+    system: SCAN_SYSTEM_PROMPT,
+    // NOTE: deliberately NO tools — mining is pure generation.
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  return parseMinedPrompts(response);
+}
+
+function parseMinedPrompts(response: {
+  content: Array<{ type: string; text?: string }>;
+}): QueryDefinition[] {
+  const textBlocks = response.content.filter(
+    (b): b is { type: "text"; text: string } => b.type === "text",
+  );
+  const lastText = textBlocks[textBlocks.length - 1]?.text ?? "";
+  const fenced = lastText.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const candidate = fenced ? fenced[1].trim() : findFirstJsonObject(lastText);
+
+  let parsed: { prompts?: unknown };
+  try {
+    parsed = JSON.parse(candidate);
+  } catch {
+    return [];
+  }
+
+  if (!Array.isArray(parsed.prompts)) return [];
+
+  const out: QueryDefinition[] = [];
+  for (const item of parsed.prompts) {
+    if (!item || typeof item !== "object") continue;
+    const obj = item as Record<string, unknown>;
+    const query = typeof obj.query === "string" ? obj.query.trim() : "";
+    if (!query) continue;
+    const rawIntent =
+      typeof obj.intent === "string" ? obj.intent.trim().toLowerCase() : "";
+    const intent: QueryIntent = VALID_INTENT_SET.has(rawIntent)
+      ? (rawIntent as QueryIntent)
+      : "research"; // safe generic fallback — never drop a prompt
+    out.push({ query, intent });
+  }
+  return dedupeQueries(out);
+}
+
+// ─── Execution subset selection ───────────────────────────────────
+//
+// We can't afford to web_search every mined prompt (cost + 60s
+// ceiling). Pick MAX_EXECUTED_QUERIES that MAXIMISE intent diversity:
+// always include a brand probe if present, then greedily take the
+// first prompt of each not-yet-covered intent, then backfill in
+// original order. This guarantees the deep-tested set spans buyer
+// intents instead of clustering on whatever the model emitted first.
+function selectExecutionSubset(pool: QueryDefinition[]): QueryDefinition[] {
+  if (pool.length <= MAX_EXECUTED_QUERIES) return pool;
+
+  const picked: QueryDefinition[] = [];
+  const pickedKeys = new Set<string>();
+  const take = (q: QueryDefinition) => {
+    const key = q.query.toLowerCase();
+    if (pickedKeys.has(key) || picked.length >= MAX_EXECUTED_QUERIES) return;
+    picked.push(q);
+    pickedKeys.add(key);
+  };
+
+  // 1. Brand probe first (highest-signal distinct check).
+  const brand = pool.find((q) => q.intent === "brand");
+  if (brand) take(brand);
+
+  // 2. One prompt per not-yet-covered intent.
+  const seenIntents = new Set<QueryIntent>(picked.map((q) => q.intent));
+  for (const q of pool) {
+    if (picked.length >= MAX_EXECUTED_QUERIES) break;
+    if (!seenIntents.has(q.intent)) {
+      take(q);
+      seenIntents.add(q.intent);
+    }
+  }
+
+  // 3. Backfill remaining slots in original order.
+  for (const q of pool) {
+    if (picked.length >= MAX_EXECUTED_QUERIES) break;
+    take(q);
+  }
+
+  return picked;
+}
+
+function dedupeQueries(queries: QueryDefinition[]): QueryDefinition[] {
+  const seen = new Set<string>();
+  const out: QueryDefinition[] = [];
+  for (const q of queries) {
+    const key = q.query.trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push({ query: q.query.trim(), intent: q.intent });
+  }
+  return out;
+}
+
+function countryName(country: BusinessProfile["country"]): string {
+  return country === "ZA"
+    ? "South Africa"
+    : country === "GB"
+      ? "UK"
+      : country === "US"
+        ? "USA"
+        : country;
+}
+
+// ─── Fallback query generation ────────────────────────────────────
+// Used only when prompt mining fails or returns too few prompts. The
+// original 4 distinct intent shapes — each exercises a different AI
+// retrieval pattern (recommendation, research, problem, brand).
+function fallbackCustomerQueries(profile: BusinessProfile): QueryDefinition[] {
   const services = profile.servicesText
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
   const primary = services[0] || profile.industry.replace(/-/g, " ");
   const industryWords = profile.industry.replace(/-/g, " ");
-  const country =
-    profile.country === "ZA"
-      ? "South Africa"
-      : profile.country === "GB"
-        ? "UK"
-        : profile.country === "US"
-          ? "USA"
-          : profile.country;
+  const country = countryName(profile.country);
 
   return [
     {
@@ -135,7 +346,7 @@ function generateCustomerQueries(profile: BusinessProfile): QueryDefinition[] {
       query: `Reviews and reputation of ${profile.businessName}`,
       intent: "brand",
     },
-  ]; // 4 queries × ~12s ≈ 48s — orchestrator timeout protects against overrun
+  ];
 }
 
 // ─── Single query execution ──────────────────────────────────────
