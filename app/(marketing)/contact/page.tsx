@@ -24,7 +24,10 @@ const channels = [
   {
     icon: Linkedin,
     label: "LinkedIn",
-    value: "linkedin.com/in/kabelomore",
+    // Derive the display value from the canonical href so it can never
+    // drift from site.social.linkedin again (previously hardcoded to
+    // the dead /in/kabelomore slug while href pointed elsewhere).
+    value: site.social.linkedin.replace(/^https?:\/\//, "").replace(/\/$/, ""),
     href: site.social.linkedin,
     note: "Best for ongoing professional connection + DMs",
   },

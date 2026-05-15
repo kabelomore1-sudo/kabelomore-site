@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Section, Eyebrow } from "@/components/ui/section";
 import { ScanForm } from "@/components/scan-form";
 import { TrustStrip } from "@/components/trust-strip";
-import { AnnotatedScreenshot } from "@/components/annotated-screenshot";
 import { JsonLd } from "@/components/ui/jsonld";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -77,59 +76,75 @@ export default async function ScanPage({
         <TrustStrip />
       </Section>
 
-      {/* Inside-the-report preview — annotated visual showing what's
-          actually in the scan report BEFORE the prospect submits.
-          Removes the "what am I actually getting" trust gap. Visual
-          mockup with 4 numbered hotspots; click any hotspot to read
-          what that section of the report shows. */}
+      {/* What's in your report — static, mobile-safe card.
+          REPLACED the AnnotatedScreenshot overlay (numbered hotspots
+          absolutely-positioned by % over a responsive CSS mockup).
+          That approach broke below the md breakpoint: the mockup's
+          2-col grids collapsed to 1-col, the container reflowed, and
+          the hardcoded % coords landed on the wrong elements — markers
+          overlaying the score, floating beside it, sitting on the
+          competitor list. Conversion page; a broken overlay is worse
+          than a clean list. This card conveys the same four points
+          with zero coordinate math and no absolute positioning. */}
       <Section variant="default" padding="default" containerSize="narrow">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-6 text-center">
+          <div className="mb-8 text-center">
             <Eyebrow className="justify-center">What you&apos;ll get</Eyebrow>
             <h2 className="mt-3 text-display-md font-semibold tracking-tight text-ink-900">
               Inside the scan report.
             </h2>
             <p className="mt-3 text-base text-ink-500">
-              Tap the numbered markers to see exactly what each part of your
-              personalised report shows.
+              Four things, delivered as a hosted report within 24 hours.
             </p>
           </div>
 
-          <AnnotatedScreenshot
-            caption="Sample report preview · your real report uses YOUR business data"
-            hotspots={[
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
               {
-                x: 17,
-                y: 22,
+                n: "1",
                 title: "Your AI visibility score",
-                description:
-                  "A 0-100 directional readiness score. Tells you where you stand without false precision (re-runs may vary 5-10 pts).",
+                body: "A 0-100 directional readiness score. Where you stand without false precision — re-runs may vary 5-10 pts.",
               },
               {
-                x: 60,
-                y: 22,
+                n: "2",
                 title: "Type classification",
-                description:
-                  "Type A / B / C / D — describes whether you're invisible, partially visible, actively cited, or dominant. Each type maps to a recommended next step.",
+                body: "Type A / B / C / D — invisible, partially visible, actively cited, or dominant. Each maps to a recommended next step.",
               },
               {
-                x: 17,
-                y: 65,
+                n: "3",
                 title: "Names that surfaced instead",
-                description:
-                  "The competitors AI recommended when your business wasn't in the answer. Verify these match your real competitive set — it's the most actionable part of the report.",
+                body: "The businesses AI cited when yours wasn't in the answer. The most actionable part — verify these match your real competitive set.",
               },
               {
-                x: 65,
-                y: 65,
+                n: "4",
                 title: "Top 3 highest-leverage fixes",
-                description:
-                  "Three prioritised recommendations ranked by impact ÷ effort. Each maps to a concrete action you can take — DIY or with us.",
+                body: "Three prioritised recommendations ranked by impact ÷ effort. Concrete actions — DIY or with us.",
               },
-            ]}
-          >
-            <ScanReportMockup />
-          </AnnotatedScreenshot>
+            ].map((item) => (
+              <div
+                key={item.n}
+                className="rounded-2xl border border-rule bg-white p-5 shadow-soft md:p-6"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-ink-900 text-sm font-bold text-white">
+                    {item.n}
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-ink-900">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1.5 text-sm text-ink-600 leading-relaxed">
+                      {item.body}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-5 text-center text-xs text-ink-400">
+            Sample structure · your real report uses YOUR business data
+          </p>
         </div>
       </Section>
 
@@ -230,133 +245,5 @@ export default async function ScanPage({
         </div>
       </Section>
     </>
-  );
-}
-
-// ─── ScanReportMockup ──────────────────────────────────────────────
-// Static visual representation of what a scan report contains. Used
-// inside AnnotatedScreenshot on the /scan page to show prospects what
-// they'll receive without exposing real client data.
-//
-// Why not a real screenshot: real screenshots would either be of OMS
-// (not yet delivered) or generic — both look worse than a clean
-// CSS-rendered mockup. The mockup is also crisp at any size, prints
-// well, and is trivially editable. Once we have 3+ real client
-// reports we can swap this for a real screenshot.
-//
-// Layout maps to the AnnotatedScreenshot hotspot coordinates:
-//   Hotspot 1 (17, 22) — Score gauge area (top-left)
-//   Hotspot 2 (60, 22) — Type classification area (top-right)
-//   Hotspot 3 (17, 65) — Competitor list area (bottom-left)
-//   Hotspot 4 (65, 65) — Recommendations area (bottom-right)
-function ScanReportMockup() {
-  return (
-    <div className="bg-ink-50/40 p-5 md:p-8">
-      <div className="rounded-2xl border border-rule bg-white p-5 shadow-soft md:p-7">
-        {/* Header — eyebrow + business name placeholder */}
-        <div className="border-b border-rule pb-3">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent-600">
-            AI Visibility Report · Sample
-          </div>
-          <div className="mt-1 font-mono text-[11px] text-ink-400">
-            scan_20260503_xxxxxxxxxx
-          </div>
-        </div>
-
-        {/* Top row — score (left) + classification (right) */}
-        <div className="mt-5 grid gap-5 md:grid-cols-2">
-          {/* Score gauge mock */}
-          <div className="rounded-xl border border-rule bg-ink-50/40 p-4 md:p-5">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">
-              Your score
-            </div>
-            <div className="mt-2 flex items-baseline gap-1.5">
-              <span className="text-4xl font-semibold tracking-tight text-amber-600 md:text-5xl">
-                32
-              </span>
-              <span className="text-base text-ink-400">/100</span>
-            </div>
-            {/* Horizontal score bar */}
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-ink-100">
-              <div className="h-full w-[32%] bg-amber-500" />
-            </div>
-            <div className="mt-2 text-[10px] text-ink-500">
-              Barely visible · directional readiness
-            </div>
-          </div>
-
-          {/* Classification mock */}
-          <div className="rounded-xl border border-rule bg-ink-50/40 p-4 md:p-5">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">
-              Classification
-            </div>
-            <div className="mt-2 text-lg font-semibold text-ink-900 md:text-xl">
-              Type B
-            </div>
-            <div className="mt-0.5 text-xs font-medium text-ink-700">
-              Partial Presence
-            </div>
-            <div className="mt-2 text-[10px] leading-relaxed text-ink-500">
-              AI engines have some record of your business but you&apos;re rarely
-              cited. Closeable gap.
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom row — competitors (left) + fixes (right) */}
-        <div className="mt-5 grid gap-5 md:grid-cols-2">
-          {/* Competitor list mock */}
-          <div className="rounded-xl border border-rule bg-ink-50/40 p-4 md:p-5">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">
-              Names that surfaced instead
-            </div>
-            <ul className="mt-3 space-y-1.5 text-[11px] text-ink-700">
-              <li className="flex items-center gap-1.5">
-                <span className="font-mono text-ink-400">1.</span>
-                Integrate Lifting SA{" "}
-                <span className="text-ink-400">· 32 citations</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <span className="font-mono text-ink-400">2.</span>
-                Elephant Lifting Equip.{" "}
-                <span className="text-ink-400">· 28 citations</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <span className="font-mono text-ink-400">3.</span>
-                RGM Cranes{" "}
-                <span className="text-ink-400">· 21 citations</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Top fixes mock */}
-          <div className="rounded-xl border border-rule bg-ink-50/40 p-4 md:p-5">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">
-              Top 3 fixes
-            </div>
-            <ul className="mt-3 space-y-1.5 text-[11px] text-ink-700">
-              <li className="flex items-start gap-1.5">
-                <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-ink-900 font-mono text-[8px] font-bold text-white">
-                  1
-                </span>
-                Deploy LocalBusiness + FAQ schema
-              </li>
-              <li className="flex items-start gap-1.5">
-                <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-ink-900 font-mono text-[8px] font-bold text-white">
-                  2
-                </span>
-                Register with LME + industry directories
-              </li>
-              <li className="flex items-start gap-1.5">
-                <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-ink-900 font-mono text-[8px] font-bold text-white">
-                  3
-                </span>
-                Active LinkedIn for founder
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }

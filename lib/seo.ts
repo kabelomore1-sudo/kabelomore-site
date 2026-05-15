@@ -119,6 +119,37 @@ export function kabeloPersonJsonLd() {
       "Gemini Visibility",
       "Perplexity SEO",
     ],
+    // Verifiable credentials. EducationalOccupationalCredential is the
+    // schema.org type Google + LLMs read for "is this person actually
+    // qualified". Only assert what's earned + verifiable — the
+    // certificate identifier makes the claim auditable. Google
+    // credential is asserted at degree level without a fake ID since
+    // the specific cert number isn't recorded; the Anthropic one is
+    // fully specified because we have the cert number.
+    hasCredential: [
+      {
+        "@type": "EducationalOccupationalCredential",
+        name: "Claude 101",
+        credentialCategory: "certificate",
+        recognizedBy: {
+          "@type": "Organization",
+          name: "Anthropic",
+          url: "https://www.anthropic.com",
+        },
+        identifier: "95bmq8ftp6ed",
+        dateCreated: "2026-05-06",
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        name: "Digital Marketing & E-Commerce Professional Certificate",
+        credentialCategory: "certificate",
+        recognizedBy: {
+          "@type": "Organization",
+          name: "Google",
+          url: "https://grow.google",
+        },
+      },
+    ],
     sameAs: [site.social.linkedin, site.social.instagram].filter(Boolean),
   };
 }

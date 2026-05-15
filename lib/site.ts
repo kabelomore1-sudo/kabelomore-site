@@ -27,7 +27,12 @@ export const site = {
   },
 
   social: {
-    linkedin: "https://www.linkedin.com/in/kabelomore/",
+    // Canonical LinkedIn URL. Single source of truth — consumed by the
+    // footer, the Person schema sameAs, AND the Organization schema
+    // sameAs. The old /in/kabelomore/ slug 404'd. Using the working
+    // slug until the custom slug is finalised — update this ONE line
+    // when the new slug is live and every surface tracks it.
+    linkedin: "https://www.linkedin.com/in/kabelo-the-digital-marketer/",
     instagram: "https://www.instagram.com/kabelomore/",
     twitter: "",
     youtube: "",

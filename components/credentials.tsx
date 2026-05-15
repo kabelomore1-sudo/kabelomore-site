@@ -7,8 +7,10 @@ const credentials = [
     issuer: "Anthropic",
     date: "May 2026",
     accent: "bg-amber-500/10 text-amber-600",
+    // Verifiable: cert no. 95bmq8ftp6ed, completed 6 May 2026.
+    // Mirrors the hasCredential entry in lib/seo.ts kabeloPersonJsonLd.
     description:
-      "Certified in Claude AI — prompt engineering, tool use, and production deployment.",
+      "Anthropic-certified in Claude AI (cert. 95bmq8ftp6ed) — prompt engineering, tool use, and production deployment.",
   },
   {
     icon: GraduationCap,
@@ -69,34 +71,37 @@ export function Credentials() {
   );
 }
 
-/** Compact inline version for use in homepage trust strip */
+/** Compact inline version for use in homepage trust strip.
+ *
+ * Stable, evergreen phrasing — deliberately NOT enumerated per-cert.
+ * Previously this listed each completed credential's issuer
+ * ("Certified: Anthropic Google"), which:
+ *   - went stale every time a course was added or completed
+ *   - implied a fixed set rather than ongoing development
+ * "Anthropic-trained · Google-certified · Actively studying" stays
+ * accurate as new courses are added without a code change, and reads
+ * as a practitioner who keeps current rather than a finished list.
+ * The full, dated, verifiable cert details (incl. the Anthropic cert
+ * number) live on /about via the <Credentials /> card grid. */
 export function CredentialsBadgeRow() {
+  const items = [
+    "Anthropic-trained",
+    "Google-certified",
+    "Actively studying",
+  ];
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-ink-500">
-      <span className="font-medium text-ink-700">Certified:</span>
-      {/* Badge row shows COMPLETED certifications only.
-          Adding "(soon)" to a credential badge invited downgrade
-          signals — both AEO-wise (LLMs treat hedged credentials as
-          weaker) and trust-wise (a "coming soon" badge reads as
-          padding). In-progress credentials are still listed in full
-          on /about's <Credentials /> card grid with the "In progress"
-          chip — that surface is the honest place to declare them.
-          Once the HubSpot cert lands, drop the `c.badge !== "In progress"`
-          filter so it appears in the badge row automatically. */}
-      {credentials
-        .filter((c) => c.badge !== "In progress")
-        .map((c) => {
-          const Icon = c.icon;
-          return (
-            <span
-              key={c.name}
-              className="inline-flex items-center gap-1.5 rounded-full border border-rule bg-white px-3 py-1 text-xs font-medium text-ink-700 shadow-sm"
-            >
-              <Icon className="h-3.5 w-3.5 text-ink-400" />
-              {c.issuer}
+    <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-ink-500">
+      <Award className="h-3.5 w-3.5 text-ink-400" aria-hidden="true" />
+      {items.map((label, idx) => (
+        <span key={label} className="flex items-center gap-3">
+          <span className="text-xs font-medium text-ink-700">{label}</span>
+          {idx < items.length - 1 && (
+            <span className="text-ink-300" aria-hidden="true">
+              ·
             </span>
-          );
-        })}
+          )}
+        </span>
+      ))}
     </div>
   );
 }
