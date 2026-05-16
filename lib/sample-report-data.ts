@@ -303,6 +303,8 @@ export function generateSampleReport(
       // visibilityChecks below: named in queries 1 & 3, position 1 both.
       mentionCount: 2,
       avgRank: 1.0,
+      // Locality (Ticket 3) — sample showcases all three states.
+      locality: "local" as const,
     },
     {
       name:
@@ -317,6 +319,7 @@ export function generateSampleReport(
       // Named in queries 1 (pos 2) & 4 (pos 1) → avg 1.5.
       mentionCount: 2,
       avgRank: 1.5,
+      locality: "regional" as const,
     },
     {
       name:
@@ -331,6 +334,7 @@ export function generateSampleReport(
       // Named in query 3 only (pos 2) → avg 2.0.
       mentionCount: 1,
       avgRank: 2.0,
+      locality: "national" as const,
     },
   ];
 

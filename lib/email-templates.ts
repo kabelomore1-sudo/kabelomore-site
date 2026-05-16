@@ -419,7 +419,11 @@ export function buildAdminCompletionEmail(input: {
         typeof c.mentionCount === "number"
           ? `, ${c.mentionCount} queries`
           : "";
-      return `  ${i + 1}. ${c.name} — ${rank}${mentions}${c.context ? ` — ${c.context}` : ""}`;
+      const loc =
+        c.locality && c.locality !== "unknown"
+          ? ` [${c.locality.toUpperCase()}]`
+          : "";
+      return `  ${i + 1}. ${c.name}${loc} — ${rank}${mentions}${c.context ? ` — ${c.context}` : ""}`;
     }),
     ``,
     `Diagnosis: ${result.diagnosisOneLiner}`,

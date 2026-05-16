@@ -155,7 +155,7 @@ export async function simulateAIQueries(
     }
   }
 
-  const competitors = aggregateCompetitors(checks);
+  const competitors = aggregateCompetitors(checks, profile);
 
   // ── Step 3: SURFACE the full mined list with executed flags ──────
   const minedPrompts: MinedPrompt[] = promptPool.map((p) => ({
@@ -462,13 +462,20 @@ function parseCompetitorEntries(raw: unknown): CompetitorEntry[] {
 // Honesty: this is observed ordering in OUR proxy responses, not an
 // authoritative market ranking — the report copy frames it that way.
 //
-// Future expansion: detect `locality` by checking whether the
-// competitor name appeared alongside the profile city in
-// `verbatimExcerpt` (a real differentiator vs SEMrush/Ubersuggest,
-// which don't fuse Google Places "nearby" data the way our gbpFetcher
-// does — see docs/competitive-research/).
-function aggregateCompetitors(checks: VisibilityCheck[]): CompetitorMention[] {
+// LOCALITY (Ticket 3): each competitor is tagged local | regional |
+// national | unknown from HOW THE AI PROXY situated them relative to
+// the prospect's location — see classifyLocality. This is the column
+// SEMrush / Ubersuggest structurally cannot produce: they measure AI
+// mentions in the abstract and never fuse a "near me" dimension.
+function aggregateCompetitors(
+  checks: VisibilityCheck[],
+  profile: BusinessProfile,
+): CompetitorMention[] {
   const map = new Map<string, CompetitorMention>();
+  // key → text snippets that mentioned this competitor (its per-query
+  // context + the verbatim excerpt of each check it appeared in).
+  // Fed to classifyLocality after aggregation.
+  const snippets = new Map<string, string[]>();
   // key → running { sum of 1-based positions, count of appearances }.
   // `__check` holds the VisibilityCheck whose contribution was last
   // counted, so a business named twice in ONE response only scores its
@@ -496,6 +503,15 @@ function aggregateCompetitors(checks: VisibilityCheck[]): CompetitorMention[] {
       if (!trimmed) return;
       upsertCompetitor(map, trimmed, entry.context, check.verbatimExcerpt);
 
+      // Collect text that mentioned this competitor, for locality
+      // inference. Both the competitor-specific context and the full
+      // verbatim answer carry "based in X" / "serves Y" phrasing.
+      const sKey = trimmed.toLowerCase();
+      const bucket = snippets.get(sKey) ?? [];
+      if (entry.context) bucket.push(entry.context);
+      if (check.verbatimExcerpt) bucket.push(check.verbatimExcerpt);
+      snippets.set(sKey, bucket);
+
       // Position within THIS query's list (1-based). Dedupe within a
       // single check — if the model names the same business twice in
       // one response, only its first (best) position counts for that
@@ -511,13 +527,18 @@ function aggregateCompetitors(checks: VisibilityCheck[]): CompetitorMention[] {
     });
   }
 
-  // Attach derived leaderboard fields.
+  // Attach derived leaderboard + locality fields.
   for (const [key, mention] of map) {
     const acc = rank.get(key);
     if (acc && acc.count > 0) {
       mention.mentionCount = acc.count;
       mention.avgRank = Math.round((acc.sum / acc.count) * 100) / 100;
     }
+    mention.locality = classifyLocality(
+      mention.name,
+      snippets.get(key) ?? [],
+      profile,
+    );
   }
 
   // Sort most-prominent-first: lower avgRank wins; more mentions breaks
@@ -564,10 +585,177 @@ function upsertCompetitor(
     hasCitations: true,
     citationCount: undefined,
     context,
-    // locality intentionally left unset for now — proper detection
-    // requires NLP on the verbatim excerpt to check if the competitor
-    // and the city were named in proximity. Roadmap.
+    // locality is set after aggregation by classifyLocality (Ticket 3)
+    // — left unset here so the post-loop pass owns it in one place.
   });
+}
+
+// ─── Locality classification (Ticket 3) ──────────────────────────
+//
+// Tags each competitor local | regional | national | unknown based on
+// HOW THE AI PROXY situated them relative to the prospect's location:
+// sentence-level co-occurrence of the competitor's name with the
+// prospect's city / region / country / global markers, across the
+// verbatim answer + the competitor-specific context snippet.
+//
+// Why it matters: SEMrush / Ubersuggest measure AI mentions in the
+// abstract and never fuse a "near me" dimension. For SA industrial /
+// legal / medical buyers, AI weights local trust heavily — the
+// supplier down the road out-ranking you is a different (and more
+// fixable) problem than a national firm doing so. This makes that gap
+// a visible column.
+//
+// Honesty: this is INFERRED from the AI's own phrasing, NOT a verified
+// company-registration or Places lookup. The report frames it that
+// way. A Places-API-backed per-competitor verification is a deliberate
+// future ticket — it would add N API calls + latency we won't spend on
+// the synchronous scan path (the 60s Vercel ceiling governs here).
+type Locality = NonNullable<CompetitorMention["locality"]>;
+
+// Country term lexicons (no manual spaces — token matching pads).
+const COUNTRY_TERMS: Record<string, string[]> = {
+  ZA: ["south africa", "south african", "rsa", "sa", "mzansi"],
+  GB: [
+    "united kingdom",
+    "uk",
+    "britain",
+    "british",
+    "england",
+    "scotland",
+    "wales",
+  ],
+  US: ["united states", "usa", "us", "america", "american"],
+};
+
+// Region / metro markers. Heavily SA-weighted (the ICP); other
+// countries get lighter coverage — regional detection there simply
+// degrades to national/unknown, which is acceptable and honest.
+const REGION_TERMS: Record<string, string[]> = {
+  ZA: [
+    "gauteng",
+    "western cape",
+    "kwazulu natal",
+    "kwazulu-natal",
+    "eastern cape",
+    "free state",
+    "limpopo",
+    "mpumalanga",
+    "north west",
+    "northern cape",
+    "pretoria",
+    "tshwane",
+    "johannesburg",
+    "joburg",
+    "jhb",
+    "sandton",
+    "midrand",
+    "centurion",
+    "cape town",
+    "durban",
+    "ethekwini",
+    "gqeberha",
+    "bloemfontein",
+  ],
+  GB: [
+    "london",
+    "manchester",
+    "birmingham",
+    "leeds",
+    "glasgow",
+    "midlands",
+  ],
+  US: ["california", "texas", "new york", "florida", "chicago"],
+};
+
+const NATIONAL_MARKERS = [
+  "nationwide",
+  "national",
+  "countrywide",
+  "across the country",
+  "throughout the country",
+];
+
+const GLOBAL_MARKERS = [
+  "global",
+  "international",
+  "worldwide",
+  "multinational",
+  "across the globe",
+  "world leading",
+];
+
+// Normalize free text to a space-padded, alnum-only token stream so
+// `hasToken` can do clean word-boundary matching without punctuation
+// edge cases ("sa" never matches inside "usage").
+function normalizeText(s: string): string {
+  return ` ${s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()} `;
+}
+
+function hasToken(paddedHaystack: string, term: string): boolean {
+  if (!term) return false;
+  return paddedHaystack.includes(` ${term} `);
+}
+
+function classifyLocality(
+  name: string,
+  snippets: string[],
+  profile: BusinessProfile,
+): Locality {
+  if (snippets.length === 0) return "unknown";
+
+  const city = normalizeText(profile.city).trim();
+  const countryTerms = COUNTRY_TERMS[profile.country] ?? [
+    normalizeText(profile.country).trim(),
+  ];
+  // The prospect's own city must resolve to LOCAL, never REGIONAL —
+  // drop it from the region list if it overlaps.
+  const regionTerms = (REGION_TERMS[profile.country] ?? []).filter(
+    (r) => r !== city,
+  );
+
+  // Name variants: full normalized name, first two words, or a single
+  // distinctive first word (≥4 chars) — catches "Integrate Lifting" ≈
+  // "Integrate Lifting SA".
+  const nm = normalizeText(name).trim();
+  const words = nm.split(" ").filter(Boolean);
+  const nameVariants = new Set<string>();
+  if (nm) nameVariants.add(nm);
+  if (words.length >= 2) nameVariants.add(`${words[0]} ${words[1]}`);
+  if (words[0] && words[0].length >= 4) nameVariants.add(words[0]);
+
+  let sawRegional = false;
+  let sawNational = false;
+
+  for (const raw of snippets) {
+    if (!raw) continue;
+    // Sentence-level: a city named far from the competitor must not
+    // tag them local.
+    for (const sentence of raw.split(/[.!?\n]+/)) {
+      const padded = normalizeText(sentence);
+      const mentionsCompetitor = [...nameVariants].some((v) =>
+        hasToken(padded, v),
+      );
+      if (!mentionsCompetitor) continue;
+
+      if (city && hasToken(padded, city)) return "local"; // strongest
+      if (regionTerms.some((r) => hasToken(padded, r))) sawRegional = true;
+      if (
+        countryTerms.some((c) => hasToken(padded, c)) ||
+        NATIONAL_MARKERS.some((m) => hasToken(padded, m)) ||
+        GLOBAL_MARKERS.some((m) => hasToken(padded, m))
+      ) {
+        sawNational = true;
+      }
+    }
+  }
+
+  if (sawRegional) return "regional"; // regional beats national
+  if (sawNational) return "national";
+  return "unknown";
 }
 
 // ─── JSON extraction (same pattern as citationAnalyzer) ──────────

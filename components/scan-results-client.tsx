@@ -47,6 +47,27 @@ const INTENT_LABELS: Record<string, string> = {
   review: "Review",
 };
 
+// Locality badge styling (Ticket 3). "local" is the loud one — a
+// competitor literally near the prospect winning the AI answer is the
+// most urgent, most fixable threat. "unknown" renders as a muted dash.
+const LOCALITY_STYLE: Record<
+  string,
+  { label: string; className: string }
+> = {
+  local: {
+    label: "Local",
+    className: "bg-emerald-100 text-emerald-700",
+  },
+  regional: {
+    label: "Regional",
+    className: "bg-amber-100 text-amber-700",
+  },
+  national: {
+    label: "National",
+    className: "bg-ink-100 text-ink-600",
+  },
+};
+
 type LoadState =
   | { status: "loading" }
   | { status: "loaded"; result: ScanResult }
@@ -498,6 +519,16 @@ function ResultsView({ result }: { result: ScanResult }) {
               </code>{" "}
               proxy responses, not an authoritative market ranking.
             </p>
+            <p className="mt-2 max-w-2xl text-sm text-ink-500 leading-relaxed">
+              <span className="font-semibold text-ink-700">Locality</span>{" "}
+              is inferred from how the AI described each business relative
+              to {result.businessName}&apos;s location — not a verified
+              registration check. A{" "}
+              <span className="font-semibold text-emerald-700">Local</span>{" "}
+              competitor winning the answer is the most urgent gap: it
+              means the business down the road is being recommended and
+              you are not.
+            </p>
 
             <div className="mt-8 overflow-hidden rounded-2xl border border-rule bg-white shadow-soft">
               <table className="w-full text-left text-sm">
@@ -505,6 +536,7 @@ function ResultsView({ result }: { result: ScanResult }) {
                   <tr className="border-b border-rule bg-ink-50/50 text-[11px] uppercase tracking-wider text-ink-500">
                     <th className="px-4 py-3 font-semibold">#</th>
                     <th className="px-4 py-3 font-semibold">Business</th>
+                    <th className="px-4 py-3 font-semibold">Locality</th>
                     <th className="px-4 py-3 font-semibold">
                       Appears in
                     </th>
@@ -530,6 +562,17 @@ function ResultsView({ result }: { result: ScanResult }) {
                           <span className="mt-0.5 block text-xs text-ink-500">
                             {c.context}
                           </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {c.locality && LOCALITY_STYLE[c.locality] ? (
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${LOCALITY_STYLE[c.locality].className}`}
+                          >
+                            {LOCALITY_STYLE[c.locality].label}
+                          </span>
+                        ) : (
+                          <span className="text-ink-300">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-ink-700">
