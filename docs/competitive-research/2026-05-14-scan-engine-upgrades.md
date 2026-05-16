@@ -7,7 +7,8 @@
 **Status log:**
 - ✅ **Ticket 1 — SHIPPED** 2026-05-15 (commit `0c50e33`): prompt mining + intent classification live in the scan engine + report + sample/preview.
 - ✅ **Ticket 2 — SHIPPED** 2026-05-16 (commit `5593c18`): competitor leaderboard with avgRank + mentionCount in the engine, report table, sample/preview, and admin email.
-- Tickets 3–5: backlog.
+- ✅ **Ticket 3 — SHIPPED** 2026-05-16 (commit `0c31a3d`): competitor locality tagging (local/regional/national/unknown) inferred from the AI proxy's own phrasing; Locality column in the report leaderboard + admin email + sample/preview. This is the "they don't do nearby" wedge vs SEMrush/Ubersuggest. Originally pitched mid-stream as "Ticket 3"; the prior Ticket 3 (headline framing) renumbered to **Ticket 4** below.
+- Tickets 4–6: backlog.
 
 Context: our scan currently runs ~4 fixed query shapes against a Claude + live-web proxy and returns a score, classification, verbatim responses, and competitor names. Ubersuggest's analysis exposes five gaps/opportunities. Tickets are ordered by leverage.
 
@@ -36,7 +37,19 @@ Context: our scan currently runs ~4 fixed query shapes against a Claude + live-w
 
 **Effort:** S · **Risk:** low (post-processing of data we already collect).
 
-## TICKET 3 — "Industry rank + visibility %" headline framing
+## TICKET 3 — Competitor locality tagging ✅ SHIPPED (commit `0c31a3d`, 2026-05-16)
+
+**Why:** SEMrush/Ubersuggest measure AI mentions in the abstract and have *no* "near me" dimension. For SA industrial/legal/medical buyers AI weights local trust heavily — a local competitor winning the answer is a different, more urgent, more fixable problem than a national firm doing so. This is the sharpest wedge in the comparison: a column their tools structurally cannot produce.
+
+**Scope (shipped):**
+- `classifyLocality` infers local | regional | national | unknown from sentence-level co-occurrence of the competitor name with the prospect's city / region / country / global markers, across the verbatim answer + context snippet.
+- Zero extra API calls/latency (sentence heuristic on text we already have). Punctuation-safe token matching; sentence-scoped to avoid false-positive "local".
+- Colour-coded Locality column in the report leaderboard (Local = emerald), admin email tag, sample/preview.
+- Framed honestly as **inferred from the AI's phrasing, not a verified registration check**.
+
+**Deliberately deferred (future ticket):** Places-API-backed per-competitor verification — adds N API calls + latency the synchronous 60s scan path won't spend. Our existing Places fusion is for the *prospect's* business; extending it per-competitor is a separate, heavier piece of work.
+
+## TICKET 4 — "Industry rank + visibility %" headline framing
 
 **Why:** Ubersuggest's funnel works because the first number is a brutal "0% / rank: —". We have the same data but bury it in a 0–100 score. Add the ordinal framing — *then immediately pair it with the fix list* (their model paywalls the fix; ours doesn't — that's the whole pitch).
 
@@ -46,7 +59,7 @@ Context: our scan currently runs ~4 fixed query shapes against a Claude + live-w
 
 **Effort:** S · **Risk:** low. **Note:** keep honest — if 0%, say 0%; never inflate. Pair every gut-punch with a concrete next step.
 
-## TICKET 4 — Multi-engine coverage made explicit
+## TICKET 5 — Multi-engine coverage made explicit
 
 **Why:** Ubersuggest is ChatGPT-default and **paywalls Gemini**. Our proxy already stands in for ChatGPT/Gemini/Perplexity — but the report doesn't make multi-engine coverage legible as a value prop, and the methodology nuance is buried in the FAQ.
 
@@ -56,7 +69,7 @@ Context: our scan currently runs ~4 fixed query shapes against a Claude + live-w
 
 **Effort:** S · **Risk:** low (presentation + copy; honesty-audit any claim before it ships).
 
-## TICKET 5 — Verbatim-response + methodology panel (moat reinforcement)
+## TICKET 6 — Verbatim-response + methodology panel (moat reinforcement)
 
 **Why:** The biggest thing Ubersuggest cannot do: show the *actual* AI answer and disclose how the scan was run. We already capture verbatim responses — this ticket is about *presenting* them as the centrepiece and adding a transparent methodology block (proxy engine, run date, prompt rationale, # runs).
 
@@ -70,9 +83,10 @@ Context: our scan currently runs ~4 fixed query shapes against a Claude + live-w
 
 ## Recommended sequencing
 
-1. **Ticket 1** (prompt mining + intent) — highest leverage, the feature that makes the rest credible.
-2. **Ticket 2** (avg-rank leaderboard) — cheap, high-impact threat signal, depends on Ticket 1's expanded prompt set for a meaningful average.
-3. **Ticket 3** (rank/% framing) — cheap conversion lift, pairs the threat with our paywall-free fix list.
-4. **Tickets 4 & 5** — presentation/positioning; reinforce the moat once the data layer (1–3) is richer.
+1. ✅ **Ticket 1** (prompt mining + intent) — highest leverage, the feature that makes the rest credible.
+2. ✅ **Ticket 2** (avg-rank leaderboard) — cheap, high-impact threat signal, builds on Ticket 1's expanded prompt set.
+3. ✅ **Ticket 3** (locality tagging) — the "they don't do nearby" wedge; a column SEMrush/Ubersuggest can't produce.
+4. **Ticket 4** (rank/% framing) — cheap conversion lift, pairs the threat with our paywall-free fix list. *Next.*
+5. **Tickets 5 & 6** — presentation/positioning; reinforce the moat once the data layer (1–4) is richer.
 
-All five stay within "diagnose hard, then hand over the fix for free" — the exact wedge against Ubersuggest's "pay to see how bad it is" model.
+All stay within "diagnose hard, then hand over the fix for free" — the exact wedge against Ubersuggest's "pay to see how bad it is" model.
