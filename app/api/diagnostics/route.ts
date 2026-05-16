@@ -81,11 +81,24 @@ export async function GET() {
     // astronomically large).
     ADMIN_TOKEN: {
       set: Boolean(process.env.ADMIN_TOKEN),
+      // Raw length (pre-trim). meetsMinLength uses the TRIMMED length
+      // because auth trims before the 24-char check — a value like
+      // "<23chars>\n" has raw length 24 but is effectively too short.
       length: process.env.ADMIN_TOKEN?.length ?? 0,
-      meetsMinLength: (process.env.ADMIN_TOKEN?.length ?? 0) >= 24,
+      meetsMinLength: (process.env.ADMIN_TOKEN?.trim().length ?? 0) >= 24,
+      // T3: the exact footgun that caused the multi-session lockout. If
+      // true, the configured value has a leading/trailing space or
+      // newline (classic password-manager / `vercel env add` paste).
+      // Auth now trims defensively so login still works — but this
+      // flags the dirty value so you can clean it WITHOUT attempting a
+      // login or ever seeing the secret. `length` vs trimmed length +
+      // this flag together tell the whole story.
+      hasSurroundingWhitespace:
+        Boolean(process.env.ADMIN_TOKEN) &&
+        process.env.ADMIN_TOKEN !== process.env.ADMIN_TOKEN?.trim(),
       required: false,
       purpose:
-        "Gates the /admin/scans dashboard + /api/admin/* endpoints. Must be 24+ chars random.",
+        "Gates the /admin/scans dashboard + /api/admin/* endpoints. Must be 24+ chars random. NOTE: these values reflect THIS deployment's env snapshot — if you rotated ADMIN_TOKEN and they still look stale, the running deployment predates the change (redeploy).",
       fix: "Vercel → Settings → Environment Variables → ADMIN_TOKEN (Production + Preview). Then REDEPLOY — env var changes don't apply to running deploys.",
     },
     // Phase 1.5: Google Places API for real GBP signals (rating, reviews,
