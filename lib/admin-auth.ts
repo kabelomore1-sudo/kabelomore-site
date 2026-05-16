@@ -47,15 +47,44 @@ export type AuthResult =
  * Returns a structured result so callers can distinguish missing vs
  * invalid vs misconfigured.
  */
+// Warn at most once per process if the configured token has stray
+// surrounding whitespace — logged as a fact, never the value.
+let _warnedTokenWhitespace = false;
+
 export function verifyAdminToken(candidate: string | undefined | null): AuthResult {
-  const expected = process.env.ADMIN_TOKEN;
+  const rawExpected = process.env.ADMIN_TOKEN;
+
+  // T1 (hardening): a trailing newline / stray space in the configured
+  // value is the single most common admin-auth footgun — pasted from a
+  // password manager, `vercel env add` echoing a newline, etc. It
+  // caused a multi-session production lockout. We now trim BOTH sides
+  // so it can never cause a silent length mismatch in constantTimeEqual
+  // again. The request extractor already trims header/cookie/query
+  // candidates; trimming here additionally covers the cookie path
+  // (verifyAdminFromComponent) and the login query token in one place.
+  if (
+    rawExpected &&
+    rawExpected !== rawExpected.trim() &&
+    !_warnedTokenWhitespace
+  ) {
+    _warnedTokenWhitespace = true;
+    console.warn(
+      JSON.stringify({
+        event: "admin_token_has_surrounding_whitespace",
+        note: "ADMIN_TOKEN has leading/trailing whitespace; trimming for comparison. Fix the value in Vercel + redeploy to silence this.",
+      }),
+    );
+  }
+
+  const expected = rawExpected?.trim();
   if (!expected || expected.length < MIN_TOKEN_LENGTH) {
     return { ok: false, reason: "no-token-configured" };
   }
-  if (!candidate) {
+  const candidateTrimmed = candidate?.trim();
+  if (!candidateTrimmed) {
     return { ok: false, reason: "missing" };
   }
-  if (!constantTimeEqual(candidate, expected)) {
+  if (!constantTimeEqual(candidateTrimmed, expected)) {
     return { ok: false, reason: "invalid" };
   }
   return { ok: true };

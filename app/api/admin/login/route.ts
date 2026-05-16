@@ -31,7 +31,9 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const token = url.searchParams.get("token");
+  // Trim at the source too (verifyAdminToken also trims): a token
+  // pasted into the address bar commonly picks up a trailing space.
+  const token = url.searchParams.get("token")?.trim() ?? null;
   const nextRaw = url.searchParams.get("next") ?? "/admin/scans";
 
   // Open-redirect prevention: only allow same-origin internal paths.
