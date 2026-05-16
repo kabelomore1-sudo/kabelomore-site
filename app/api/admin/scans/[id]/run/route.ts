@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { Resend } from "resend";
 import {
   getProfile,
@@ -131,74 +131,88 @@ export async function POST(
       data: { score: result.score, trigger: "admin_manual" },
     });
 
-    // Email dispatch — non-fatal failures. Track per-email outcome
-    // so the response tells the admin what actually went out.
-    let clientEmailSent = false;
-    let adminEmailSent = false;
-    const emailErrors: string[] = [];
-
+    // Email dispatch is DEFERRED to after the response is flushed
+    // (next/server `after`). Sending two transactional emails inline
+    // added ~2-5s to the critical path right at the 60s ceiling and was
+    // a contributor to the 504s. The scan result + "complete" status
+    // are already persisted above, so even if this post-response work
+    // is cut short the dashboard shows the result and the "Send email"
+    // button can retry. Outcomes are tracked via recordEvent + the
+    // Emailed meta flag (the dashboard reads those, not this response).
     if (!skipEmail) {
-      const resend = new Resend(process.env.RESEND_API_KEY!);
-      const inboxEmail = process.env.SCAN_INBOX_EMAIL ?? site.contact.email;
-      const fromEmail = process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
-
-      // Client completion email — conversion-focused
-      try {
-        const email = buildClientCompletionEmail({ result, profile });
-        await sendEmailOrThrow(resend, {
-          from: `Kabelo More <${fromEmail}>`,
-          to: [profile.email],
-          replyTo: site.contact.email,
-          subject: email.subject,
-          text: email.text,
-          html: email.html,
-        });
-        clientEmailSent = true;
-        recordEvent({ type: "client_completion_email_sent", scanId: id });
-      } catch (e) {
-        emailErrors.push(`client: ${safeErrorMessage(e)}`);
-        recordEvent({
-          type: "client_completion_email_failed",
-          scanId: id,
-          error: safeErrorMessage(e),
-        });
-      }
-
-      // Admin notification — operational, comprehensive
-      try {
-        const email = buildAdminCompletionEmail({
-          result,
-          profile,
-          stageReport: (result as ScanResultWithStages).stageReport,
-          clientEmailWillBeSent: clientEmailSent,
-        });
-        await sendEmailOrThrow(resend, {
-          from: `Kabelomore Scans <${fromEmail}>`,
-          to: [inboxEmail],
-          replyTo: profile.email,
-          subject: email.subject,
-          text: email.text,
-        });
-        adminEmailSent = true;
-        recordEvent({ type: "completion_email_sent", scanId: id });
-      } catch (e) {
-        emailErrors.push(`admin: ${safeErrorMessage(e)}`);
-        recordEvent({
-          type: "completion_email_failed",
-          scanId: id,
-          error: safeErrorMessage(e),
-        });
-      }
-
-      // If the client email landed, mark the scan as Emailed in admin
-      // workflow state. Same flag the Mark Emailed button toggles.
-      if (clientEmailSent) {
+      after(async () => {
         try {
-          await updateScanMeta(id, { emailed: true });
-        } catch {
-          /* meta update non-fatal */
+          const resend = new Resend(process.env.RESEND_API_KEY!);
+          const inboxEmail =
+            process.env.SCAN_INBOX_EMAIL ?? site.contact.email;
+          const fromEmail =
+            process.env.SCAN_FROM_EMAIL ?? "scan@kabelomore.com";
+
+          let clientEmailSent = false;
+
+          // Client completion email — conversion-focused
+          try {
+            const email = buildClientCompletionEmail({ result, profile });
+            await sendEmailOrThrow(resend, {
+              from: `Kabelo More <${fromEmail}>`,
+              to: [profile.email],
+              replyTo: site.contact.email,
+              subject: email.subject,
+              text: email.text,
+              html: email.html,
+            });
+            clientEmailSent = true;
+            recordEvent({ type: "client_completion_email_sent", scanId: id });
+          } catch (e) {
+            recordEvent({
+              type: "client_completion_email_failed",
+              scanId: id,
+              error: safeErrorMessage(e),
+            });
+          }
+
+          // Admin notification — operational, comprehensive
+          try {
+            const email = buildAdminCompletionEmail({
+              result,
+              profile,
+              stageReport: (result as ScanResultWithStages).stageReport,
+              clientEmailWillBeSent: clientEmailSent,
+            });
+            await sendEmailOrThrow(resend, {
+              from: `Kabelomore Scans <${fromEmail}>`,
+              to: [inboxEmail],
+              replyTo: profile.email,
+              subject: email.subject,
+              text: email.text,
+            });
+            recordEvent({ type: "completion_email_sent", scanId: id });
+          } catch (e) {
+            recordEvent({
+              type: "completion_email_failed",
+              scanId: id,
+              error: safeErrorMessage(e),
+            });
+          }
+
+          // If the client email landed, mark the scan Emailed (same
+          // flag the Mark Emailed button toggles).
+          if (clientEmailSent) {
+            try {
+              await updateScanMeta(id, { emailed: true });
+            } catch {
+              /* meta update non-fatal */
+            }
+          }
+        } catch (e) {
+          // Defensive: a post-response task must never throw uncaught.
+          recordEvent({
+            type: "completion_email_failed",
+            scanId: id,
+            error: safeErrorMessage(e),
+          });
         }
-      }
+      });
     }
 
     return NextResponse.json({
@@ -208,9 +222,7 @@ export async function POST(
       classification: result.classification,
       durationMs: result.durationMs,
       resultUrl: `/scan/${id}/results`,
-      clientEmailSent,
-      adminEmailSent,
-      emailErrors: emailErrors.length > 0 ? emailErrors : undefined,
+      emailDispatch: skipEmail ? "skipped" : "deferred",
     });
   } catch (err) {
     const msg = safeErrorMessage(err);

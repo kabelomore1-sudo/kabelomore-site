@@ -24,10 +24,14 @@
  *   Fallback: if mining fails or yields too few, we fall back to the
  *   original 4 hardcoded intent shapes. The scan never fails on this.
  *
- * Budget: mining (serial, no web_search) ~4-6s, then MAX_EXECUTED
- * web_search queries in PARALLEL ~15-20s (slowest, not sum). Runs
- * alongside citation analysis in the orchestrator's Promise.all; total
- * stays inside the Vercel 60s function ceiling.
+ * Budget (post-504 fix): mining is started by the orchestrator at t=0
+ * and runs CONCURRENTLY with discovery+presence (it needs no web_search
+ * and doesn't depend on their output), so by the time this stage runs
+ * the prompts are already in hand. Then MAX_EXECUTED web_search queries
+ * run in PARALLEL ~15-20s (slowest, not sum), alongside citation
+ * analysis. The orchestrator also enforces a hard deadline so a slow
+ * run degrades to partial results instead of being killed by Vercel's
+ * 60s ceiling (which previously left scans stuck on "scanning").
  */
 
 import {
@@ -47,14 +51,17 @@ import type {
 /**
  * How many mined prompts we actually run through live web_search.
  *
- * The old engine ran 4 in parallel "well inside the safe zone" (its
- * own comment noted 8 would need chunking). 5 keeps us conservative on
- * both the Anthropic web_search rate limit (5 × max_uses 2 = 10 search
- * burst) and the Vercel 60s ceiling, while giving one more intent slot
- * than before. Promise.allSettled means a rate-limited query just
- * drops — the scan continues with the rest.
+ * Held at 4 (not 5): Ticket 1 briefly raised this to 5, but combined
+ * with the added mining call it pushed the synchronous scan past
+ * Vercel's 60s function ceiling → 504s + scans stuck on "scanning".
+ * 4 is the value the engine ran at safely for a long time (4 × max_uses
+ * 2 = 8 search burst, well inside the web_search rate limit). The FULL
+ * mined list (up to TARGET_MINED_PROMPTS) is still surfaced in the
+ * report — only the deep-tested subset is bounded here.
+ * Promise.allSettled means a rate-limited query just drops — the scan
+ * continues with the rest.
  */
-const MAX_EXECUTED_QUERIES = 5;
+const MAX_EXECUTED_QUERIES = 4;
 
 /** Target size of the mined prompt list surfaced in the report. */
 const TARGET_MINED_PROMPTS = 12;
@@ -84,7 +91,7 @@ const VALID_INTENT_SET = new Set<string>(VALID_INTENTS);
  * "you appear for research queries but not urgency queries" rather
  * than just showing 4 strings with no semantic grouping.
  */
-type QueryDefinition = {
+export type QueryDefinition = {
   query: string;
   intent: QueryIntent;
 };
@@ -99,14 +106,25 @@ export type VisibilityAnalysis = {
 
 export async function simulateAIQueries(
   profile: BusinessProfile,
+  /**
+   * Optional pre-started mining promise. The orchestrator kicks mining
+   * off at t=0 so it overlaps discovery+presence; we just await the
+   * in-flight result here instead of starting a fresh (serial) call.
+   * It is pre-caught upstream so awaiting it never throws. Falls back
+   * to an internal mining call if not supplied (backwards-compatible
+   * for any other caller / tests).
+   */
+  minedPromptsPromise?: Promise<QueryDefinition[]>,
 ): Promise<VisibilityAnalysis> {
   // ── Step 1: MINE (cheap — one Claude call, no web_search) ────────
   // If mining fails or returns too few usable prompts, fall back to
   // the original hardcoded intent shapes. The scan never fails here.
-  const mined = await mineCustomerPrompts(profile).catch((err) => {
-    console.error("[visibilitySimulator] prompt mining failed:", err);
-    return [] as QueryDefinition[];
-  });
+  const mined = minedPromptsPromise
+    ? await minedPromptsPromise
+    : await mineCustomerPrompts(profile).catch((err) => {
+        console.error("[visibilitySimulator] prompt mining failed:", err);
+        return [] as QueryDefinition[];
+      });
 
   let promptPool: QueryDefinition[] =
     mined.length >= 4 ? mined : fallbackCustomerQueries(profile);
@@ -173,7 +191,7 @@ export async function simulateAIQueries(
 // so it's fast (~4-6s) and cheap. Produces realistic, localised buyer
 // questions the way a customer actually types them, intent-tagged.
 // Validated + sanitised before use; never trusted raw.
-async function mineCustomerPrompts(
+export async function mineCustomerPrompts(
   profile: BusinessProfile,
 ): Promise<QueryDefinition[]> {
   const industryWords = profile.industry.replace(/-/g, " ");

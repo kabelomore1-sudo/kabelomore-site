@@ -18,7 +18,11 @@
 
 import { discoverPresence } from "./presenceDiscovery";
 import { analyzeCitations } from "./citationAnalyzer";
-import { simulateAIQueries } from "./visibilitySimulator";
+import {
+  simulateAIQueries,
+  mineCustomerPrompts,
+  type QueryDefinition,
+} from "./visibilitySimulator";
 import { findPlace } from "./gbpFetcher";
 import { computeScore } from "./scoring";
 import { classify } from "./classification";
@@ -40,10 +44,74 @@ export type ScanStageReport = {
   visibilitySimulation: StageStatus;
 };
 
+// ─── Time budget (504 fix) ───────────────────────────────────────
+//
+// The run route caps the serverless function at maxDuration=60s. The
+// orchestrator must RETURN (so the route can write a terminal status +
+// flush the response) well before that, or Vercel kills the function
+// mid-run and the scan is stuck on "scanning" forever. We aim to be
+// done by ~52s, leaving ~8s for KV writes + the HTTP response (emails
+// are deferred post-response by the route).
+const SCAN_BUDGET_MS = 52_000;
+// Discovery runs sequentially before the parallel stage; bound it so a
+// slow Claude+web_search discovery can't eat the whole budget.
+const DISCOVERY_BUDGET_MS = 18_000;
+// Never give the parallel stage less than this, even if earlier stages
+// ran long — better a short attempt than none.
+const MIN_PARALLEL_BUDGET_MS = 8_000;
+
+/**
+ * Race a promise against a deadline. On timeout, resolve to `onTimeout`
+ * instead of hanging. Does NOT cancel the underlying work (Anthropic
+ * SDK calls aren't abortable mid-flight here) — it just stops the
+ * orchestrator from waiting, so the function can return before Vercel
+ * kills it. The abandoned promise is GC'd when the invocation ends.
+ *
+ * Callers pass branches that already `.catch(() => fallback)`, so this
+ * only ever resolves (never rejects) — the orchestrator's existing
+ * null/empty fallbacks then produce a partial-but-complete ScanResult.
+ */
+function withDeadline<T>(
+  p: Promise<T>,
+  ms: number,
+  onTimeout: T,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((resolve) => {
+    timer = setTimeout(() => resolve(onTimeout), ms);
+  });
+  return Promise.race([
+    p.then(
+      (v) => {
+        if (timer) clearTimeout(timer);
+        return v;
+      },
+      (e) => {
+        if (timer) clearTimeout(timer);
+        throw e;
+      },
+    ),
+    timeout,
+  ]);
+}
+
 export async function runFullScan(
   profile: BusinessProfile,
 ): Promise<ScanResult & { stageReport: ScanStageReport }> {
   const startTime = Date.now();
+
+  // ── Ticket 1 latency fix: start prompt mining NOW so it runs
+  // concurrently with discovery + presence (it's generation-only — no
+  // web_search — and depends only on the raw profile, not on resolved
+  // URLs). Pre-caught so it can never reject (no unhandled rejection if
+  // the visibility stage is skipped); simulateAIQueries awaits this
+  // in-flight promise instead of starting a fresh serial call.
+  const minedPromptsPromise: Promise<QueryDefinition[]> = mineCustomerPrompts(
+    profile,
+  ).catch((err) => {
+    console.error("[scanOrchestrator] prompt mining failed:", err);
+    return [] as QueryDefinition[];
+  });
   const stageReport: ScanStageReport = {
     discovery: "skipped",
     presenceCheck: "skipped",
@@ -58,8 +126,20 @@ export async function runFullScan(
   let discoveryNotes = "";
 
   if (!resolvedWebsite || !resolvedGbpUrl) {
-    try {
-      const discovered = await discoverPresence(profile);
+    // catch→null and deadline→null are treated identically: discovery
+    // didn't yield, so we proceed with whatever URLs the user provided.
+    const discovered = await withDeadline(
+      discoverPresence(profile).catch((err) => {
+        console.error("[scanOrchestrator] discovery failed:", err);
+        return null;
+      }),
+      DISCOVERY_BUDGET_MS,
+      null,
+    );
+
+    if (!discovered) {
+      stageReport.discovery = "failed"; // errored or exceeded its budget
+    } else {
       stageReport.discovery = discovered.discoveryRan ? "ok" : "failed";
       discoveryNotes = discovered.notes;
 
@@ -72,9 +152,6 @@ export async function runFullScan(
         // GBP exists but no direct URL — flag as found anyway
         resolvedGbpUrl = "(found-via-search)";
       }
-    } catch (err) {
-      console.error("[scanOrchestrator] discovery failed:", err);
-      stageReport.discovery = "failed";
     }
   } else {
     stageReport.discovery = "skipped"; // user provided both URLs
@@ -115,19 +192,40 @@ export async function runFullScan(
     gbpUrl: resolvedGbpUrl,
   };
 
+  // Whatever budget is left after discovery+presence goes to the
+  // parallel stage. Each branch already resolves to null on failure;
+  // withDeadline makes a slow branch resolve to null too, so the
+  // synthesize step below always runs and produces a terminal result.
+  const parallelBudgetMs = Math.max(
+    MIN_PARALLEL_BUDGET_MS,
+    SCAN_BUDGET_MS - (Date.now() - startTime),
+  );
+
   const [citationResult, visibilityResult, gbpResult] = await Promise.all([
-    analyzeCitations(profileForEngines).catch((err) => {
-      console.error("[scanOrchestrator] citation analysis failed:", err);
-      return null;
-    }),
-    simulateAIQueries(profileForEngines).catch((err) => {
-      console.error("[scanOrchestrator] visibility simulation failed:", err);
-      return null;
-    }),
-    findPlace(profileForEngines).catch((err) => {
-      console.error("[scanOrchestrator] GBP lookup failed:", err);
-      return null;
-    }),
+    withDeadline(
+      analyzeCitations(profileForEngines).catch((err) => {
+        console.error("[scanOrchestrator] citation analysis failed:", err);
+        return null;
+      }),
+      parallelBudgetMs,
+      null,
+    ),
+    withDeadline(
+      simulateAIQueries(profileForEngines, minedPromptsPromise).catch((err) => {
+        console.error("[scanOrchestrator] visibility simulation failed:", err);
+        return null;
+      }),
+      parallelBudgetMs,
+      null,
+    ),
+    withDeadline(
+      findPlace(profileForEngines).catch((err) => {
+        console.error("[scanOrchestrator] GBP lookup failed:", err);
+        return null;
+      }),
+      parallelBudgetMs,
+      null,
+    ),
   ]);
 
   // GBP stage report: "skipped" if API key missing (we infer this from
