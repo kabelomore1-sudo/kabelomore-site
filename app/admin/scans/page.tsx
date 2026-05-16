@@ -56,6 +56,13 @@ interface PageProps {
 
 type DecoratedRow = IndexEntry & {
   status: string;
+  /** True when a ScanResult actually exists in storage — independent
+   *  of the brittle status string. Option B can finish a scan in a
+   *  partial state, and the function can die/lag between saveResult
+   *  and setStatus("complete"), leaving a real, viewable result whose
+   *  status isn't literally "complete". The UI keys View/Send/score
+   *  off THIS, not the status string. */
+  hasResult: boolean;
   score: number | null;
   meta: ScanMeta;
 };
@@ -247,7 +254,14 @@ function SubmissionsTable({ rows }: { rows: DecoratedRow[] }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-rule">
-          {rows.map((r) => (
+          {rows.map((r) => {
+            // A saved result means the run reached saveResult — status
+            // either got set "complete" or the function died/lagged
+            // immediately after. Either way it's viewable + emailable,
+            // so present it as complete. Only fall back to the raw
+            // status string when there is no result at all.
+            const effectiveStatus = r.hasResult ? "complete" : r.status;
+            return (
             <tr key={r.scanId} className="hover:bg-ink-50/30">
               <td className="whitespace-nowrap px-4 py-3 text-xs text-ink-500">
                 {formatRelative(r.submittedAt)}
@@ -272,7 +286,7 @@ function SubmissionsTable({ rows }: { rows: DecoratedRow[] }) {
                 <EmailStatusPills row={r} />
               </td>
               <td className="px-4 py-3">
-                <ScanStatusPill status={r.status} />
+                <ScanStatusPill status={effectiveStatus} />
               </td>
               <td className="px-4 py-3">
                 {r.score != null ? (
@@ -290,12 +304,13 @@ function SubmissionsTable({ rows }: { rows: DecoratedRow[] }) {
               <td className="px-4 py-3 text-right">
                 <ScanRowActions
                   scanId={r.scanId}
-                  status={r.status}
+                  status={effectiveStatus}
                   meta={r.meta}
                 />
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -554,6 +569,7 @@ async function safeFetchScans(limit: number): Promise<FetchOutcome> {
     entries.map(async (e): Promise<DecoratedRow> => {
       let status = "unknown";
       let score: number | null = null;
+      let hasResult = false;
       let meta: ScanMeta = {};
 
       try {
@@ -565,16 +581,22 @@ async function safeFetchScans(limit: number): Promise<FetchOutcome> {
         );
       }
 
-      if (status === "complete") {
-        try {
-          const r = await getResult(e.scanId);
-          score = r?.score ?? null;
-        } catch (err) {
-          console.error(
-            `[admin/scans page] getResult(${e.scanId}) failed:`,
-            err instanceof Error ? err.message.slice(0, 300) : String(err),
-          );
+      // Fetch the result UNCONDITIONALLY — not gated on
+      // status === "complete". A killed/lagged status write or an
+      // Option B partial finish can leave a real result whose status
+      // isn't literally "complete"; gating here was exactly why a
+      // scored scan showed no View result / Send email.
+      try {
+        const r = await getResult(e.scanId);
+        if (r) {
+          hasResult = true;
+          score = r.score ?? null;
         }
+      } catch (err) {
+        console.error(
+          `[admin/scans page] getResult(${e.scanId}) failed:`,
+          err instanceof Error ? err.message.slice(0, 300) : String(err),
+        );
       }
 
       try {
@@ -586,7 +608,7 @@ async function safeFetchScans(limit: number): Promise<FetchOutcome> {
         );
       }
 
-      return { ...e, status, score, meta };
+      return { ...e, status, hasResult, score, meta };
     }),
   );
 
