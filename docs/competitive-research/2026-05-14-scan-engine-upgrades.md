@@ -6,7 +6,8 @@
 
 **Status log:**
 - ✅ **Ticket 1 — SHIPPED** 2026-05-15 (commit `0c50e33`): prompt mining + intent classification live in the scan engine + report + sample/preview.
-- Tickets 2–5: backlog.
+- ✅ **Ticket 2 — SHIPPED** 2026-05-16 (commit `5593c18`): competitor leaderboard with avgRank + mentionCount in the engine, report table, sample/preview, and admin email.
+- Tickets 3–5: backlog.
 
 Context: our scan currently runs ~4 fixed query shapes against a Claude + live-web proxy and returns a score, classification, verbatim responses, and competitor names. Ubersuggest's analysis exposes five gaps/opportunities. Tickets are ordered by leverage.
 
@@ -25,7 +26,7 @@ Context: our scan currently runs ~4 fixed query shapes against a Claude + live-w
 
 **Differentiator framing:** "We don't guess what your customers ask AI — we mine the actual questions, then show you the exact answers."
 
-## TICKET 2 — Competitor leaderboard with average rank
+## TICKET 2 — Competitor leaderboard with average rank ✅ SHIPPED (commit `5593c18`, 2026-05-16)
 
 **Why:** Ubersuggest's free "Top Brands / Avg. rank" table is its most concrete threat signal. We already list "names that surfaced instead of you"; adding **average position when cited** turns a list into a ranking and quantifies the gap.
 
