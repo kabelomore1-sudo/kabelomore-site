@@ -181,6 +181,22 @@ export type CompetitorMention = {
    *  in the AI response. Indicates true local competition vs
    *  national/multinational firms that surface from generic queries. */
   locality?: "local" | "regional" | "national" | "unknown";
+
+  // ─── Leaderboard signals (Ticket 2) ──────────────────────────────
+  // From the Ubersuggest competitive analysis: their free "Top Brands /
+  // Avg. rank" table is the most concrete threat signal. We derive the
+  // same from data we already collect — the order the AI proxy named
+  // each business within each query result.
+  /** Number of executed queries this competitor appeared in. Pair with
+   *  the total executed-query count for an "appears in X of Y" ratio.
+   *  Optional — older scans pre-date leaderboard aggregation. */
+  mentionCount?: number;
+  /** Mean 1-based position the AI proxy named this competitor, averaged
+   *  across the queries where it appeared (2 d.p.). LOWER = named
+   *  earlier / more prominently. This is observed ordering in our proxy
+   *  responses, NOT an authoritative market ranking — the report copy
+   *  must frame it honestly. Optional for back-compat. */
+  avgRank?: number;
 };
 
 export type VisibilityCheck = {

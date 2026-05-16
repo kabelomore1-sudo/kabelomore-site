@@ -447,11 +447,36 @@ function parseCompetitorEntries(raw: unknown): CompetitorEntry[] {
 //
 // Preserves original casing (the map KEY is lowercased; the stored
 // `name` is the first occurrence as-cased). Merges per-competitor
-// context across queries — first non-empty context wins. Future
-// expansion: detect `locality` by checking whether the competitor name
-// appeared alongside the profile city in `verbatimExcerpt`.
+// context across queries — first non-empty context wins.
+//
+// LEADERBOARD (Ticket 2): the position a business is named WITHIN a
+// query's competitor list is a usable prominence proxy — the runQuery
+// prompt asks for "the top 3-5 businesses being recommended", so index
+// order ≈ how prominently the AI proxy surfaced them. We accumulate
+// (sum of 1-based positions, count) per competitor, then attach
+// `avgRank` (mean position, lower = more prominent) and `mentionCount`
+// (queries appeared in). The result is sorted most-prominent-first so
+// every downstream consumer (report leaderboard, admin/client emails,
+// follow-up drips) leads with who's actually winning.
+//
+// Honesty: this is observed ordering in OUR proxy responses, not an
+// authoritative market ranking — the report copy frames it that way.
+//
+// Future expansion: detect `locality` by checking whether the
+// competitor name appeared alongside the profile city in
+// `verbatimExcerpt` (a real differentiator vs SEMrush/Ubersuggest,
+// which don't fuse Google Places "nearby" data the way our gbpFetcher
+// does — see docs/competitive-research/).
 function aggregateCompetitors(checks: VisibilityCheck[]): CompetitorMention[] {
   const map = new Map<string, CompetitorMention>();
+  // key → running { sum of 1-based positions, count of appearances }.
+  // `__check` holds the VisibilityCheck whose contribution was last
+  // counted, so a business named twice in ONE response only scores its
+  // first (best) position for that query.
+  const rank = new Map<
+    string,
+    { sum: number; count: number; __check: VisibilityCheck }
+  >();
 
   for (const check of checks) {
     // Read per-competitor detail from the symbol side channel attached
@@ -461,18 +486,54 @@ function aggregateCompetitors(checks: VisibilityCheck[]): CompetitorMention[] {
       COMPETITOR_DETAIL_KEY
     ] as CompetitorEntry[] | undefined;
 
-    if (details && details.length > 0) {
-      for (const entry of details) {
-        upsertCompetitor(map, entry.name, entry.context, check.verbatimExcerpt);
-      }
-    } else {
-      for (const name of check.competitorsCited) {
-        upsertCompetitor(map, name, undefined, check.verbatimExcerpt);
-      }
+    const entries: CompetitorEntry[] =
+      details && details.length > 0
+        ? details
+        : check.competitorsCited.map((name) => ({ name }));
+
+    entries.forEach((entry, idx) => {
+      const trimmed = entry.name.trim();
+      if (!trimmed) return;
+      upsertCompetitor(map, trimmed, entry.context, check.verbatimExcerpt);
+
+      // Position within THIS query's list (1-based). Dedupe within a
+      // single check — if the model names the same business twice in
+      // one response, only its first (best) position counts for that
+      // query so a repeated mention can't inflate mentionCount.
+      const key = trimmed.toLowerCase();
+      const acc = rank.get(key);
+      if (acc && acc.__check === check) return;
+      const next = acc ?? { sum: 0, count: 0, __check: check };
+      next.sum += idx + 1;
+      next.count += 1;
+      next.__check = check;
+      rank.set(key, next);
+    });
+  }
+
+  // Attach derived leaderboard fields.
+  for (const [key, mention] of map) {
+    const acc = rank.get(key);
+    if (acc && acc.count > 0) {
+      mention.mentionCount = acc.count;
+      mention.avgRank = Math.round((acc.sum / acc.count) * 100) / 100;
     }
   }
 
-  return Array.from(map.values()).slice(0, 10);
+  // Sort most-prominent-first: lower avgRank wins; more mentions breaks
+  // ties; then name for stable output. Competitors with no rank data
+  // (shouldn't happen post-aggregation, but defensive) sink last.
+  return Array.from(map.values())
+    .sort((a, b) => {
+      const ar = a.avgRank ?? Number.POSITIVE_INFINITY;
+      const br = b.avgRank ?? Number.POSITIVE_INFINITY;
+      if (ar !== br) return ar - br;
+      const am = a.mentionCount ?? 0;
+      const bm = b.mentionCount ?? 0;
+      if (am !== bm) return bm - am;
+      return a.name.localeCompare(b.name);
+    })
+    .slice(0, 10);
 }
 
 function upsertCompetitor(

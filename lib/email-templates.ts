@@ -409,10 +409,18 @@ export function buildAdminCompletionEmail(input: {
         `  • "${v.query}" → ${v.businessAppears ? "✓ business cited" : "✗ NOT cited"}${v.intent ? ` (${v.intent})` : ""}`,
     ),
     ``,
-    `─── Competitors AI surfaced ───`,
-    ...result.competitors
-      .slice(0, 8)
-      .map((c) => `  • ${c.name}${c.context ? ` — ${c.context}` : ""}`),
+    `─── Competitor leaderboard (avg position, lower = more dominant) ───`,
+    ...result.competitors.slice(0, 8).map((c, i) => {
+      const rank =
+        typeof c.avgRank === "number"
+          ? `avg pos ${c.avgRank.toFixed(1)}`
+          : "avg pos n/a";
+      const mentions =
+        typeof c.mentionCount === "number"
+          ? `, ${c.mentionCount} queries`
+          : "";
+      return `  ${i + 1}. ${c.name} — ${rank}${mentions}${c.context ? ` — ${c.context}` : ""}`;
+    }),
     ``,
     `Diagnosis: ${result.diagnosisOneLiner}`,
     ``,

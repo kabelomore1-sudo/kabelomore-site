@@ -299,6 +299,10 @@ export function generateSampleReport(
       appearsInEngines: ["chatgpt", "perplexity", "gemini"] as Engine[],
       hasCitations: true,
       citationCount: 32,
+      // Leaderboard (Ticket 2) — coherent with the sample
+      // visibilityChecks below: named in queries 1 & 3, position 1 both.
+      mentionCount: 2,
+      avgRank: 1.0,
     },
     {
       name:
@@ -310,6 +314,9 @@ export function generateSampleReport(
       appearsInEngines: ["chatgpt", "claude", "perplexity"] as Engine[],
       hasCitations: true,
       citationCount: 28,
+      // Named in queries 1 (pos 2) & 4 (pos 1) → avg 1.5.
+      mentionCount: 2,
+      avgRank: 1.5,
     },
     {
       name:
@@ -321,6 +328,9 @@ export function generateSampleReport(
       appearsInEngines: ["chatgpt", "gemini"] as Engine[],
       hasCitations: true,
       citationCount: 21,
+      // Named in query 3 only (pos 2) → avg 2.0.
+      mentionCount: 1,
+      avgRank: 2.0,
     },
   ];
 

@@ -467,6 +467,100 @@ function ResultsView({ result }: { result: ScanResult }) {
         </Section>
       )}
 
+      {/* COMPETITOR LEADERBOARD (Ticket 2) — turns the flat "names that
+          surfaced" list into a ranked table. avgRank = mean position the
+          AI proxy named each business across the queries it appeared in;
+          lower = more dominant. Framed honestly as observed proxy
+          ordering, not an authoritative market ranking. Only renders
+          when rank data exists (new scans) — older cached scans simply
+          skip it, no regression. */}
+      {(() => {
+        const ranked = (result.competitors ?? []).filter(
+          (c) => typeof c.avgRank === "number",
+        );
+        if (ranked.length === 0) return null;
+        const totalQueries = result.visibilityChecks.length;
+        return (
+          <Section variant="default" padding="lg" containerSize="narrow">
+            <Eyebrow>Competitor leaderboard</Eyebrow>
+            <h2 className="mt-4 text-display-md font-semibold tracking-tight text-ink-900">
+              Who AI names instead of you — ranked.
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm text-ink-500 leading-relaxed">
+              <span className="font-semibold text-ink-700">
+                Avg. position
+              </span>{" "}
+              is how early the AI proxy named each business across the
+              queries it returned them in — lower means it dominates the
+              answer. This is observed ordering in our{" "}
+              <code className="rounded bg-ink-50 px-1 py-0.5 text-[11px]">
+                web_search
+              </code>{" "}
+              proxy responses, not an authoritative market ranking.
+            </p>
+
+            <div className="mt-8 overflow-hidden rounded-2xl border border-rule bg-white shadow-soft">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-rule bg-ink-50/50 text-[11px] uppercase tracking-wider text-ink-500">
+                    <th className="px-4 py-3 font-semibold">#</th>
+                    <th className="px-4 py-3 font-semibold">Business</th>
+                    <th className="px-4 py-3 font-semibold">
+                      Appears in
+                    </th>
+                    <th className="px-4 py-3 text-right font-semibold">
+                      Avg. position
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ranked.map((c, idx) => (
+                    <tr
+                      key={`${c.name}-${idx}`}
+                      className="border-b border-rule last:border-0"
+                    >
+                      <td className="px-4 py-3 font-mono text-ink-400">
+                        {String(idx + 1).padStart(2, "0")}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-medium text-ink-900">
+                          {c.name}
+                        </span>
+                        {c.context && (
+                          <span className="mt-0.5 block text-xs text-ink-500">
+                            {c.context}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-ink-700">
+                        {typeof c.mentionCount === "number"
+                          ? totalQueries > 0
+                            ? `${c.mentionCount} of ${totalQueries} queries`
+                            : `${c.mentionCount} queries`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="font-mono text-base font-semibold text-ink-900">
+                          {c.avgRank?.toFixed(1)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="mt-4 text-xs italic text-ink-500">
+              {result.visibilityChecks.some((v) => v.businessAppears)
+                ? `${result.businessName} surfaced in some queries (see above) but is not among the dominant names AI returns — these businesses are.`
+                : `${result.businessName} did not surface for any tested query — these businesses took those answers instead.`}{" "}
+              Verify these are your actual competitors; live search can
+              surface adjacent firms.
+            </p>
+          </Section>
+        );
+      })()}
+
       {/* Recommendations + CTA */}
       <Section variant="default" padding="lg" containerSize="narrow">
         <Eyebrow>What to do about it</Eyebrow>
