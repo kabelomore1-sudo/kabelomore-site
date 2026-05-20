@@ -26,6 +26,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site.url}/case-studies/oms-lifting-solutions`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${site.url}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${site.url}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    // Legal pages — indexable on purpose (compliance signal + AI engines
+    // see disclosure). Low changeFrequency: real updates are rare.
+    { url: `${site.url}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${site.url}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
   ];
 
   // Dynamically include every published blog post

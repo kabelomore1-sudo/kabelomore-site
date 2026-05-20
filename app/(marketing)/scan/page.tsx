@@ -28,7 +28,7 @@ const scanFaqs = [
   },
   {
     q: "What happens to my information?",
-    a: "We use it only to deliver your scan. We don't sell, share, or add you to any mailing lists without your explicit consent.",
+    a: "We use it only to deliver your scan. We don't sell, share, or add you to any mailing lists without your explicit consent. Scan submissions are auto-deleted after 30 days. Full disclosure of every processor we use (Anthropic, Resend, Vercel, Microsoft Clarity, Google Analytics) is in our Privacy Notice at /privacy.",
   },
 ];
 

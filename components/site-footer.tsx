@@ -121,6 +121,22 @@ export function SiteFooter() {
                   Blog
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/privacy"
+                  className="text-ink-700 hover:text-ink-900"
+                >
+                  Privacy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terms"
+                  className="text-ink-700 hover:text-ink-900"
+                >
+                  Terms
+                </Link>
+              </li>
             </ul>
           </div>
 
