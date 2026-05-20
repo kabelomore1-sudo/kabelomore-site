@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { StickyMobileCta } from "@/components/sticky-mobile-cta";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { JsonLd } from "@/components/ui/jsonld";
+import { ClarityLoader } from "@/components/clarity-loader";
 import {
   organizationJsonLd,
   kabeloPersonJsonLd,
@@ -117,6 +118,11 @@ export default function RootLayout({
         <StickyMobileCta />
         <ScrollToTop />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
+        {/* Microsoft Clarity — session replays + heatmaps + Copilot.
+            Loader self-skips on /admin/* and on URLs carrying ?token=
+            so the admin secret in the bootstrap login URL never lands
+            in a session recording. See components/clarity-loader.tsx. */}
+        <ClarityLoader />
       </body>
     </html>
   );

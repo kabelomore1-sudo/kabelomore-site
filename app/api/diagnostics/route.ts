@@ -101,6 +101,16 @@ export async function GET() {
         "Gates the /admin/scans dashboard + /api/admin/* endpoints. Must be 24+ chars random. NOTE: these values reflect THIS deployment's env snapshot — if you rotated ADMIN_TOKEN and they still look stale, the running deployment predates the change (redeploy).",
       fix: "Vercel → Settings → Environment Variables → ADMIN_TOKEN (Production + Preview). Then REDEPLOY — env var changes don't apply to running deploys.",
     },
+    // Microsoft Clarity project ID (NEXT_PUBLIC_ — reaches the browser
+    // bundle; not a secret). Reports presence so you can confirm the
+    // env landed on a deployment without watching for the script tag.
+    NEXT_PUBLIC_CLARITY_PROJECT_ID: {
+      set: Boolean(process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID),
+      required: false,
+      purpose:
+        "Microsoft Clarity session replays + heatmaps. Loader skips /admin/* and URLs with ?token= so the admin secret never lands in a recording.",
+      fix: "clarity.microsoft.com → project → Settings → Overview → copy ID. Vercel → Settings → Environment Variables → Add NEXT_PUBLIC_CLARITY_PROJECT_ID (Production) → REDEPLOY (NEXT_PUBLIC_ vars are inlined at build time, so a rebuild is required).",
+    },
     // Phase 1.5: Google Places API for real GBP signals (rating, reviews,
     // hours, categories). Without it, the scan can detect whether a GBP
     // exists (via Claude+web_search inference) but can't measure quality.
