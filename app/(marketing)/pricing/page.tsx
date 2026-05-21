@@ -55,7 +55,7 @@ const pricingFaqs: { q: string; a: string; id?: string }[] = [
   // troubleshooting (the broken-GBP catch-all, no public pricing).
   {
     q: "I just need help with my Google Business Profile. Which package fits?",
-    a: "The GBP Setup package at R5,000 is the right starting point. It includes everything to claim, optimize, and verify your Google Business Profile plus the foundational AEO work that makes the GBP work compound. Most clients add the Optimization Pack later once they're ready for deeper AI visibility work.",
+    a: "The GBP Setup package at R5,000 is the right starting point. It includes everything to claim, optimize, and verify your Google Business Profile, plus directory citations across 10 trusted SA directories. Most clients add the Optimization Pack later once they're ready for deeper AI visibility work that requires a website.",
   },
   {
     q: "What's the difference between Google Business Profile and AEO (Answer Engine Optimization)?",
@@ -65,6 +65,14 @@ const pricingFaqs: { q: string; a: string; id?: string }[] = [
     q: "What if my Google Business Profile is already broken (duplicate listings, lost access, verification issues, suspended)?",
     a: "We troubleshoot existing GBP problems. Scope and cost vary by situation — duplicate cleanup, verification recovery, ownership transfers all require different work, and pricing depends on the specifics. Reach out via WhatsApp or the contact form and we'll scope your specific situation.",
     id: FAQ_GBP_TROUBLESHOOTING_ID,
+  },
+  {
+    // FAQ 4 — access recovery. Distinct from the GBP troubleshooting
+    // FAQ above (this one covers website / CMS / hosting access, not
+    // GBP). Pricing IS included here because access-recovery work
+    // typically falls in a narrow predictable range (R1,500-R3,500).
+    q: "What if I can't grant full access to my website (lost passwords, former developer won't release credentials, restricted platform)?",
+    a: "This is common. Most clients haven't logged into their hosting or CMS in years. Before engagement begins, we audit what access is available and what needs to be recovered. Access recovery work is priced separately from package scope — typically R1,500-R3,500 depending on complexity. Common scenarios include password resets, contacting former developers, DNS reclamation, and platform migrations.",
   },
   // ─── Existing FAQs (kept verbatim except for the rename cascade) ──
   {
@@ -100,17 +108,16 @@ const pricingFaqs: { q: string; a: string; id?: string }[] = [
 // fields (highlight state, CTA copy, score target language) that don't
 // belong in the pricing data model itself.
 //
-// 2026-05-16 restructure: main grid now shows ONLY GBP Setup +
-// Optimization Pack (md:grid-cols-2). Foundation Build Lite was
-// demoted to the secondary "no-website builds" block alongside
-// Foundation Build to:
-//   1. Make the GBP-led entry point visually unmistakable.
-//   2. Group the two build packages (Lite + full) where they
-//      naturally belong — they share a different buyer (no
-//      website yet) than the other two cards.
-// Optimization Pack keeps its "Most clients land here" modal
-// positioning. GBP Setup gets a smaller "Start here" pill so the
-// two badges read as complementary, not competing.
+// 2026-05-16 restructure (v2): 4 once-off cards in a 2x2 grid. The
+// repricing of the Foundation builds (Lite R9,500; full R14,500-
+// R19,500) makes them buyer-friendly enough to sit as standard cards
+// rather than de-emphasized below the modal pair. Visual order:
+//   Row 1: GBP Setup ("Start here" pill) | Optimization Pack ("Most
+//          clients land here" modal badge)
+//   Row 2: Foundation Build Lite           | Foundation Build
+// Each card's internal content is sectioned (see lib/pricing
+// `sections`) — the brief required consistent sectioned organization
+// across every tier.
 const onceOffCards = [
   {
     pkg: PACKAGES.starter,
@@ -137,7 +144,7 @@ const onceOffCards = [
     priceSubtitle: "Once-off · 50% deposit / 50% on Day 30 delivery",
     intlPrice: "$595 · £475",
     forWho:
-      "Service businesses that need their Google Business Profile rebuilt properly plus the full AEO layer that makes them citable by ChatGPT, Claude, Gemini, and Perplexity. The complete visibility foundation in 3 weeks.",
+      "Service businesses with an existing website who want the full AEO (Answer Engine Optimization) layer — the work that makes your business citable by ChatGPT, Claude, Gemini, and Perplexity when customers ask them questions. The modal once-off where most one-time clients land.",
     delivery: PACKAGES.optimizationPack.timeInvestment + " over 3 weeks",
     scoreTarget: "20-40 → 60-75",
     scoreColor: "#22c55e",
@@ -145,6 +152,41 @@ const onceOffCards = [
     ctaStyle: "primary" as const,
     highlight: true,
     setupPrice: PACKAGES.optimizationPack.price,
+    entryPoint: false,
+  },
+  {
+    pkg: PACKAGES.foundationBuildLite,
+    priceDisplay: formatPrice(PACKAGES.foundationBuildLite.price),
+    priceSubtitle: "Once-off · 50% deposit / 50% on delivery",
+    intlPrice: "$555 · £445",
+    forWho:
+      "Service businesses that don't have a website yet but want to be found on Google Maps AND cited by AI engines like ChatGPT, Claude, Gemini, and Perplexity. We build the website and lay the AEO foundation in one package.",
+    delivery: PACKAGES.foundationBuildLite.timeInvestment + " · 2-3 weeks",
+    scoreTarget: "0 → 60-75",
+    scoreColor: "#16a34a",
+    cta: "Build my foundation",
+    ctaStyle: "outline" as const,
+    highlight: false,
+    setupPrice: PACKAGES.foundationBuildLite.price,
+    entryPoint: false,
+  },
+  {
+    pkg: PACKAGES.foundationBuild,
+    priceDisplay: formatPriceRange(
+      PACKAGES.foundationBuild.priceMin,
+      PACKAGES.foundationBuild.priceMax,
+    ),
+    priceSubtitle: "Once-off · 50% deposit / 50% on delivery",
+    intlPrice: "$845 · £680 — from",
+    forWho:
+      "Established service businesses needing a multi-page online presence with AEO baked in from line one. For businesses where one page isn't enough — multiple services, multiple locations, or content depth requirements.",
+    delivery: PACKAGES.foundationBuild.timeInvestment + " · 4-6 weeks",
+    scoreTarget: "0 → 60-80",
+    scoreColor: "#16a34a",
+    cta: "Get scoped",
+    ctaStyle: "outline" as const,
+    highlight: false,
+    setupPrice: PACKAGES.foundationBuild.priceMin,
     entryPoint: false,
   },
 ];
@@ -276,102 +318,69 @@ export default function PricingPage() {
             is the entry point — the fastest, most visible win.{" "}
             <strong className="text-ink-700">Optimization Pack</strong> is
             where most one-time clients land — the full AEO layer that
-            makes you citable by AI engines. No website yet? See the
-            build packages below.
+            makes you citable by AI engines. The two Foundation Builds
+            include a website for clients starting from scratch.
           </p>
         </div>
 
-        {/* Main grid — 2 columns now (GBP Setup + Optimization Pack).
-            Foundation Builds (Lite + full) moved to the secondary
-            block below so the entry-point and modal positions
-            dominate the viewport above the fold. */}
+        {/* Main grid: 4 once-off cards in a 2×2 layout. Each card
+            renders its own sectioned content via `pkg.sections`.
+            Row 1 carries the two badged cards (GBP Setup "Start
+            here" + Optimization Pack "Most clients land here"); Row
+            2 carries the two Foundation Builds (Lite + full) as
+            standard cards. */}
         <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
           {onceOffCards.map((card) => (
             <OnceOffCard key={card.pkg.slug} card={card} />
           ))}
         </div>
+      </Section>
 
-        {/* ─── Secondary block: "If you don't have a website yet" ──
-            Two demoted cards (Foundation Build Lite + Foundation
-            Build) side-by-side. Visually lighter than the main grid
-            (ink-50 background, slimmer padding, smaller headings) so
-            they don't compete with GBP Setup / Optimization Pack. */}
-        <div className="mx-auto mt-12 max-w-5xl">
+      {/* ─── CLIENT JOURNEY NARRATIVE ────────────────────────
+          Sits between once-off and retainer sections. Tells the
+          progression story without competing with the package
+          cards — supplementary, not dominant. Vertical step flow
+          with downward arrows; one closing paragraph. Variant
+          stays "default" so we don't run two tinted sections
+          back-to-back (the retainer block below is tinted). */}
+      <Section variant="default" padding="default">
+        <div className="mx-auto max-w-3xl">
           <div className="text-center">
-            <Eyebrow className="justify-center">No website yet?</Eyebrow>
-            <h3 className="mt-3 text-xl font-semibold tracking-tight text-ink-900 md:text-2xl">
-              Site + AEO, built together.
-            </h3>
-            <p className="mt-2 text-sm text-ink-500">
-              For clients who don&apos;t have a website to start from.
-              Everything in the Optimization Pack is baked in from line
-              one.
-            </p>
+            <Eyebrow className="justify-center">How clients progress</Eyebrow>
+            <h2 className="mt-3 text-xl font-semibold tracking-tight text-ink-900 md:text-2xl">
+              The typical client journey.
+            </h2>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {/* Foundation Build Lite — demoted card */}
-            <div className="rounded-2xl border border-rule bg-ink-50/40 p-5 md:p-6">
-              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
-                Solo professionals
-              </div>
-              <h4 className="mt-2 text-lg font-semibold tracking-tight text-ink-900">
-                {PACKAGES.foundationBuildLite.name} —{" "}
-                <span className="font-bold">
-                  {formatPrice(PACKAGES.foundationBuildLite.price)}
-                </span>
-                <span className="text-sm font-normal text-ink-500"> once-off</span>
-              </h4>
-              <p className="mt-2 text-sm text-ink-500 leading-relaxed">
-                One-page site with AEO baked in from launch. Same
-                Optimization Pack layer, smaller scope.
-              </p>
-              <a
-                href="/scan"
-                data-tier={PACKAGES.foundationBuildLite.slug}
-                data-setup-price={String(PACKAGES.foundationBuildLite.price)}
-                data-monthly-price="0"
-                data-currency="ZAR"
-                className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-4 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
-              >
-                Build my foundation
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            </div>
+          <ol className="mt-8 space-y-3">
+            <JourneyStep
+              label="Start"
+              package={`${PACKAGES.starter.name} (${formatPrice(PACKAGES.starter.price)})`}
+              note="get visible on Google Maps in 1-2 weeks"
+            />
+            <JourneyStep
+              label="Expand"
+              package={`${PACKAGES.optimizationPack.name} (${formatPrice(PACKAGES.optimizationPack.price)})`}
+              note="add the full AEO layer once your GBP is performing"
+            />
+            <JourneyStep
+              label="Compound"
+              package={`Growth Retainer (${formatPriceMonthly(RETAINERS.growth.price)})`}
+              note="keep building citations, content, and authority month over month"
+            />
+            <JourneyStep
+              label="Dominate"
+              package={`Premium Retainer (from ${formatPriceMonthly(RETAINERS.premium.priceMin)})`}
+              note="category leadership with daily cadence, ads, and PR"
+              last
+            />
+          </ol>
 
-            {/* Foundation Build (ranged price) — demoted card */}
-            <div className="rounded-2xl border border-rule bg-ink-50/40 p-5 md:p-6">
-              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
-                Multi-page site
-              </div>
-              <h4 className="mt-2 text-lg font-semibold tracking-tight text-ink-900">
-                {PACKAGES.foundationBuild.name} —{" "}
-                <span className="font-bold">
-                  {formatPriceRange(
-                    PACKAGES.foundationBuild.priceMin,
-                    PACKAGES.foundationBuild.priceMax,
-                  )}
-                </span>
-                <span className="text-sm font-normal text-ink-500"> once-off</span>
-              </h4>
-              <p className="mt-2 text-sm text-ink-500 leading-relaxed">
-                3-9+ page site (WordPress or Next.js) with everything
-                from the Optimization Pack baked in. For businesses
-                that need depth, not a landing page.
-              </p>
-              <a
-                href="/scan"
-                data-tier={PACKAGES.foundationBuild.slug}
-                data-setup-price={String(PACKAGES.foundationBuild.priceMin)}
-                data-monthly-price="0"
-                data-currency="ZAR"
-                className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-4 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
-              >
-                Get scoped
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            </div>
-          </div>
+          <p className="mt-6 text-center text-sm text-ink-500 leading-relaxed">
+            Most clients spend 2-3 months in once-off packages before
+            moving to retainer work. Some skip ahead. Some stay focused
+            on once-off only. Free scan first determines what fits.
+          </p>
         </div>
       </Section>
 
@@ -580,12 +589,17 @@ export default function PricingPage() {
 function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
   const isHighlighted = card.highlight;
   const isEntryPoint = card.entryPoint;
-  // Optional subtitle exists only on Starter (GBP Setup) today. TS
-  // narrows via the optional-property check; other tiers render
-  // without one.
+  // Subtitle is defined on starter / foundationBuildLite /
+  // foundationBuild but not on optimizationPack. Defensive access.
   const subtitle =
     "subtitle" in card.pkg
       ? (card.pkg as { subtitle?: string }).subtitle
+      : undefined;
+  // priceNote exists on foundationBuild (scope confirmation). Same
+  // defensive access — renders muted under the price when present.
+  const priceNote =
+    "priceNote" in card.pkg
+      ? (card.pkg as { priceNote?: string }).priceNote
       : undefined;
   const cardClasses = isHighlighted
     ? "relative rounded-3xl border-2 border-emerald-500 bg-white p-7 shadow-card md:p-8 md:-translate-y-2"
@@ -639,6 +653,13 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
         </div>
         <div className="mt-1 text-[11px] text-ink-500">{card.priceSubtitle}</div>
         <div className="mt-0.5 text-[11px] text-ink-400">{card.intlPrice}</div>
+        {/* priceNote — only Foundation Build today. Italicized
+            muted, visible but secondary. */}
+        {priceNote && (
+          <div className="mt-2 rounded-md bg-amber-50/60 px-2.5 py-1.5 text-[11px] italic leading-snug text-amber-800">
+            {priceNote}
+          </div>
+        )}
       </div>
 
       <div className="mt-5">
@@ -659,24 +680,20 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
         <strong className="text-ink-900">Best for:</strong> {card.forWho}
       </div>
 
-      {/* GBP Setup card ONLY: stylized before/after Maps mockup +
-          inline link to the troubleshooting FAQ. The pricing-page
-          constraint is one mockup per page; do NOT add to other
-          cards. */}
+      {/* GBP Setup card ONLY: stylized before/after Maps mockup. The
+          pricing-page constraint is one mockup per page; do NOT add
+          to other cards. */}
       {isEntryPoint && <GbpBeforeAfter />}
 
-      <ul className="mt-5 space-y-2.5">
-        {card.pkg.deliverables.slice(0, 8).map((item) => (
-          <li key={item} className="flex items-start gap-2.5 text-sm">
-            <CheckCircle2
-              className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
-                isHighlighted ? "text-emerald-600" : "text-emerald-500"
-              }`}
-            />
-            <span className="text-ink-700 leading-snug">{item}</span>
-          </li>
-        ))}
-      </ul>
+      {/* Sectioned deliverables. Primary sections render as titled
+          checklists; "prerequisite" and "platform" variants render
+          as muted <details> collapsibles below the deliverables
+          (closed by default — they're informational, not selling
+          points). */}
+      <SectionedDeliverables
+        sections={card.pkg.sections}
+        isHighlighted={isHighlighted}
+      />
 
       <div className="mt-5 text-[11px] text-ink-500">
         <strong className="text-ink-700">Delivery:</strong> {card.delivery}
@@ -694,6 +711,17 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
           >
             See troubleshooting FAQ below.
           </a>
+        </p>
+      )}
+
+      {/* Ongoing-posting note — GBP Setup card only. Routes
+          prospects toward the natural Growth retainer follow-on
+          while being honest that posting is a maintenance need. */}
+      {isEntryPoint && (
+        <p className="mt-3 text-[11px] italic text-ink-500">
+          Continued posting after Day 30 is essential for ongoing
+          listing performance. Most clients add the Growth Retainer
+          to maintain consistent activity.
         </p>
       )}
 
@@ -717,9 +745,144 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
   );
 }
 
+// ─── SectionedDeliverables ───────────────────────────────
+// Shared renderer used by both OnceOffCard and RetainerCard. Renders
+// primary sections as titled checklists with green checks; renders
+// "prerequisite" / "platform" variants as muted <details>
+// collapsibles below the deliverables. Keeps card heights honest by
+// hiding informational sections behind a click.
+type Section = {
+  heading: string;
+  items: readonly string[];
+  variant?: "deliverable" | "prerequisite" | "platform";
+};
+
+function SectionedDeliverables({
+  sections,
+  isHighlighted,
+}: {
+  sections: readonly Section[];
+  isHighlighted: boolean;
+}) {
+  const primary = sections.filter(
+    (s) => (s.variant ?? "deliverable") === "deliverable",
+  );
+  const informational = sections.filter(
+    (s) => s.variant && s.variant !== "deliverable",
+  );
+
+  return (
+    <>
+      <div className="mt-6 space-y-5">
+        {primary.map((section) => (
+          <div key={section.heading}>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-ink-500">
+              {section.heading}
+            </div>
+            <ul className="mt-2 space-y-2">
+              {section.items.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-2 text-[13px]"
+                >
+                  <CheckCircle2
+                    className={`mt-0.5 h-3.5 w-3.5 flex-shrink-0 ${
+                      isHighlighted ? "text-emerald-600" : "text-emerald-500"
+                    }`}
+                  />
+                  <span className="text-ink-700 leading-snug">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      {informational.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {informational.map((section) => (
+            <details
+              key={section.heading}
+              className="group rounded-xl bg-ink-50/60 px-3 py-2 text-xs text-ink-600"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 font-semibold text-ink-700">
+                <span>{section.heading}</span>
+                <span
+                  className="text-ink-400 transition-transform group-open:rotate-45"
+                  aria-hidden="true"
+                >
+                  +
+                </span>
+              </summary>
+              <ul className="mt-2 space-y-1.5">
+                {section.items.map((item) => (
+                  <li key={item} className="leading-snug">
+                    — {item}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+// ─── JourneyStep ─────────────────────────────────────────
+// Single row of the client-journey narrative. Label badge + package
+// name + value-prop line. Downward chevron between steps (suppressed
+// on the last row).
+function JourneyStep({
+  label,
+  package: pkgName,
+  note,
+  last,
+}: {
+  label: string;
+  package: string;
+  note: string;
+  last?: boolean;
+}) {
+  return (
+    <li>
+      <div className="flex flex-wrap items-baseline gap-2 rounded-xl border border-rule bg-white px-4 py-3 shadow-soft">
+        <span className="rounded-full bg-ink-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+          {label}
+        </span>
+        <span className="text-sm font-semibold text-ink-900">{pkgName}</span>
+        <span className="text-sm text-ink-500">— {note}</span>
+      </div>
+      {!last && (
+        <div className="flex justify-center py-1.5" aria-hidden="true">
+          <svg
+            width="14"
+            height="10"
+            viewBox="0 0 14 10"
+            fill="none"
+            className="text-ink-300"
+          >
+            <path
+              d="M7 1V9M7 9L1 4M7 9L13 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      )}
+    </li>
+  );
+}
+
 // ─── RetainerCard ─────────────────────────────────────────
 function RetainerCard({ card }: { card: (typeof retainerCards)[number] }) {
   const isHighlighted = card.highlight;
+  const priceNote =
+    "priceNote" in card.ret
+      ? (card.ret as { priceNote?: string }).priceNote
+      : undefined;
   const cardClasses = isHighlighted
     ? "relative rounded-3xl border-2 border-emerald-500 bg-white p-7 shadow-card md:p-8"
     : "relative rounded-3xl border border-rule bg-white p-7 shadow-soft md:p-8";
@@ -754,6 +917,14 @@ function RetainerCard({ card }: { card: (typeof retainerCards)[number] }) {
         </div>
         <div className="mt-1 text-[11px] text-ink-500">{card.priceSubtitle}</div>
         <div className="mt-0.5 text-[11px] text-ink-400">{card.intlPrice}</div>
+        {/* priceNote — Premium retainer surfaces the ad-spend
+            disclosure prominently so prospects don't anchor on the
+            R10,500 number expecting it to include media spend. */}
+        {priceNote && (
+          <div className="mt-2 rounded-md bg-amber-50/60 px-2.5 py-1.5 text-[11px] italic leading-snug text-amber-800">
+            <strong className="not-italic">Note:</strong> {priceNote}
+          </div>
+        )}
       </div>
 
       <div className="mt-5">
@@ -774,18 +945,10 @@ function RetainerCard({ card }: { card: (typeof retainerCards)[number] }) {
         <strong className="text-ink-900">Best for:</strong> {card.forWho}
       </div>
 
-      <ul className="mt-5 space-y-2.5">
-        {card.ret.deliverables.slice(0, 8).map((item) => (
-          <li key={item} className="flex items-start gap-2.5 text-sm">
-            <CheckCircle2
-              className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
-                isHighlighted ? "text-emerald-600" : "text-emerald-500"
-              }`}
-            />
-            <span className="text-ink-700 leading-snug">{item}</span>
-          </li>
-        ))}
-      </ul>
+      <SectionedDeliverables
+        sections={card.ret.sections}
+        isHighlighted={isHighlighted}
+      />
 
       <div className="mt-7">
         <a
