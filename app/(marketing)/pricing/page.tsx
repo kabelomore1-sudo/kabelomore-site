@@ -13,6 +13,14 @@ import {
   formatPriceMonthly,
   formatPriceRange,
 } from "@/lib/pricing";
+import { GbpBeforeAfter } from "@/components/pricing/gbp-before-after";
+
+/**
+ * Anchor ID for the GBP troubleshooting FAQ. Linked from the GBP
+ * Setup tier card so prospects with broken existing profiles can
+ * jump straight to the right answer instead of bouncing.
+ */
+const FAQ_GBP_TROUBLESHOOTING_ID = "faq-gbp-troubleshooting";
 
 /**
  * Pricing page — every price imported from lib/pricing (single source
@@ -33,18 +41,41 @@ import {
 
 export const metadata: Metadata = {
   title: "Pricing — Fixed-tier AEO packages for SA, UK, and US businesses",
-  description: `Three core packages: Starter R5,000 once-off, Optimization Pack R10,500 (the modal once-off), Growth retainer R5,500/month. Foundation Build adds website + AEO. Premium retainer for category leadership. All prices fixed, no custom quotes after the scan.`,
+  description: `Google Business Profile Setup R5,000 once-off (the entry point), Optimization Pack R10,500 once-off (the modal AEO build), Growth retainer R5,500/month. Foundation Build adds website + AEO. Premium retainer for category leadership. All prices fixed, no custom quotes after the scan.`,
   alternates: { canonical: `${site.url}/pricing` },
 };
 
-const pricingFaqs = [
+// FAQ entries can carry an optional `id` so anchor links can target
+// them. Today only the GBP troubleshooting FAQ uses this — see the
+// "Already have a GBP that needs fixing?" link on the GBP Setup card.
+const pricingFaqs: { q: string; a: string; id?: string }[] = [
+  // ─── GBP-led FAQs (prepended 2026-05-16) ────────────────────────
+  // These three answer the GBP-first prospect path before the AEO
+  // deep-dive FAQs. Ordering matters: GBP entry → AEO definition →
+  // troubleshooting (the broken-GBP catch-all, no public pricing).
+  {
+    q: "I just need help with my Google Business Profile. Which package fits?",
+    a: "The GBP Setup package at R5,000 is the right starting point. It includes everything to claim, optimize, and verify your Google Business Profile plus the foundational AEO work that makes the GBP work compound. Most clients add the Optimization Pack later once they're ready for deeper AI visibility work.",
+  },
+  {
+    q: "What's the difference between Google Business Profile and AEO (Answer Engine Optimization)?",
+    a: "Google Business Profile is your business listing on Google Maps and local search. AEO is the broader work of being recommended by AI engines like ChatGPT, Claude, Gemini, and Perplexity when customers ask conversational questions about your category. GBP is one component of AEO. Most clients start with GBP because the results are visible quickly, then expand into the full AEO layer once they see the value.",
+  },
+  {
+    q: "What if my Google Business Profile is already broken (duplicate listings, lost access, verification issues, suspended)?",
+    a: "We troubleshoot existing GBP problems. Scope and cost vary by situation — duplicate cleanup, verification recovery, ownership transfers all require different work, and pricing depends on the specifics. Reach out via WhatsApp or the contact form and we'll scope your specific situation.",
+    id: FAQ_GBP_TROUBLESHOOTING_ID,
+  },
+  // ─── Existing FAQs (kept verbatim except for the rename cascade) ──
   {
     q: "What's included in the R10,500 Optimization Pack?",
     a: "Everything to build your AEO layer: full measurement stack (GA4, GSC, BWT, Clarity), JSON-LD schemas across service pages, llms.txt + robots.txt rebuilt, GBP complete rebuild, 10 directory citations with NAP consistency, 3 priority pages rewritten in answer-shape, 10-12 FAQ items with FAQPage schema, LinkedIn refresh, and Day 0 + Day 30 rescans with progress report. 32-40 hours of work over 3 weeks.",
   },
   {
-    q: "Can I start with Starter and upgrade later?",
-    a: "Yes. Starter (R5,000) lays the foundations. You can move to Optimization Pack (R10,500) or a Growth retainer (R5,500/mo) at any time. We do not double-bill — Starter work carries forward.",
+    // Updated 2026-05-16: "Starter" → "GBP Setup" to track the
+    // canonical rename. Substance of the answer unchanged.
+    q: "Can I start with GBP Setup and upgrade later?",
+    a: "Yes. GBP Setup (R5,000) lays the foundations — your Google Business Profile plus the AEO baseline. You can move to Optimization Pack (R10,500) or a Growth retainer (R5,500/mo) at any time. We do not double-bill — GBP Setup work carries forward.",
   },
   {
     q: "What happens after the 3-month Growth minimum?",
@@ -68,6 +99,18 @@ const pricingFaqs = [
 // Pulls from canonical lib/pricing PACKAGES + adds display-specific
 // fields (highlight state, CTA copy, score target language) that don't
 // belong in the pricing data model itself.
+//
+// 2026-05-16 restructure: main grid now shows ONLY GBP Setup +
+// Optimization Pack (md:grid-cols-2). Foundation Build Lite was
+// demoted to the secondary "no-website builds" block alongside
+// Foundation Build to:
+//   1. Make the GBP-led entry point visually unmistakable.
+//   2. Group the two build packages (Lite + full) where they
+//      naturally belong — they share a different buyer (no
+//      website yet) than the other two cards.
+// Optimization Pack keeps its "Most clients land here" modal
+// positioning. GBP Setup gets a smaller "Start here" pill so the
+// two badges read as complementary, not competing.
 const onceOffCards = [
   {
     pkg: PACKAGES.starter,
@@ -75,14 +118,18 @@ const onceOffCards = [
     priceSubtitle: "Once-off · 50% deposit / 50% on delivery",
     intlPrice: "$295 · £235",
     forWho:
-      "Solo professionals and small service businesses with a website that needs the AEO foundation laid.",
+      "Service businesses that need to show up when customers search Google Maps and AI search. The fastest, most visible win in local search.",
     delivery: PACKAGES.starter.timeInvestment + " of work · 1-2 weeks",
     scoreTarget: "Lays the foundation",
     scoreColor: "#84cc16",
-    cta: "Start with Starter",
+    cta: "Start with GBP Setup",
     ctaStyle: "outline" as const,
     highlight: false,
     setupPrice: PACKAGES.starter.price,
+    // Soft "entry-point" callout. Subordinate to the Optimization
+    // modal badge — different visual weight (corner pill vs centered
+    // ribbon) so the two can co-exist without competing.
+    entryPoint: true,
   },
   {
     pkg: PACKAGES.optimizationPack,
@@ -90,7 +137,7 @@ const onceOffCards = [
     priceSubtitle: "Once-off · 50% deposit / 50% on Day 30 delivery",
     intlPrice: "$595 · £475",
     forWho:
-      "Businesses with a website that need the full AEO layer in 3 weeks. The modal once-off — where most one-time clients land.",
+      "Service businesses that need their Google Business Profile rebuilt properly plus the full AEO layer that makes them citable by ChatGPT, Claude, Gemini, and Perplexity. The complete visibility foundation in 3 weeks.",
     delivery: PACKAGES.optimizationPack.timeInvestment + " over 3 weeks",
     scoreTarget: "20-40 → 60-75",
     scoreColor: "#22c55e",
@@ -98,21 +145,7 @@ const onceOffCards = [
     ctaStyle: "primary" as const,
     highlight: true,
     setupPrice: PACKAGES.optimizationPack.price,
-  },
-  {
-    pkg: PACKAGES.foundationBuildLite,
-    priceDisplay: formatPrice(PACKAGES.foundationBuildLite.price),
-    priceSubtitle: "Once-off · 50% deposit / 50% on delivery",
-    intlPrice: "$735 · £585",
-    forWho:
-      "Solo professionals without a website. One-page site with AEO baked in from launch.",
-    delivery: PACKAGES.foundationBuildLite.timeInvestment + " · 2-3 weeks",
-    scoreTarget: "0 → 60-75",
-    scoreColor: "#16a34a",
-    cta: "Build my foundation",
-    ctaStyle: "outline" as const,
-    highlight: false,
-    setupPrice: PACKAGES.foundationBuildLite.price,
+    entryPoint: false,
   },
 ];
 
@@ -174,6 +207,29 @@ export default function PricingPage() {
             <br className="hidden md:block" />
             Fixed-tier pricing — no custom quotes, no surprises.
           </p>
+
+          {/* AEO-anchored explainer paragraph (added 2026-05-16).
+              The leading sentence is the strategic anchor — it tells
+              every visitor, before any pricing is shown, that this is
+              an AI Visibility consultancy whose most popular entry is
+              GBP. The paragraph does double duty: it surfaces GBP as
+              the easy entry point AND reinforces AEO as the strategic
+              depth. Verification criterion #9 (the page must read as
+              an AEO consultancy, not a GBP service) lives or dies on
+              this paragraph. */}
+          <div className="mt-10 rounded-2xl border border-accent-200 bg-accent-50/40 p-5 text-left md:p-6">
+            <p className="text-base leading-relaxed text-ink-700">
+              <strong className="font-semibold text-ink-900">
+                I&apos;m an AI Visibility (AEO/GEO) consultant.
+              </strong>{" "}
+              Most clients start with their Google Business Profile
+              because it&apos;s the fastest visible win for local
+              search. From there, the Optimization Pack adds the full
+              AEO layer that makes you citable by AI engines like
+              ChatGPT, Claude, Gemini, and Perplexity. Growth retainer
+              continues the compounding work month over month.
+            </p>
+          </div>
         </div>
       </Section>
 
@@ -216,48 +272,100 @@ export default function PricingPage() {
             Pick the level of work your score needs.
           </h2>
           <p className="mt-4 text-base text-ink-500">
-            Most one-time clients land on the Optimization Pack. Starter is
-            entry-level. Foundation Build Lite covers no-website clients.
+            <strong className="text-ink-700">Google Business Profile Setup</strong>{" "}
+            is the entry point — the fastest, most visible win.{" "}
+            <strong className="text-ink-700">Optimization Pack</strong> is
+            where most one-time clients land — the full AEO layer that
+            makes you citable by AI engines. No website yet? See the
+            build packages below.
           </p>
         </div>
 
-        <div className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-3">
+        {/* Main grid — 2 columns now (GBP Setup + Optimization Pack).
+            Foundation Builds (Lite + full) moved to the secondary
+            block below so the entry-point and modal positions
+            dominate the viewport above the fold. */}
+        <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
           {onceOffCards.map((card) => (
             <OnceOffCard key={card.pkg.slug} card={card} />
           ))}
         </div>
 
-        {/* Foundation Build (ranged price) — secondary card */}
-        <div className="mx-auto mt-10 max-w-4xl">
-          <div className="rounded-2xl border border-rule bg-ink-50/40 p-6 md:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex-1 min-w-[280px]">
-                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
-                  Multi-page website build
-                </div>
-                <h3 className="mt-2 text-xl font-semibold tracking-tight text-ink-900">
-                  {PACKAGES.foundationBuild.name} —{" "}
-                  <span className="font-bold">
-                    {formatPriceRange(
-                      PACKAGES.foundationBuild.priceMin,
-                      PACKAGES.foundationBuild.priceMax,
-                    )}
-                  </span>
-                  <span className="text-base font-normal text-ink-500"> once-off</span>
-                </h3>
-                <p className="mt-2 text-sm text-ink-500 leading-relaxed">
-                  3-9+ page site (WordPress or Next.js) with everything from the
-                  Optimization Pack baked in from line one. For businesses that
-                  need a multi-page presence, not a single landing page.
-                </p>
+        {/* ─── Secondary block: "If you don't have a website yet" ──
+            Two demoted cards (Foundation Build Lite + Foundation
+            Build) side-by-side. Visually lighter than the main grid
+            (ink-50 background, slimmer padding, smaller headings) so
+            they don't compete with GBP Setup / Optimization Pack. */}
+        <div className="mx-auto mt-12 max-w-5xl">
+          <div className="text-center">
+            <Eyebrow className="justify-center">No website yet?</Eyebrow>
+            <h3 className="mt-3 text-xl font-semibold tracking-tight text-ink-900 md:text-2xl">
+              Site + AEO, built together.
+            </h3>
+            <p className="mt-2 text-sm text-ink-500">
+              For clients who don&apos;t have a website to start from.
+              Everything in the Optimization Pack is baked in from line
+              one.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {/* Foundation Build Lite — demoted card */}
+            <div className="rounded-2xl border border-rule bg-ink-50/40 p-5 md:p-6">
+              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
+                Solo professionals
               </div>
+              <h4 className="mt-2 text-lg font-semibold tracking-tight text-ink-900">
+                {PACKAGES.foundationBuildLite.name} —{" "}
+                <span className="font-bold">
+                  {formatPrice(PACKAGES.foundationBuildLite.price)}
+                </span>
+                <span className="text-sm font-normal text-ink-500"> once-off</span>
+              </h4>
+              <p className="mt-2 text-sm text-ink-500 leading-relaxed">
+                One-page site with AEO baked in from launch. Same
+                Optimization Pack layer, smaller scope.
+              </p>
+              <a
+                href="/scan"
+                data-tier={PACKAGES.foundationBuildLite.slug}
+                data-setup-price={String(PACKAGES.foundationBuildLite.price)}
+                data-monthly-price="0"
+                data-currency="ZAR"
+                className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-4 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
+              >
+                Build my foundation
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+
+            {/* Foundation Build (ranged price) — demoted card */}
+            <div className="rounded-2xl border border-rule bg-ink-50/40 p-5 md:p-6">
+              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
+                Multi-page site
+              </div>
+              <h4 className="mt-2 text-lg font-semibold tracking-tight text-ink-900">
+                {PACKAGES.foundationBuild.name} —{" "}
+                <span className="font-bold">
+                  {formatPriceRange(
+                    PACKAGES.foundationBuild.priceMin,
+                    PACKAGES.foundationBuild.priceMax,
+                  )}
+                </span>
+                <span className="text-sm font-normal text-ink-500"> once-off</span>
+              </h4>
+              <p className="mt-2 text-sm text-ink-500 leading-relaxed">
+                3-9+ page site (WordPress or Next.js) with everything
+                from the Optimization Pack baked in. For businesses
+                that need depth, not a landing page.
+              </p>
               <a
                 href="/scan"
                 data-tier={PACKAGES.foundationBuild.slug}
                 data-setup-price={String(PACKAGES.foundationBuild.priceMin)}
                 data-monthly-price="0"
                 data-currency="ZAR"
-                className="inline-flex h-11 flex-shrink-0 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-5 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
+                className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-4 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50"
               >
                 Get scoped
                 <ArrowRight className="h-4 w-4" />
@@ -363,7 +471,15 @@ export default function PricingPage() {
             {pricingFaqs.map((faq, idx) => (
               <details
                 key={faq.q}
-                className="group rounded-2xl border border-rule bg-white p-5 shadow-soft transition-colors hover:border-accent-300 md:p-6"
+                id={faq.id}
+                className="group rounded-2xl border border-rule bg-white p-5 shadow-soft transition-colors target:border-accent-500 target:bg-accent-50/30 hover:border-accent-300 md:p-6 scroll-mt-24"
+                // Auto-expand the first FAQ (GBP entry-point question)
+                // AND any FAQ that was navigated to by anchor. Native
+                // `<details>` doesn't auto-open on :target, but
+                // open-by-default for the troubleshooting one would
+                // hide its anchor purpose; instead the :target style
+                // above tints it so the destination is unmistakable
+                // when the page scrolls to it.
                 {...(idx === 0 ? { open: true } : {})}
               >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
@@ -463,6 +579,14 @@ export default function PricingPage() {
 // ─── OnceOffCard ─────────────────────────────────────────
 function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
   const isHighlighted = card.highlight;
+  const isEntryPoint = card.entryPoint;
+  // Optional subtitle exists only on Starter (GBP Setup) today. TS
+  // narrows via the optional-property check; other tiers render
+  // without one.
+  const subtitle =
+    "subtitle" in card.pkg
+      ? (card.pkg as { subtitle?: string }).subtitle
+      : undefined;
   const cardClasses = isHighlighted
     ? "relative rounded-3xl border-2 border-emerald-500 bg-white p-7 shadow-card md:p-8 md:-translate-y-2"
     : "relative rounded-3xl border border-rule bg-white p-7 shadow-soft md:p-8";
@@ -474,6 +598,8 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
 
   return (
     <article className={cardClasses}>
+      {/* Modal badge — Optimization Pack only. Centered top, emerald,
+          dominant. */}
       {isHighlighted && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
           <span className="rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft">
@@ -482,10 +608,26 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
         </div>
       )}
 
+      {/* Entry-point pill — GBP Setup only. Top-right corner,
+          subordinate to the modal badge so the two cards co-exist
+          without visual competition. */}
+      {isEntryPoint && (
+        <div className="absolute -top-3 right-5">
+          <span className="rounded-full bg-accent-500 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft">
+            Start here
+          </span>
+        </div>
+      )}
+
       <div>
         <h3 className="text-2xl font-semibold tracking-tight text-ink-900">
           {card.pkg.name}
         </h3>
+        {subtitle && (
+          <div className="mt-1 text-sm font-medium text-accent-700">
+            {subtitle}
+          </div>
+        )}
         <p className="mt-2 text-sm text-ink-500 leading-relaxed">
           {card.pkg.tagline}
         </p>
@@ -517,8 +659,14 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
         <strong className="text-ink-900">Best for:</strong> {card.forWho}
       </div>
 
+      {/* GBP Setup card ONLY: stylized before/after Maps mockup +
+          inline link to the troubleshooting FAQ. The pricing-page
+          constraint is one mockup per page; do NOT add to other
+          cards. */}
+      {isEntryPoint && <GbpBeforeAfter />}
+
       <ul className="mt-5 space-y-2.5">
-        {card.pkg.deliverables.slice(0, 7).map((item) => (
+        {card.pkg.deliverables.slice(0, 8).map((item) => (
           <li key={item} className="flex items-start gap-2.5 text-sm">
             <CheckCircle2
               className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
@@ -533,6 +681,21 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
       <div className="mt-5 text-[11px] text-ink-500">
         <strong className="text-ink-700">Delivery:</strong> {card.delivery}
       </div>
+
+      {/* Troubleshooting link — GBP Setup card only. Muted italic so
+          it routes the right prospects to the right FAQ without
+          competing with the primary CTA. */}
+      {isEntryPoint && (
+        <p className="mt-4 text-[11px] italic text-ink-500">
+          Already have a GBP that needs fixing?{" "}
+          <a
+            href={`#${FAQ_GBP_TROUBLESHOOTING_ID}`}
+            className="text-accent-600 underline-offset-2 hover:underline"
+          >
+            See troubleshooting FAQ below.
+          </a>
+        </p>
+      )}
 
       <div className="mt-7">
         <a
@@ -649,7 +812,7 @@ function ScoreTargetBar() {
   const segments = [
     { from: 0, to: 30, label: "Where most start", colour: "#ef4444" },
     { from: 30, to: 60, label: "Most SA businesses today", colour: "#f97316" },
-    { from: 60, to: 75, label: "After Starter / Optimization", colour: "#84cc16" },
+    { from: 60, to: 75, label: "After GBP Setup / Optimization", colour: "#84cc16" },
     { from: 75, to: 85, label: "After 3-6 months Growth", colour: "#22c55e" },
     { from: 85, to: 100, label: "After Premium + 6+ months", colour: "#16a34a" },
   ];

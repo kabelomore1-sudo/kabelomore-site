@@ -21,19 +21,28 @@ export const CURRENCY_SYMBOL = "R";
 
 export const PACKAGES = {
   starter: {
-    name: "Starter",
+    // GBP-led repositioning (2026-05-16). The package itself is
+    // unchanged — same scope, same price, same delivery — but the
+    // surfaced name leads with the easiest-to-understand component
+    // (Google Business Profile) while the subtitle keeps the AEO
+    // foundation visible. Slug stays "starter" to preserve every
+    // existing data-tier, Stripe ref, and intake-brief lookup.
+    name: "Google Business Profile Setup",
+    subtitle: "+ AEO foundation",
     price: 5000,
     priceType: "once-off",
     slug: "starter",
-    tagline: "For solo professionals and small service businesses",
+    tagline: "The fastest visible win in local + AI search.",
     description:
-      "Foundations: schema, GBP, 10 directory listings, basic measurement.",
+      "GBP claimed and optimized, schema foundation, 10 directory citations, basic measurement.",
     deliverables: [
+      "Google Business Profile complete setup and optimization",
+      "Categories, hours, services, photos, Q&A all configured",
+      "NAP consistency across listings",
+      "10 directory citations submitted (Brabys, Cylex, HelloPeter, etc.)",
+      "Schema markup foundation on website homepage",
       "Google Analytics 4 + Google Search Console verified",
-      "Organization/LocalBusiness schema on homepage",
-      "10 directory citations",
-      "Google Business Profile claim and basic setup",
-      "Day 0 baseline scan",
+      "Day 0 baseline scan included",
     ],
     timeInvestment: "12-16 hours",
   },
@@ -46,11 +55,19 @@ export const PACKAGES = {
     tagline: "The full AEO layer in 3 weeks",
     description:
       "Schema, GBP rebuild, 10 citations, 3 priority pages rewritten in answer-shape, llms.txt deployed, full measurement stack.",
+    // GBP-led repositioning (2026-05-16). GBP rebuild + review
+    // acquisition split apart and lifted to positions 1 + 2 so the
+    // visible card opens with the easy-to-understand work, then
+    // stacks the AEO depth (schema, measurement, llms.txt, citations,
+    // answer-shape rewrites, FAQ schema). Tail items (LinkedIn,
+    // Day 0/30 rescans) retained — slice extended to 9 so all
+    // shipped work is visible on the card.
     deliverables: [
-      "Full Measurement Foundation (GA4, GSC, Bing Webmaster Tools with IndexNow, Microsoft Clarity)",
+      "Google Business Profile complete rebuild with optimization",
+      "Review acquisition workflow setup",
       "JSON-LD schemas across all service pages",
+      "Full Measurement Foundation (GA4, GSC, Bing Webmaster Tools with IndexNow, Microsoft Clarity)",
       "llms.txt and robots.txt rebuilt with AI bot allows",
-      "GBP complete rebuild with review acquisition workflow",
       "10 directory citations with NAP consistency",
       "3 priority pages rewritten in answer-shape format",
       "10-12 FAQ items deployed with FAQPage schema",
