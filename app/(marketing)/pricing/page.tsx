@@ -13,8 +13,6 @@ import {
   formatPriceMonthly,
   formatPriceRange,
 } from "@/lib/pricing";
-import { GbpBeforeAfter } from "@/components/pricing/gbp-before-after";
-
 /**
  * Anchor ID for the GBP troubleshooting FAQ. Linked from the GBP
  * Setup tier card so prospects with broken existing profiles can
@@ -445,7 +443,7 @@ export default function PricingPage() {
               Credentials
             </div>
           </div>
-          <div className="mt-5 grid gap-4 text-center text-sm sm:grid-cols-3">
+          <div className="mx-auto mt-5 grid max-w-2xl gap-4 text-center text-sm sm:grid-cols-2">
             <div className="rounded-xl border border-rule bg-white p-4 shadow-soft">
               <div className="font-semibold text-ink-900">Google Digital Marketing</div>
               <div className="mt-0.5 text-xs text-ink-500">Certified · 2024</div>
@@ -453,10 +451,6 @@ export default function PricingPage() {
             <div className="rounded-xl border border-rule bg-white p-4 shadow-soft">
               <div className="font-semibold text-ink-900">Anthropic Claude 101</div>
               <div className="mt-0.5 text-xs text-ink-500">Certified · May 2026</div>
-            </div>
-            <div className="rounded-xl border border-rule bg-white p-4 shadow-soft">
-              <div className="font-semibold text-ink-900">HubSpot Marketing AI</div>
-              <div className="mt-0.5 text-xs text-ink-500">In progress</div>
             </div>
           </div>
           <p className="mt-4 text-center text-xs text-ink-400">
@@ -679,11 +673,6 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
       <div className="mt-5 rounded-xl bg-ink-50/60 p-4 text-xs text-ink-700 leading-relaxed">
         <strong className="text-ink-900">Best for:</strong> {card.forWho}
       </div>
-
-      {/* GBP Setup card ONLY: stylized before/after Maps mockup. The
-          pricing-page constraint is one mockup per page; do NOT add
-          to other cards. */}
-      {isEntryPoint && <GbpBeforeAfter />}
 
       {/* Sectioned deliverables. Primary sections render as titled
           checklists; "prerequisite" and "platform" variants render

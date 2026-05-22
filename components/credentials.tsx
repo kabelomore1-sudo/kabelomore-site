@@ -1,5 +1,11 @@
-import { Award, GraduationCap, BookOpen } from "lucide-react";
+import { Award, GraduationCap } from "lucide-react";
 
+// Only earned, verifiable credentials are listed. In-progress courses
+// previously appeared here (HubSpot Marketing AI) but were removed
+// 2026-05-16 — they read as filler next to two completed certificates,
+// and the evergreen "Actively studying" badge in CredentialsBadgeRow
+// already covers ongoing development without naming specific courses
+// (which go stale fast).
 const credentials = [
   {
     icon: Award,
@@ -21,21 +27,11 @@ const credentials = [
     description:
       "Google's professional certificate covering SEO, SEM, analytics, and e-commerce strategy.",
   },
-  {
-    icon: BookOpen,
-    name: "Marketing AI",
-    issuer: "HubSpot Academy",
-    date: "Coming soon",
-    accent: "bg-orange-500/10 text-orange-600",
-    badge: "In progress",
-    description:
-      "AI-powered marketing strategy, content automation, and campaign optimisation.",
-  },
 ];
 
 export function Credentials() {
   return (
-    <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-3">
+    <div className="mx-auto grid max-w-3xl gap-5 md:grid-cols-2">
       {credentials.map((c) => {
         const Icon = c.icon;
         return (
@@ -48,16 +44,9 @@ export function Credentials() {
             >
               <Icon className="h-5 w-5" />
             </div>
-            <div className="mt-4 flex items-center gap-2">
-              <h3 className="text-base font-semibold text-ink-900">
-                {c.name}
-              </h3>
-              {c.badge && (
-                <span className="rounded-full bg-accent-100 px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-accent-700">
-                  {c.badge}
-                </span>
-              )}
-            </div>
+            <h3 className="mt-4 text-base font-semibold text-ink-900">
+              {c.name}
+            </h3>
             <div className="mt-1 text-sm font-medium text-ink-500">
               {c.issuer} · {c.date}
             </div>
