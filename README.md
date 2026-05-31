@@ -130,7 +130,7 @@ You'll get a temporary URL like `kabelomore-site-xxxx.vercel.app`. Test it works
 In your Vercel project → **Settings** → **Domains**, add both:
 
 - `kabelomore.com` (set as **Primary**)
-- `www.kabelomore.com` (Vercel auto-redirects to apex)
+- `www.kabelomore.com` (also 301-redirected to apex in code via `next.config.ts redirects()` — belt-and-braces with whatever the Vercel dashboard does)
 - `kabelomore.co.za` (set as **Redirect** → `kabelomore.com`)
 - `www.kabelomore.co.za` (auto-redirect to apex co.za, which then 301s to .com)
 

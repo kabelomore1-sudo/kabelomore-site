@@ -13,6 +13,115 @@ import {
   formatPriceMonthly,
   formatPriceRange,
 } from "@/lib/pricing";
+// ─── Service + Offer JSON-LD generators (pricing-specific) ───────
+//
+// Emitted in the page <JsonLd> so AI engines + Google can read every
+// tier as a structured Service with an attached Offer. This is the
+// schema layer the /pricing page was missing — /services already
+// emits Service schemas via lib/seo.ts serviceJsonLd(), but that
+// helper expects a tier shape that doesn't match the canonical
+// PACKAGES/RETAINERS in lib/pricing.ts (which carry numeric
+// price / priceMin / priceMax). These local helpers handle the
+// pricing.ts shape natively so the schema stays in lockstep with
+// what the page actually displays — change a price in lib/pricing,
+// the schema updates on the next render.
+//
+// Shape rationale:
+//   - Fixed-price once-off (starter / optimization / Lite):
+//       Service + Offer { price, priceCurrency: "ZAR" }
+//   - Ranged once-off (foundationBuild):
+//       Service + AggregateOffer { lowPrice, highPrice }
+//   - Monthly retainer (growth, premium):
+//       Service + Offer { priceSpecification: UnitPriceSpecification
+//       with referenceQuantity in months } + eligibleDuration for
+//       the minimum commitment.
+
+type ServicePackageInput = {
+  name: string;
+  description: string;
+  slug: string;
+  price?: number;
+  priceMin?: number;
+  priceMax?: number;
+};
+
+type ServiceRetainerInput = {
+  name: string;
+  description: string;
+  slug: string;
+  price?: number;
+  priceMin?: number;
+  minimumMonths: number;
+};
+
+function buildPackageServiceJsonLd(pkg: ServicePackageInput) {
+  const hasRange =
+    typeof pkg.priceMin === "number" && typeof pkg.priceMax === "number";
+  const offers = hasRange
+    ? {
+        "@type": "AggregateOffer" as const,
+        priceCurrency: "ZAR",
+        lowPrice: String(pkg.priceMin),
+        highPrice: String(pkg.priceMax),
+        offerCount: 1,
+        availability: "https://schema.org/InStock",
+        url: `${site.url}/pricing#${pkg.slug}`,
+      }
+    : {
+        "@type": "Offer" as const,
+        priceCurrency: "ZAR",
+        price: String(pkg.price ?? 0),
+        availability: "https://schema.org/InStock",
+        url: `${site.url}/pricing#${pkg.slug}`,
+      };
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: pkg.name,
+    description: pkg.description,
+    serviceType: "Answer Engine Optimization (AEO) consulting",
+    provider: { "@id": `${site.url}/#organization` },
+    areaServed: ["South Africa", "United Kingdom", "United States"],
+    offers,
+  };
+}
+
+function buildRetainerServiceJsonLd(ret: ServiceRetainerInput) {
+  const monthlyPrice = ret.price ?? ret.priceMin ?? 0;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: ret.name,
+    description: ret.description,
+    serviceType: "Answer Engine Optimization (AEO) retainer",
+    provider: { "@id": `${site.url}/#organization` },
+    areaServed: ["South Africa", "United Kingdom", "United States"],
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "ZAR",
+      url: `${site.url}/pricing#${ret.slug}`,
+      availability: "https://schema.org/InStock",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: String(monthlyPrice),
+        priceCurrency: "ZAR",
+        referenceQuantity: {
+          "@type": "QuantitativeValue",
+          value: 1,
+          unitCode: "MON",
+        },
+      },
+      eligibleDuration: {
+        "@type": "QuantitativeValue",
+        value: ret.minimumMonths,
+        unitCode: "MON",
+      },
+    },
+  };
+}
+
 /**
  * Anchor ID for the GBP troubleshooting FAQ. Linked from the GBP
  * Setup tier card so prospects with broken existing profiles can
@@ -230,6 +339,15 @@ export default function PricingPage() {
             { label: "Pricing", href: "/pricing" },
           ]),
           faqJsonLd(pricingFaqs),
+          // Service + Offer per tier — emitted from canonical
+          // PACKAGES + RETAINERS so any price change in lib/pricing.ts
+          // auto-flows into the schema.
+          buildPackageServiceJsonLd(PACKAGES.starter),
+          buildPackageServiceJsonLd(PACKAGES.optimizationPack),
+          buildPackageServiceJsonLd(PACKAGES.foundationBuildLite),
+          buildPackageServiceJsonLd(PACKAGES.foundationBuild),
+          buildRetainerServiceJsonLd(RETAINERS.growth),
+          buildRetainerServiceJsonLd(RETAINERS.premium),
         ]}
       />
 
@@ -605,7 +723,10 @@ function OnceOffCard({ card }: { card: (typeof onceOffCards)[number] }) {
       : "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-6 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50";
 
   return (
-    <article className={cardClasses}>
+    <article
+      id={card.pkg.slug}
+      className={`${cardClasses} scroll-mt-24`}
+    >
       {/* Modal badge — Optimization Pack only. Centered top, emerald,
           dominant. */}
       {isHighlighted && (
@@ -882,7 +1003,10 @@ function RetainerCard({ card }: { card: (typeof retainerCards)[number] }) {
       : "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-ink-900 bg-white px-6 text-sm font-semibold text-ink-900 transition-all hover:bg-ink-50";
 
   return (
-    <article className={cardClasses}>
+    <article
+      id={card.ret.slug}
+      className={`${cardClasses} scroll-mt-24`}
+    >
       {isHighlighted && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
           <span className="rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft">

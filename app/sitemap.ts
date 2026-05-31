@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site.url}/how-we-work`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.url}/process`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.url}/scan`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${site.url}/scan/preview`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.url}/discover`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${site.url}/resources`, lastModified: now, changeFrequency: "monthly", priority: 0.85 },
     { url: `${site.url}/leaderboard`, lastModified: now, changeFrequency: "monthly", priority: 0.85 },

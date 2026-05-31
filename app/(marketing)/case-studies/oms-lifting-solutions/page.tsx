@@ -27,6 +27,12 @@ export default function OmsCaseStudyPage() {
             { label: "OMS Lifting Solutions", href: "/case-studies/oms-lifting-solutions" },
           ]),
           {
+            // Article schema enriched 2026-05-16 to match the
+            // blog/[slug] richness — added articleSection, keywords,
+            // and switched mainEntityOfPage from a bare URL string to
+            // the schema.org-recommended { @type: WebPage, @id }
+            // object form. The base schema was already present; this
+            // is a richness pass for AI-engine citation quality.
             "@context": "https://schema.org",
             "@type": "Article",
             headline:
@@ -40,7 +46,22 @@ export default function OmsCaseStudyPage() {
             datePublished: "2026-04-26",
             description:
               "How OMS Lifting Solutions, a BBBEE Level 1 industrial supplier in Pretoria, is going from AI-invisible to AI-cited.",
-            mainEntityOfPage: `${site.url}/case-studies/oms-lifting-solutions`,
+            articleSection: "Case Studies",
+            keywords: [
+              "AI visibility",
+              "Answer Engine Optimization",
+              "AEO",
+              "industrial",
+              "lifting equipment",
+              "BBBEE Level 1",
+              "Pretoria",
+              "South Africa",
+              "OMS Lifting Solutions",
+            ].join(", "),
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": `${site.url}/case-studies/oms-lifting-solutions`,
+            },
           },
         ]}
       />
