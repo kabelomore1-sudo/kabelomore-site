@@ -10,7 +10,13 @@ import { ArrowRight } from "lucide-react";
 import { Credentials } from "@/components/credentials";
 
 export const metadata: Metadata = {
-  title: "About Kabelo More — AI Visibility Consultant, Pretoria",
+  // Title intentionally OMITS "Kabelo More" — the root layout's
+  // title template (`%s — Kabelo More`) appends it automatically.
+  // Previously this read "About Kabelo More — AI Visibility
+  // Consultant, Pretoria" and the template-appended brand suffix
+  // produced a double-brand SERP title. Final rendered title now:
+  //   "About — AI Visibility Consultant, Pretoria — Kabelo More"
+  title: "About — AI Visibility Consultant, Pretoria",
   description:
     "Kabelo More is an AI Visibility / AEO consultant based in Pretoria, South Africa. 8 years of local SEO experience now applied to the AI search era. Serving clients in SA, UK, and US.",
   alternates: { canonical: `${site.url}/about` },

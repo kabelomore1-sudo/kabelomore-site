@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Section, Eyebrow } from "@/components/ui/section";
 import { Container } from "@/components/ui/container";
@@ -27,6 +28,30 @@ import {
 import { CredentialsBadgeRow } from "@/components/credentials";
 import { BeforeAfter } from "@/components/before-after";
 import { HEADLINE_PRICE_RANGE } from "@/lib/pricing";
+
+/**
+ * Homepage-specific metadata override.
+ *
+ * The root layout exports a comprehensive ~320-char `site.description`
+ * that's rich for JSON-LD entity descriptions + LinkedIn / Twitter
+ * share cards. But Google truncates SERP descriptions at ~155-160
+ * chars — the full version was being cut mid-sentence inside
+ * "ChatGPT, Claude, Gemini, and Perplexity." losing the entire
+ * second clause (industrial/legal/medical, SA/UK/US).
+ *
+ * This override sets the `<meta name="description">` to a tight
+ * SERP-fit version. We deliberately don't override openGraph or
+ * twitter descriptions — those don't have the same truncation
+ * pressure, and the long form is genuinely better in share cards.
+ *
+ * Title is intentionally NOT overridden — the root layout's default
+ * `${site.brand} — ${site.tagline}` already reads cleanly for the
+ * homepage and owns the branded query.
+ */
+export const metadata: Metadata = {
+  description:
+    "AI Visibility (AEO/GEO) consultant in Pretoria — get your business cited by ChatGPT, Claude, Gemini, Perplexity. Free 24-hour scan. SA, UK, US.",
+};
 
 const homepageFaqs = [
   {
